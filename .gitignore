@@ -1,3 +1,19 @@
+#=========================
+#    Stuff I Added
+#=========================
+
+# Sensitive Info
+/*/private/
+/*/*/database/request*
+
+# "compiled" files
+/*/*/*.pyc
+
+# IDE files
+/*/.idea/
+
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
