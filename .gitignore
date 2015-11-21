@@ -4,7 +4,8 @@
 
 # Sensitive Info
 /*/private/
-/*/*/database/request*
+/*/monitoring/
+/*/*/database/subscriptions.db
 
 # "compiled" files
 /*/*/*.pyc

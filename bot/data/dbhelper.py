@@ -3,7 +3,7 @@
 #           DATABASE SUBSCRIPTIONS INFO
 # ======================================================================================================
 
-DATABASE_LOCATION = 'data/database/requests.db'
+DATABASE_LOCATION = 'data/database/subscriptions.db'
 
 TABLE_SUBSCRIPTIONS = 'subscriptions'
 

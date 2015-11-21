@@ -6,13 +6,13 @@ Date:           11/13/2015
 ==========================================
 """
 
-import sqlite3
-import time
-
+import os
+import sys
 import praw
+import time
+import sqlite3
 from private import login
 from utils import colors
-
 from data import dbhelper
 
 SLEEP_SECONDS = 5
@@ -23,8 +23,7 @@ db = None
 cursor = None
 
 
-def main():
-    initialize()
+def run_bot():
     while True:
         read_inbox()
         get_subscriptions()
@@ -206,24 +205,6 @@ def open_or_create_database():
     return conn
 
 
-def initialize():
-    connect_to_reddit()
-    print colors.FORE_YELLOW + \
-        "================================================================\n" + \
-        "\t\tSALES__BOT - A Sales Notifier Bot\n" + \
-        "================================================================\n\n" + \
-        colors.FORE_RESET
-
-    global db, cursor
-    db = open_or_create_database()
-    cursor = db.cursor()
-    print colors.FORE_BLUE + \
-        '\n--------------------------------------------------\n' + \
-        '\t\twww.reddit.com/r/' + str(subreddit) + '\n' + \
-        '--------------------------------------------------\n' + \
-        colors.FORE_RESET
-
-
 def connect_to_reddit():
     # Connecting to Reddit
     user_agent = 'SALES__B0T - A Sales Notifier R0B0T'
@@ -244,6 +225,67 @@ def sleep():
     print 'Yaaaaaawn... That was a nice nap!\n\n' + colors.FORE_RESET
 
 
+def initialize():
+    connect_to_reddit()
+    print colors.FORE_YELLOW + \
+        "================================================================\n" + \
+        "\t\tSALES__BOT - A Sales Notifier Bot\n" + \
+        "================================================================\n\n" + \
+        colors.FORE_RESET
+
+    global db, cursor
+    db = open_or_create_database()
+    cursor = db.cursor()
+    print colors.FORE_BLUE + \
+        '\n--------------------------------------------------\n' + \
+        '\t\twww.reddit.com/r/' + str(subreddit) + '\n' + \
+        '--------------------------------------------------\n' + \
+        colors.FORE_RESET
+
+
+def main():
+    setup_process_id()
+    initialize()
+    run_bot()
+
+
+def setup_process_id():
+    f = open(os.getcwd() + '/bot/monitoring/process_id.pid', 'w')
+    f.seek(0)
+    f.truncate()
+    f.write(str(os.getpid()))
+    f.close()
+
+
+def crash():
+    print 'Starting...'
+    time.sleep(15)
+    print 'Crashing...'
+    a = [0,1,2,3,4]
+    for i in range(0, len(a) + 5, 1):
+        a[i] = i
+
+
+def handle_crash():
+    e = sys.exc_info()[0]
+    f1 = open(os.getcwd() + '/bot/monitoring/stacktrace.txt', 'w')
+    f1.seek(0)
+    f1.truncate()
+    f1.write(str(e))
+    f1.close()
+    f2 = open(os.getcwd() + '/bot/monitoring/process_id.pid', 'w')
+    f2.seek(0)
+    f2.truncate()
+    f2.close()
+    print colors.FORE_MAGENTA + str(e) + colors.FORE_RESET
+    exit()
+
+
 __author__ = 'tyler'
 if __name__ == "__main__":
-    main()
+    setup_process_id()
+    try:
+        crash()
+        #main()
+    except:
+        handle_crash()
