@@ -3,7 +3,7 @@
 #           DATABASE SUBSCRIPTIONS INFO
 # ======================================================================================================
 
-DATABASE_LOCATION = 'data/database/subscriptions.db'
+DATABASE_LOCATION = '/data/database/subscriptions.db'
 
 TABLE_SUBSCRIPTIONS = 'subscriptions'
 
@@ -42,7 +42,7 @@ GET_SUBSCRIPTIONS_BY_USERNAME = "SELECT * " + \
 TABLE_MATCHES = 'matches'
 
 COL_MATCHES_USERNAME = 0
-COL_MATCHES_PART = 1
+COL_MATCHES_ITEM = 1
 COL_MATCHES_LINK = 2
 
 LINK = 'link'
@@ -76,9 +76,4 @@ INSERT_ROW_MATCHES = "INSERT INTO " + \
 
 REMOVE_ALL_MATCHES_BY_USERNAME = "DELETE FROM " + TABLE_MATCHES + \
     " WHERE " + USERNAME + " = (?) "
-
-# Username defined above
-# Part defined above
-LINK = 'link'
-
 

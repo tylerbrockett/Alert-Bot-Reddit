@@ -7,27 +7,45 @@ Date:           11/13/2015
 """
 
 import os
-import sys
 import praw
 import time
 import sqlite3
-from private import login
-from utils import colors
 from data import dbhelper
+from helpers import filehelper
+from helpers import colorhelper
+from private import accountinfo
+from helpers.filehelper import FileHelper
+from helpers.gmailhelper import GmailHelper
+from helpers.exceptionhelper import ExceptionHelper
 
 SLEEP_SECONDS = 5
 subreddit = 'buildapcsales'
-botname = login.username
+botname = accountinfo.username
 subscriptions = []
+
 db = None
 cursor = None
-
+file_helper = None
+gmail_helper = None
+exception_helper = None
 
 def run_bot():
+    colorhelper.printcolor(
+        'yellow',
+        "================================================================\n" +
+        "\t\tSALES__BOT - A Sales Notifier Bot\n" +
+        "================================================================\n\n")
+
+    colorhelper.printcolor(
+        'blue',
+        '\n--------------------------------------------------\n' +
+        '\t\twww.reddit.com/r/' + str(subreddit) + '\n' +
+        '--------------------------------------------------\n')
+
     while True:
         read_inbox()
         get_subscriptions()
-        print colors.FORE_YELLOW + 'Starting to do work boss!' + colors.FORE_RESET
+        colorhelper.printcolor('yellow', 'Starting to do work boss!')
         crawl_subreddit(subreddit)
         sleep()
 
@@ -40,12 +58,12 @@ def crawl_subreddit(subreddit):
 
 
 def handle_part_match(username, part, title, url):
-    print colors.FORE_MAGENTA + \
+    colorhelper.printcolor(
+        'magenta',
         "\n-------- SUBMISSION MATCH DETAILS ---------\n" \
         "USERNAME:\t\t" + username + "\n"   + \
         "PART:\t\t\t"   + part +     "\n"   + \
-        "LINK:\t\t\t"   + url +     "\n\n" + \
-        colors.FORE_RESET
+        "LINK:\t\t\t"   + url +     "\n\n")
 
     # TODO: SEND MESSAGE HERE
 
@@ -64,7 +82,7 @@ def check_for_subscription(submission):
     for item in subscriptions:
         if item in title:
             cursor = db.execute(dbhelper.GET_SUBSCRIBED_USERS_WITHOUT_LINK, (item, url))
-            print colors.FORE_RED + str(cursor.fetchall()) + colors.FORE_RESET
+            colorhelper.printcolor('red', str(cursor.fetchall()))
             if len(cursor.fetchall()) > 0:
                 for match in cursor.fetchall():
                     handle_part_match(match[dbhelper.COL_SUB_USERNAME],
@@ -72,7 +90,7 @@ def check_for_subscription(submission):
                                       title,
                                       url)
             else:
-                print colors.FORE_RED + 'YOU SHOULD NOT SEE THIS EVER.' + colors.FORE_RESET
+                colorhelper.printcolor('red', 'YOU SHOULD NOT SEE THIS EVER.')
         else:
             print 'No matches for this submission'
 
@@ -84,9 +102,9 @@ def get_subscriptions():
     cursor = db.execute(dbhelper.SELECT_DISTINCT_PARTS)
     for item in cursor.fetchall():
         subscriptions.append(item[0])
-        print colors.FORE_MAGENTA + 'APPENDED!!!!!!!!!!!!!' + colors.FORE_RESET
+        colorhelper.printcolor('magenta', 'APPENDED!!!!!!!!!!!!!')
     if len(subscriptions) == 0:
-        print colors.FORE_RED + 'WHY ARE THERE NO SUBSCRIPTIONS?!?!' + colors.FORE_RESET
+        colorhelper.printcolor('red', 'WHY ARE THERE NO SUBSCRIPTIONS?!?!')
 
 
 # TODO For some reason, it sends out many messages at once. WEIRD.
@@ -109,16 +127,15 @@ def read_inbox():
             unread_message.reply("You have unsubscribed from the item '" + subject + "'. Thanks for using me!" +
                                  "\n\n-\nsales__bot")
         elif body == 'subscribe' and body != '' and body.replace(' ', '') != '':
-            print colors.FORE_GREEN + \
-                  '-------------------------------' + \
-                    'New Subscription:\n' + \
-                    'username: ' + username + "\n" + \
-                    'message_id: ' + message_id + '\n' + \
-                    'subject: ' + subject + '\n' + \
-                    'body: ' + body + '\n' + \
-                  '-------------------------------' + \
-                  '\n\n\n' + \
-                colors.FORE_RESET
+            colorhelper.printcolor('green',
+                                   '-------------------------------' +
+                                   'New Subscription:\n' +
+                                   'username: ' + username + "\n" +
+                                   'message_id: ' + message_id + '\n' +
+                                   'subject: ' + subject + '\n' +
+                                   'body: ' + body + '\n' +
+                                   '-------------------------------' +
+                                   '\n\n\n')
 
             cursor.execute(dbhelper.INSERT_ROW_SUBMISSIONS, request)
             db.commit()
@@ -199,7 +216,8 @@ def read_inbox():
 
 
 def open_or_create_database():
-    conn = sqlite3.connect(dbhelper.DATABASE_LOCATION)
+    print dbhelper.DATABASE_LOCATION
+    conn = sqlite3.connect(os.path.dirname(__file__) + dbhelper.DATABASE_LOCATION)
     conn.execute(dbhelper.CREATE_TABLE_SUBSCRIPTIONS)
     conn.execute(dbhelper.CREATE_TABLE_MATCHES)
     return conn
@@ -211,50 +229,30 @@ def connect_to_reddit():
     global r
     r = praw.Reddit(user_agent=user_agent)
     # TODO - TAKE OUT DISABLE WARNING AND FIGURE OUT REPLACEMENT CODE
-    r.login(login.username, login.password, disable_warning=True)
+    r.login(accountinfo.username, accountinfo.password, disable_warning=True)
 
 
 def sleep():
-    print "\n\n" + colors.FORE_YELLOW + "I'm exhausted, time to nap..."
+    colorhelper.printcolor('yellow', "\n\nI'm exhausted, time to nap...")
     for i in range(0, SLEEP_SECONDS, 1):
         if i % 2 == 0:
-            print "ZZzzZZzzZZzzZZzz"
+            colorhelper.printcolor('yellow', 'ZZzzZZzzZZzzZZzz')
         else:
-            print "zzZZzzZZzzZZzzZZ"
+            colorhelper.printcolor('yellow', 'zzZZzzZZzzZZzzZZ')
         time.sleep(2)
-    print 'Yaaaaaawn... That was a nice nap!\n\n' + colors.FORE_RESET
+    colorhelper.printcolor('yellow', 'Yaaaaaawn... That was a nice nap!\n\n')
 
 
 def initialize():
+    global exception_helper, file_helper, db, cursor
+    exception_helper = ExceptionHelper()
+    file_helper = FileHelper()
+    # Setup process_id.pid
+    file_helper.writeToFile(filehelper.PROCESS_ID, str(os.getpid()))
+    gmail_helper = GmailHelper()
     connect_to_reddit()
-    print colors.FORE_YELLOW + \
-        "================================================================\n" + \
-        "\t\tSALES__BOT - A Sales Notifier Bot\n" + \
-        "================================================================\n\n" + \
-        colors.FORE_RESET
-
-    global db, cursor
     db = open_or_create_database()
     cursor = db.cursor()
-    print colors.FORE_BLUE + \
-        '\n--------------------------------------------------\n' + \
-        '\t\twww.reddit.com/r/' + str(subreddit) + '\n' + \
-        '--------------------------------------------------\n' + \
-        colors.FORE_RESET
-
-
-def main():
-    setup_process_id()
-    initialize()
-    run_bot()
-
-
-def setup_process_id():
-    f = open(os.getcwd() + '/bot/monitoring/process_id.pid', 'w')
-    f.seek(0)
-    f.truncate()
-    f.write(str(os.getpid()))
-    f.close()
 
 
 def crash():
@@ -267,25 +265,17 @@ def crash():
 
 
 def handle_crash():
-    e = sys.exc_info()[0]
-    f1 = open(os.getcwd() + '/bot/monitoring/stacktrace.txt', 'w')
-    f1.seek(0)
-    f1.truncate()
-    f1.write(str(e))
-    f1.close()
-    f2 = open(os.getcwd() + '/bot/monitoring/process_id.pid', 'w')
-    f2.seek(0)
-    f2.truncate()
-    f2.close()
-    print colors.FORE_MAGENTA + str(e) + colors.FORE_RESET
+    stacktrace = exception_helper.getStacktrace()
+    file_helper.eraseContents(filehelper.PROCESS_ID)
+    file_helper.writeToFile(filehelper.STACKTRACE, stacktrace)
     exit()
 
 
 __author__ = 'tyler'
 if __name__ == "__main__":
-    setup_process_id()
     try:
+        initialize()
         crash()
-        #main()
+        run_bot()
     except:
         handle_crash()
