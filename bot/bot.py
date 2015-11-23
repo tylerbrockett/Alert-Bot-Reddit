@@ -20,6 +20,7 @@ from helpers.inboxhelper import InboxHelper
 from helpers.exceptionhelper import ExceptionHelper
 
 SLEEP_SECONDS = 5
+NUM_POSTS_TO_CRAWL = 50
 subreddit = 'buildapcsales'
 botname = accountinfo.username
 
@@ -30,8 +31,11 @@ gmail_helper = None
 inbox_helper = None
 exception_helper = None
 
+items = []
+
 
 def run_bot():
+    global items
     colorhelper.printcolor(
         'yellow',
         "================================================================\n" +
@@ -47,18 +51,20 @@ def run_bot():
     while True:
         read_inbox()
         colorhelper.printcolor('yellow', 'Starting to do work boss!')
+        items = db.execute(dbhelper.SELECT_DISTINCT_ITEMS).fetchall()
         crawl_subreddit(subreddit)
         sleep()
 
 
 def crawl_subreddit(subreddit):
-    submissions = r.get_subreddit(subreddit).get_new(limit=50)
+    global NUM_POSTS_TO_CRAWL
+    submissions = r.get_subreddit(subreddit).get_new(limit=NUM_POSTS_TO_CRAWL)
     for submission in submissions:
-        #print "\nTITLE\n", submission.title.lower(), "\nBODY\n", submission.selftext.lower()
+        # TODO: Make sure sale is still valid, check NSFW
         check_for_subscription(submission)
 
 
-def handle_part_match(username, item, message_id, title, permalink, url):
+def handle_item_match(username, item, message_id, title, permalink, url):
     colorhelper.printcolor(
         'magenta',
         "\n-------- SUBMISSION MATCH DETAILS ---------\n" \
@@ -76,23 +82,21 @@ def handle_part_match(username, item, message_id, title, permalink, url):
         colorhelper.printcolor('red', 'SEND MESSAGE FAILED')
 
     cursor.execute(dbhelper.INSERT_ROW_MATCHES, (username, item, url))
-    db.commit()
 
 
 # TODO: I see the message 'you should not see this ever.' Fix it.
 def check_for_subscription(submission):
-    global db, cursor
+    global db, cursor, items
 
-    subscriptions = db.execute(dbhelper.SELECT_DISTINCT_PARTS).fetchall()
     title = submission.title.lower()
     text = submission.selftext.lower()
     url = submission.url
 
-    for item in subscriptions:
+    for item in items:
         if item[0] in title or item[0] in text:
             cursor = db.execute(dbhelper.GET_SUBSCRIBED_USERS_WITHOUT_LINK, (item[0], url))
             for match in cursor.fetchall():
-                handle_part_match(match[dbhelper.COL_SUB_USERNAME],
+                handle_item_match(match[dbhelper.COL_SUB_USERNAME],
                                   match[dbhelper.COL_SUB_ITEM],
                                   match[dbhelper.COL_SUB_MESSAGE_ID],
                                   title,
