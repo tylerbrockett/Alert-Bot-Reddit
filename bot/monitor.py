@@ -87,22 +87,10 @@ def main():
         print 'Random', str(50 * random.random())
         check_on_bot()
 
-
-def crash():
-    for i in range(10):
-        print 'ZzZzZzZzZzZzZz...'
-        time.sleep(2)
-    print 'Crashing...'
-    a = [0,1,2,3,4]
-    for i in range(0, len(a) + 5, 1):
-        a[i] = i
-
-
 __author__ = 'tyler'
 if __name__ == "__main__":
     try:
         initialize()
-        #crash()
         main()
     except:
         handle_crash()

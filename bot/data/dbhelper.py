@@ -27,13 +27,13 @@ REMOVE_ROW_SUBSCRIPTIONS = "DELETE FROM " + TABLE_SUBSCRIPTIONS + \
     " AND " + ITEM + " = (?)"
 
 REMOVE_ALL_SUBSCRIPTIONS_BY_USERNAME = "DELETE FROM " + TABLE_SUBSCRIPTIONS + \
-    " WHERE " + USERNAME + " = (?) "
+    " WHERE " + USERNAME + " = (?)"
 
 SELECT_DISTINCT_PARTS = "SELECT DISTINCT " + ITEM + " FROM " + TABLE_SUBSCRIPTIONS
 
 GET_SUBSCRIPTIONS_BY_USERNAME = "SELECT * " + \
                                 "FROM " + TABLE_SUBSCRIPTIONS + " " + \
-                                "WHERE username = (?)"
+                                "WHERE username = ?"
 
 # ======================================================================================================
 #           DATABASE MATCHES INFO
@@ -54,26 +54,23 @@ CREATE_TABLE_MATCHES = "CREATE TABLE IF NOT EXISTS " + TABLE_MATCHES + \
 GET_SUBSCRIBED_USERS_WITHOUT_LINK = \
     "SELECT DISTINCT * " + \
     "FROM " + TABLE_SUBSCRIPTIONS + " s " + \
-    "WHERE EXISTS " + \
+    "WHERE s." + ITEM + " = (?) and NOT EXISTS " + \
         "(SELECT * " + \
-        "FROM " + TABLE_MATCHES + " m " + \
-        "WHERE s." + USERNAME + " = m." + USERNAME + " and " + \
-                "s." + ITEM + " = m." + ITEM + " and " + \
-                "m." + ITEM + " = (?) and NOT EXISTS " + \
+        "FROM " + TABLE_SUBSCRIPTIONS + " b " + \
+        "WHERE s." + USERNAME + " = b." + USERNAME + " and " + \
+                "s." + ITEM + " = b." + ITEM + " and EXISTS " + \
             "(SELECT * " + \
-            "FROM " + TABLE_SUBSCRIPTIONS + " b " + \
-            "WHERE b." + USERNAME + " = s." + USERNAME + " and b." + ITEM + " = s." + ITEM + " and EXISTS " + \
-                "(SELECT * " + \
-                "FROM " + TABLE_MATCHES + " v " + \
-                "WHERE " + \
-                    "b." + USERNAME + " = v." + USERNAME + " and " + \
-                    "v." + ITEM + " = m." + ITEM + " and " + \
-                    "v." + LINK + " = (?) )))"
+            "FROM " + TABLE_MATCHES + " m " + \
+            "WHERE b." + ITEM + " = m." + ITEM + " and " + \
+                "b." + USERNAME + " = m." + USERNAME + " and " + \
+                "m." + LINK + " = (?) ))"
 
 INSERT_ROW_MATCHES = "INSERT INTO " + \
                          TABLE_MATCHES + \
                          " VALUES (?,?,?)"
 
 REMOVE_ALL_MATCHES_BY_USERNAME = "DELETE FROM " + TABLE_MATCHES + \
-    " WHERE " + USERNAME + " = (?) "
+    " WHERE " + USERNAME + " = ? "
 
+REMOVE_MATCHES_BY_USERNAME_AND_SUBJECT = "DELETE FROM " + TABLE_MATCHES + \
+    " WHERE " + USERNAME + " = (?) " + " AND " + ITEM + " = (?)"

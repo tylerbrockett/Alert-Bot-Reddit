@@ -4,13 +4,14 @@ from private import accountinfo
 
 class InboxHelper:
     def __init__(self):
-        print ''
+        self.temp = -1
 
     def composeGreeting(self, username):
         return "Hi " + username + ",\n\n"
 
     def composeSubscribeMessage(self, username, item):
-        result = "Hi " + username + "\nThanks for your subscription to '" + item + "'. " + \
+        result = self.composeGreeting(username) + \
+            "Thanks for your subscription to '" + item + "'. " + \
             "You will continue to receive updates to part sales that contain that " + \
             "in its title until you send me a message with the subject as 'Unsubscribe' " + \
             "and the message body the same as the subscription message you sent to me." + \
@@ -18,7 +19,7 @@ class InboxHelper:
         return result
 
     def composeInformationMessage(self, username, subscriptions):
-        result = "Hi " + username + ",\n" + \
+        result = self.composeGreeting(username) + \
             INFORMATION + "\n\n" + self.formatsubscriptions(subscriptions) + \
             self.composeSalutation()
         return result
@@ -41,7 +42,7 @@ class InboxHelper:
         return result
 
     def composeUnsubscribeAllMessage(self, username):
-        result = 'Hi ' + username + ',\n' + \
+        result = self.composeGreeting(username) + \
             "Sorry to see you go. Thanks for trying me though! I hope you'll be back soon!" + \
             self.composeSalutation()
         return result
@@ -57,24 +58,35 @@ class InboxHelper:
 
     def composeDefaultMessage(self, username, item, request):
         result = self.composeGreeting(username) + \
-            "There was an error processing your request. Please review your message and " + \
+            "**There was an error processing your request.** Please review your message and " + \
             "make sure it follows the guidelines I have set. Please private message me " + \
             "with the subject 'Information' to get detailed information on how I work, " + \
             "or message me with tne subject line 'Help' if you want specialized help " + \
-            "or have any questions for me. Thank you for your patience! \n\n" + \
-            "Your request: \n" + \
-            "Subject: " + item + "\n" + \
-            "Body   : " + request + \
-            "\n\n-\nsales__bot"
-
-    def composeSalutation(self):
-        result = SIGNATURE + "\n" + \
-            "Developer: Tyler Brockett\n" + \
-            "Code:      [Github Repository](https://github.com/tylerbrockett/reddit-bot-buildapcsales)\n" + \
-            "Email Dev: [Developer Email](mailto:" + accountinfo.developeremail + ")\n"
+            "or have any questions for me. Thank you for your patience! \n\t \n\t \n" + \
+            "**Your request:** \t \n" + \
+            "Subject:\t" + item + "\t \n" + \
+            "Body:\t\t" + request + \
+            self.composeSalutation()
         return result
 
-SIGNATURE = "\n\n\t-sales__bot"
+    def composeSalutation(self):
+        result = SIGNATURE + "\n\t \n\t \n" + \
+            "[Github Repository](https://github.com/tylerbrockett/reddit-bot-buildapcsales) | " + \
+            accountinfo.developeremail + "\n"
+        return result
+
+    def composeMatchMessage(self, username, item, title, permalink, url):
+        result = self.composeGreeting(username) + \
+            "We have found a match for your subscription to '" + item + "'! " + \
+            "Below you will find the details:\n\t \n " + \
+            "**Sale Title:**\t \n" + \
+            title + "\t \n" + \
+            "[Reddit URL](" + permalink + ")" + "     |     " + \
+            "[Sale URL](" + url + ")" + "\n\t \n\t \n" + \
+            self.composeSalutation()
+        return result
+
+SIGNATURE = "\n\t \n\t \n-sales__bot"
 
 INFORMATION = "Thanks for your interest in my abilities! This is how I work \n\n" + \
             \

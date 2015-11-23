@@ -10,4 +10,4 @@ def printcolor(c, string):
     if len(col) != 1:
         printcolor('red', 'Color not defined')
         exit()
-    print col[0][1] + string + RESET
+    print col[0][1] + str(string) + RESET

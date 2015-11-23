@@ -22,7 +22,6 @@ from helpers.exceptionhelper import ExceptionHelper
 SLEEP_SECONDS = 5
 subreddit = 'buildapcsales'
 botname = accountinfo.username
-subscriptions = []
 
 db = None
 cursor = None
@@ -30,6 +29,7 @@ file_helper = None
 gmail_helper = None
 inbox_helper = None
 exception_helper = None
+
 
 def run_bot():
     colorhelper.printcolor(
@@ -46,7 +46,6 @@ def run_bot():
 
     while True:
         read_inbox()
-        get_subscriptions()
         colorhelper.printcolor('yellow', 'Starting to do work boss!')
         crawl_subreddit(subreddit)
         sleep()
@@ -59,17 +58,22 @@ def crawl_subreddit(subreddit):
         check_for_subscription(submission)
 
 
-def handle_part_match(username, item, message_id, title, url):
+def handle_part_match(username, item, message_id, title, permalink, url):
     colorhelper.printcolor(
         'magenta',
         "\n-------- SUBMISSION MATCH DETAILS ---------\n" \
         "USERNAME:\t\t" + username + "\n"   + \
         "MESSAGE ID:\t" + message_id + "\n" + \
-        "PART:\t\t\t"   + item +     "\n"   + \
+        "ITEM:\t\t\t"   + item +     "\n"   + \
         "TITLE:\t\t"    + title +    "\n"   + \
+        "REDDIT URL:\t" + permalink+ "\n"   + \
         "LINK:\t\t\t"   + url +     "\n\n")
 
-    # TODO: SEND MESSAGE HERE
+    try:
+        message = r.get_message(message_id)
+        message.reply(inbox_helper.composeMatchMessage(username, item, title, permalink, url))
+    except:
+        colorhelper.printcolor('red', 'SEND MESSAGE FAILED')
 
     cursor.execute(dbhelper.INSERT_ROW_MATCHES, (username, item, url))
     db.commit()
@@ -77,57 +81,49 @@ def handle_part_match(username, item, message_id, title, url):
 
 # TODO: I see the message 'you should not see this ever.' Fix it.
 def check_for_subscription(submission):
-    global db, cursor, subscriptions
+    global db, cursor
 
+    subscriptions = db.execute(dbhelper.SELECT_DISTINCT_PARTS).fetchall()
     title = submission.title.lower()
     text = submission.selftext.lower()
     url = submission.url
 
     for item in subscriptions:
-        if item in title:
-            cursor = db.execute(dbhelper.GET_SUBSCRIBED_USERS_WITHOUT_LINK, (item, url))
-            colorhelper.printcolor('red', str(cursor.fetchall()))
-            if len(cursor.fetchall()) > 0:
-                for match in cursor.fetchall():
-                    handle_part_match(match[dbhelper.COL_SUB_USERNAME],
-                                      match[dbhelper.COL_SUB_ITEM],
-                                      match[dbhelper.COL_SUB_MESSAGE_ID],
-                                      title,
-                                      url)
-            else:
-                colorhelper.printcolor('red', 'YOU SHOULD NOT SEE THIS EVER.')
-        else:
-            print 'No matches for this submission'
+        if item[0] in title or item[0] in text:
+            cursor = db.execute(dbhelper.GET_SUBSCRIBED_USERS_WITHOUT_LINK, (item[0], url))
+            for match in cursor.fetchall():
+                handle_part_match(match[dbhelper.COL_SUB_USERNAME],
+                                  match[dbhelper.COL_SUB_ITEM],
+                                  match[dbhelper.COL_SUB_MESSAGE_ID],
+                                  title,
+                                  submission.permalink,
+                                  url)
 
 
-def get_subscriptions():
-    global subscriptions, db, cursor
-    subscriptions = []
-    cursor = db.cursor()
-    cursor = db.execute(dbhelper.SELECT_DISTINCT_PARTS)
-    for item in cursor.fetchall():
-        subscriptions.append(item[0])
-        colorhelper.printcolor('magenta', 'APPENDED ' + item)
-    if len(subscriptions) == 0:
-        colorhelper.printcolor('red', 'NO SUBSCRIPTIONS')
-
-
-# TODO For some reason, it sends out many messages at once. WEIRD.
 def read_inbox():
+    def formatsubject(subject):
+        subject = subject.replace('re:', '')
+        while len(subject) > 0 and subject[0] == ' ':
+            subject = subject[1:]
+        return subject
+
     global db, cursor
-    cursor = db.cursor()
+    i = 0
     for unread_message in r.get_unread(limit=None):
+        i += 1
         # print unread_message
-        username, message_id, subject, body = (str(unread_message.author).lower(), unread_message.id, unread_message.subject.lower(), unread_message.body.lower())
+        username, message_id, subject, body = (str(unread_message.author).lower(), unread_message.id,
+                                               formatsubject(unread_message.subject.lower()), unread_message.body.lower())
         request = (username, message_id, subject)
         if body == 'unsubscribe all':
-            cursor.execute(dbhelper.REMOVE_ALL_SUBSCRIPTIONS_BY_USERNAME, username)
-            cursor.execute(dbhelper.REMOVE_ALL_MATCHES_BY_USERNAME, username)
+            cursor.execute(dbhelper.REMOVE_ALL_SUBSCRIPTIONS_BY_USERNAME, (username,))
+            cursor.execute(dbhelper.REMOVE_ALL_MATCHES_BY_USERNAME, (username,))
             db.commit()
-            unread_message.reply(inbox_helper.composeUnsubscribeAllMessaage(username))
-
+            unread_message.reply(inbox_helper.composeUnsubscribeAllMessage(username))
+        # TODO: format all subjects before using them!
         elif body == 'unsubscribe' and subject != '':
             cursor.execute(dbhelper.REMOVE_ROW_SUBSCRIPTIONS, (username, subject))
+            cursor.execute(dbhelper.REMOVE_MATCHES_BY_USERNAME_AND_SUBJECT, (username, subject))
             db.commit()
             unread_message.reply(inbox_helper.composeUnsubscribeMessage(username, subject))
 
@@ -155,10 +151,10 @@ def read_inbox():
         else:
             unread_message.reply(inbox_helper.composeDefaultMessage(username, subject, body))
         unread_message.mark_as_read()
+    colorhelper.printcolor('cyan', str(i) + ' UNREAD MESSAGES')
 
 
 def open_or_create_database():
-    print dbhelper.DATABASE_LOCATION
     conn = sqlite3.connect(os.path.dirname(__file__) + dbhelper.DATABASE_LOCATION)
     conn.execute(dbhelper.CREATE_TABLE_SUBSCRIPTIONS)
     conn.execute(dbhelper.CREATE_TABLE_MATCHES)
@@ -197,16 +193,6 @@ def initialize():
     cursor = db.cursor()
     inbox_helper = InboxHelper()
 
-
-def crash():
-    print 'Starting...'
-    time.sleep(15)
-    print 'Crashing...'
-    a = [0,1,2,3,4]
-    for i in range(0, len(a) + 5, 1):
-        a[i] = i
-
-
 def handle_crash():
     stacktrace = exception_helper.getStacktrace()
     file_helper.eraseContents(filehelper.PROCESS_ID)
@@ -218,7 +204,6 @@ __author__ = 'tyler'
 if __name__ == "__main__":
     try:
         initialize()
-        crash()
         run_bot()
     except:
         handle_crash()
