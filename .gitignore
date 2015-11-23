@@ -4,16 +4,17 @@
 
 # Sensitive Info
 /*/private/
-/*/monitoring/
-/*/*/database/subscriptions.db
+/bot/data/database/subscriptions.db
 
 # "compiled" files
-/*/*/*.pyc
+*.pyc
 
 # IDE files
 /*/.idea/
 
-
+#=========================
+#    Original Stuff
+#=========================
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

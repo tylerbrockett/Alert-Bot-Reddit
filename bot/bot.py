@@ -121,12 +121,13 @@ def read_inbox():
             db.commit()
             unread_message.reply('Sorry to see you go. Thanks for giving me a shot though!' +
                                  "\n\n-\nsales__bot")
-        elif body == 'unsubscribe' and body != '':
+        elif body == 'unsubscribe' and subject != '':
             cursor.execute(dbhelper.REMOVE_ROW_SUBSCRIPTIONS, (username, subject))
             db.commit()
             unread_message.reply("You have unsubscribed from the item '" + subject + "'. Thanks for using me!" +
                                  "\n\n-\nsales__bot")
-        elif body == 'subscribe' and body != '' and body.replace(' ', '') != '':
+        # Subject can't be empty, and must be longer than 2 non-space characters.
+        elif body == 'subscribe' and subject.replace(' ', '') != '' and len(subject.replace(' ', '')) > 2:
             colorhelper.printcolor('green',
                                    '-------------------------------' +
                                    'New Subscription:\n' +
@@ -212,7 +213,6 @@ def read_inbox():
                                  "Body   : " + body +
                                  "\n\n-\nsales__bot")
         unread_message.mark_as_read()
-    #print 'done.'
 
 
 def open_or_create_database():
