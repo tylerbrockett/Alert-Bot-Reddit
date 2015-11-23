@@ -16,6 +16,7 @@ from helpers import colorhelper
 from private import accountinfo
 from helpers.filehelper import FileHelper
 from helpers.gmailhelper import GmailHelper
+from helpers.inboxhelper import InboxHelper
 from helpers.exceptionhelper import ExceptionHelper
 
 SLEEP_SECONDS = 5
@@ -27,6 +28,7 @@ db = None
 cursor = None
 file_helper = None
 gmail_helper = None
+inbox_helper = None
 exception_helper = None
 
 def run_bot():
@@ -57,17 +59,19 @@ def crawl_subreddit(subreddit):
         check_for_subscription(submission)
 
 
-def handle_part_match(username, part, title, url):
+def handle_part_match(username, item, message_id, title, url):
     colorhelper.printcolor(
         'magenta',
         "\n-------- SUBMISSION MATCH DETAILS ---------\n" \
         "USERNAME:\t\t" + username + "\n"   + \
-        "PART:\t\t\t"   + part +     "\n"   + \
+        "MESSAGE ID:\t" + message_id + "\n" + \
+        "PART:\t\t\t"   + item +     "\n"   + \
+        "TITLE:\t\t"    + title +    "\n"   + \
         "LINK:\t\t\t"   + url +     "\n\n")
 
     # TODO: SEND MESSAGE HERE
 
-    cursor.execute(dbhelper.INSERT_ROW_MATCHES, (username, part, url))
+    cursor.execute(dbhelper.INSERT_ROW_MATCHES, (username, item, url))
     db.commit()
 
 
@@ -87,6 +91,7 @@ def check_for_subscription(submission):
                 for match in cursor.fetchall():
                     handle_part_match(match[dbhelper.COL_SUB_USERNAME],
                                       match[dbhelper.COL_SUB_ITEM],
+                                      match[dbhelper.COL_SUB_MESSAGE_ID],
                                       title,
                                       url)
             else:
@@ -102,9 +107,9 @@ def get_subscriptions():
     cursor = db.execute(dbhelper.SELECT_DISTINCT_PARTS)
     for item in cursor.fetchall():
         subscriptions.append(item[0])
-        colorhelper.printcolor('magenta', 'APPENDED!!!!!!!!!!!!!')
+        colorhelper.printcolor('magenta', 'APPENDED ' + item)
     if len(subscriptions) == 0:
-        colorhelper.printcolor('red', 'WHY ARE THERE NO SUBSCRIPTIONS?!?!')
+        colorhelper.printcolor('red', 'NO SUBSCRIPTIONS')
 
 
 # TODO For some reason, it sends out many messages at once. WEIRD.
@@ -119,17 +124,19 @@ def read_inbox():
             cursor.execute(dbhelper.REMOVE_ALL_SUBSCRIPTIONS_BY_USERNAME, username)
             cursor.execute(dbhelper.REMOVE_ALL_MATCHES_BY_USERNAME, username)
             db.commit()
-            unread_message.reply('Sorry to see you go. Thanks for giving me a shot though!' +
-                                 "\n\n-\nsales__bot")
+            unread_message.reply(inbox_helper.composeUnsubscribeAllMessaage(username))
+
         elif body == 'unsubscribe' and subject != '':
             cursor.execute(dbhelper.REMOVE_ROW_SUBSCRIPTIONS, (username, subject))
             db.commit()
-            unread_message.reply("You have unsubscribed from the item '" + subject + "'. Thanks for using me!" +
-                                 "\n\n-\nsales__bot")
+            unread_message.reply(inbox_helper.composeUnsubscribeMessage(username, subject))
+
         # Subject can't be empty, and must be longer than 2 non-space characters.
         elif body == 'subscribe' and subject.replace(' ', '') != '' and len(subject.replace(' ', '')) > 2:
+            cursor.execute(dbhelper.INSERT_ROW_SUBMISSIONS, request)
+            db.commit()
             colorhelper.printcolor('green',
-                                   '-------------------------------' +
+                                   '-------------------------------\n' +
                                    'New Subscription:\n' +
                                    'username: ' + username + "\n" +
                                    'message_id: ' + message_id + '\n' +
@@ -137,81 +144,16 @@ def read_inbox():
                                    'body: ' + body + '\n' +
                                    '-------------------------------' +
                                    '\n\n\n')
-
-            cursor.execute(dbhelper.INSERT_ROW_SUBMISSIONS, request)
-            db.commit()
-            unread_message.reply("Thanks for your subscription to '" + subject + "'. " +
-                                 "You will continue to receive updates to part sales that contain that " +
-                                 "in its title until you send me a message with the subject as 'Unsubscribe' " +
-                                 "and the message body the same as the subscription message you sent to me." +
-                                 "\n\n-\nsales__bot")
-            unread_message.mark_as_read()
+            unread_message.reply(inbox_helper.composeSubscribeMessage(username, subject))
 
         elif subject == 'information':
             cursor.execute(dbhelper.GET_SUBSCRIPTIONS_BY_USERNAME, username)
-            reply = "Thanks for your interest in my abilities! This is how I work \n\n" + \
-                                \
-                                 "SUBSCRIBING\n" + \
-                                 "Send me a private message with the subject line as the exact string you " + \
-                                 "want me to keep an eye out for, and the body as 'subscribe'. Keep it " + \
-                                 "semi-general as to not limit my search too much. For example, use " + \
-                                 "'i5-4590' instead of 'Intel Core i5-4590 3.3GHz LGA 1150'. \n\n" + \
-                                \
-                                 "WHAT I DO\n" + \
-                                 "I will send you a message that contains a link to that item each time " + \
-                                 "I come across a post in /r/buildapcsales that matches. It will be a reply " + \
-                                 "to the original message you sent. This will happen until you send me a " + \
-                                 "message unsubscribing from the part, which is described more in the next " + \
-                                 "line. \n\n" + \
-                                \
-                                 "UNSUBSCRIBING\n" + \
-                                 "If or when you want to unsubscribe, send me another private message with " + \
-                                 "the subject line as the item you want to unsubscribe from, and the body as " + \
-                                 "'Unsubscribe'. If you want to unsubscribe from ALL of the parts you are " + \
-                                 "subscribed to, make the body of the pm 'unsubscribe all' and the subject line " + \
-                                 "can be whatever four letter word you can think of. /s, kinda :D \n\n" + \
-                                \
-                                 "GETTING HELP\n" + \
-                                 "Remember that you can always send me a message with the subject line as " + \
-                                 "'Information' to get this message, and all of the parts you are subscribed to. " + \
-                                 "If you want more specific help, send me a private message with the subject " + \
-                                 "'Help' and the body as whatever you need help with and I will try my absolute " + \
-                                 "best to keep up with my mail and help you out.\n\n" + \
-                                \
-                                 "FEEDBACK\n" + \
-                                 "I am always open to feedback, requests, or things of that nature. While I am " + \
-                                 "very much still in the process of learning, I will try my best to take your " + \
-                                 "feedback into consideration. Sending me feedback should use the subject line " + \
-                                 "'Feedback'."
-
-            if len(cursor.fetchall()) > 0:
-                reply += "\n\n--------------------------\n" \
-                            "\tYour Subscription(s):\n"
-                for item in cursor.fetchall():
-                    reply += "Part:\t\t" + item[dbhelper.COL_SUB_ITEM] + "\n"
-                reply += "\n\n--------------------------\n\n"
-
-            reply += "\n\n-\nsales__bot"
-
-            unread_message.reply(reply)
+            unread_message.reply(inbox_helper.composeInformationMessage(username, cursor.fetchall()))
 
         elif subject == 'feedback':
-            unread_message.reply("Hi " + username + ",\n\n" + \
-                                 "Thank you very much for your feedback, however nice or harsh it may be! " + \
-                                 "I am still a student, in the process of learning, but I am open to whatever " + \
-                                 "requests the community makes. If your message is urgent, please feel free to " + \
-                                 "PM me at /u/XdrummerXboy.\n\n Thanks again, \n" + botname)
+            unread_message.reply(inbox_helper.composeFeedbackMessage(username))
         else:
-            unread_message.reply("There was an error processing your request. Please review your message and " +
-                                 "make sure it follows the guidelines I have set. Please private message me " +
-                                 "with the subject 'Information' to get detailed information on how I work, " +
-                                 "or message me with tne subject line 'Help' if you want specialized help " +
-                                 "or have any questions for me. Thank you for your patience! \n\n" +
-
-                                 "Your request: \n" +
-                                 "Subject: " + subject + "\n" +
-                                 "Body   : " + body +
-                                 "\n\n-\nsales__bot")
+            unread_message.reply(inbox_helper.composeDefaultMessage(username, subject, body))
         unread_message.mark_as_read()
 
 
@@ -244,7 +186,7 @@ def sleep():
 
 
 def initialize():
-    global exception_helper, file_helper, db, cursor
+    global exception_helper, gmail_helper, inbox_helper, file_helper, db, cursor
     exception_helper = ExceptionHelper()
     file_helper = FileHelper()
     # Setup process_id.pid
@@ -253,6 +195,7 @@ def initialize():
     connect_to_reddit()
     db = open_or_create_database()
     cursor = db.cursor()
+    inbox_helper = InboxHelper()
 
 
 def crash():

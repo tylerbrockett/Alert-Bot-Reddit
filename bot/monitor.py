@@ -36,7 +36,7 @@ def check_on_bot():
             colorhelper.printcolor('green', 'BOT STARTED RUNNING')
             led_helper.setGreenState(True)
             CHECK_INTERVAL = 2
-            gmail_helper.sendEmail(accountinfo.tyler_email, 'Boss, the bot is running again', 'The bot started running at ' + time_helper.getFormattedTime())
+            gmail_helper.sendEmail(accountinfo.developeremail, 'Boss, the bot is running again', 'The bot started running at ' + time_helper.getFormattedTime())
         print 'Carry on.'
 
     def handle_bot_not_running():
@@ -47,7 +47,7 @@ def check_on_bot():
             CHECK_INTERVAL = 4
             stacktrace = file_helper.readFile(filehelper.STACKTRACE)
             file_helper.eraseContents(filehelper.STACKTRACE)
-            gmail_helper.sendEmail(accountinfo.tyler_email, 'Boss, the bot crashed', 'The bot crashed at ' +
+            gmail_helper.sendEmail(accountinfo.developeremail, 'Boss, the bot crashed', 'The bot crashed at ' +
                                    time_helper.getFormattedTime() + "\n\n\nThe Stacktrace is: \n\n\n" + stacktrace)
         print 'Bot not running.'
 
@@ -76,7 +76,7 @@ def handle_crash():
     colorhelper.printcolor('red', "Monitor Crashed")
     led_helper.monitorCrashed()
     stacktrace = exception_helper.getStacktrace()
-    gmail_helper.sendEmail(accountinfo.tyler_email, "Boss... The monitor crashed", "The monitor crashed at " +
+    gmail_helper.sendEmail(accountinfo.developeremail, "Boss... The monitor crashed", "The monitor crashed at " +
                            time_helper.getFormattedTime() + "\n\n\nHere's the stacktrace\n\n\n" + stacktrace)
 
 
