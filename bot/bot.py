@@ -30,7 +30,6 @@ file_helper = None
 gmail_helper = None
 inbox_helper = None
 exception_helper = None
-
 items = []
 
 
@@ -60,8 +59,11 @@ def crawl_subreddit(subreddit):
     global NUM_POSTS_TO_CRAWL
     submissions = r.get_subreddit(subreddit).get_new(limit=NUM_POSTS_TO_CRAWL)
     for submission in submissions:
-        # TODO: Make sure sale is still valid, check NSFW
-        check_for_subscription(submission)
+        if not submission.over_18:
+            check_for_subscription(submission)
+        else:
+            colorhelper.printcolor('magenta', 'Skipping submission ' + submission.url +
+                                   ' because it is marked as NSFW.')
 
 
 def handle_item_match(username, item, message_id, title, permalink, url):
@@ -84,7 +86,6 @@ def handle_item_match(username, item, message_id, title, permalink, url):
     cursor.execute(dbhelper.INSERT_ROW_MATCHES, (username, item, url))
 
 
-# TODO: I see the message 'you should not see this ever.' Fix it.
 def check_for_subscription(submission):
     global db, cursor, items
 
@@ -106,10 +107,10 @@ def check_for_subscription(submission):
 
 def read_inbox():
     def formatsubject(subject):
-        subject = subject.replace('re:', '')
-        while len(subject) > 0 and subject[0] == ' ':
-            subject = subject[1:]
-        return subject
+        temp = subject.replace('re:', '')
+        while len(temp) > 0 and temp[0] == ' ':
+            temp = temp[1:]
+        return temp
 
     global db, cursor
     i = 0
@@ -119,20 +120,21 @@ def read_inbox():
         username, message_id, subject, body = (str(unread_message.author).lower(), unread_message.id,
                                                formatsubject(unread_message.subject.lower()), unread_message.body.lower())
         request = (username, message_id, subject)
-        if body == 'unsubscribe all':
+
+        if 'unsubscribe' in body and 'all' in body:
             cursor.execute(dbhelper.REMOVE_ALL_SUBSCRIPTIONS_BY_USERNAME, (username,))
             cursor.execute(dbhelper.REMOVE_ALL_MATCHES_BY_USERNAME, (username,))
             db.commit()
             unread_message.reply(inbox_helper.composeUnsubscribeAllMessage(username))
-        # TODO: format all subjects before using them!
-        elif body == 'unsubscribe' and subject != '':
+
+        elif body == 'unsubscribe' and subject.replace(' ', '') != '':
             cursor.execute(dbhelper.REMOVE_ROW_SUBSCRIPTIONS, (username, subject))
             cursor.execute(dbhelper.REMOVE_MATCHES_BY_USERNAME_AND_SUBJECT, (username, subject))
             db.commit()
             unread_message.reply(inbox_helper.composeUnsubscribeMessage(username, subject))
 
-        # Subject can't be empty, and must be longer than 2 non-space characters.
-        elif body == 'subscribe' and subject.replace(' ', '') != '' and len(subject.replace(' ', '')) > 2:
+        # Subject must be longer than 2 non-space characters.
+        elif body == 'subscribe' and len(formatsubject(subject).replace(' ', '')) > 2:
             cursor.execute(dbhelper.INSERT_ROW_SUBMISSIONS, request)
             db.commit()
             colorhelper.printcolor('green',
