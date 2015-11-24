@@ -78,6 +78,7 @@ def handle_item_match(username, item, message_id, title, permalink, url):
     try:
         message = r.get_message(message_id)
         message.reply(inbox_helper.composeMatchMessage(username, item, title, permalink, url))
+        time.sleep(2)
     except:
         colorhelper.printcolor('red', 'SEND MESSAGE FAILED')
 
@@ -115,8 +116,10 @@ def read_inbox():
     for unread_message in r.get_unread(limit=None):
         i += 1
         # print unread_message
-        username, message_id, subject, body = (str(unread_message.author).lower(), unread_message.id,
-                                               formatsubject(unread_message.subject.lower()), unread_message.body.lower())
+        username, message_id, subject, body = (str(unread_message.author).lower(),
+                                               unread_message.id,
+                                               formatsubject(unread_message.subject.lower()),
+                                               unread_message.body.lower())
         request = (username, message_id, subject)
 
         if 'unsubscribe' in body and 'all' in body:
@@ -147,7 +150,7 @@ def read_inbox():
             unread_message.reply(inbox_helper.composeSubscribeMessage(username, subject))
 
         elif subject == 'information':
-            cursor.execute(dbhelper.GET_SUBSCRIPTIONS_BY_USERNAME, username)
+            cursor.execute(dbhelper.GET_SUBSCRIPTIONS_BY_USERNAME, (username,))
             unread_message.reply(inbox_helper.composeInformationMessage(username, cursor.fetchall()))
 
         elif subject == 'feedback':
@@ -155,6 +158,7 @@ def read_inbox():
         else:
             unread_message.reply(inbox_helper.composeDefaultMessage(username, subject, body))
         unread_message.mark_as_read()
+        time.sleep(2)
     colorhelper.printcolor('cyan', str(i) + ' UNREAD MESSAGES')
 
 

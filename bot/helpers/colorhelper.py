@@ -7,6 +7,8 @@ colors = [['black', '\033[30m'], ['red', '\033[31m'],     ['green', '\033[32m'],
 
 
 def printcolor(c, string):
+    print string
+    return
     col = None
     if c == 'random':
         r = randint(1, len(colors) - 1)
