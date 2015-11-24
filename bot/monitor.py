@@ -51,7 +51,7 @@ def check_on_bot():
                                    time_helper.getFormattedTime() + "\n\n\nThe Stacktrace is: \n\n\n" + stacktrace)
         print 'Bot not running.'
 
-    print 'Checking...'
+    colorhelper.printcolor('random', 'Checking')
     contents = file_helper.readFile(filehelper.PROCESS_ID)
     if contents == '':
         print 'PID: EMPTY'
@@ -84,7 +84,6 @@ def main():
     while True:
         time.sleep(CHECK_INTERVAL)
         # Just to make following the output easier, since all output is basically the same.
-        print 'Random', str(50 * random.random())
         check_on_bot()
 
 __author__ = 'tyler'

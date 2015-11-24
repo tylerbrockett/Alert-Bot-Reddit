@@ -20,7 +20,7 @@ from helpers.inboxhelper import InboxHelper
 from helpers.exceptionhelper import ExceptionHelper
 
 SLEEP_SECONDS = 5
-NUM_POSTS_TO_CRAWL = 50
+NUM_POSTS_TO_CRAWL = 100
 subreddit = 'buildapcsales'
 botname = accountinfo.username
 
@@ -59,11 +59,9 @@ def crawl_subreddit(subreddit):
     global NUM_POSTS_TO_CRAWL
     submissions = r.get_subreddit(subreddit).get_new(limit=NUM_POSTS_TO_CRAWL)
     for submission in submissions:
+        # Make sure sale is not expired!
         if not submission.over_18:
             check_for_subscription(submission)
-        else:
-            colorhelper.printcolor('magenta', 'Skipping submission ' + submission.url +
-                                   ' because it is marked as NSFW.')
 
 
 def handle_item_match(username, item, message_id, title, permalink, url):
