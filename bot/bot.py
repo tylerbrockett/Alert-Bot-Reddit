@@ -197,10 +197,12 @@ def initialize():
     cursor = db.cursor()
     inbox_helper = InboxHelper()
 
+
 def handle_crash():
     stacktrace = exception_helper.getStacktrace()
     file_helper.eraseContents(filehelper.PROCESS_ID)
     file_helper.writeToFile(filehelper.STACKTRACE, stacktrace)
+    db.close()
     exit()
 
 
