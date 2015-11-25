@@ -10,17 +10,20 @@ TABLE_SUBSCRIPTIONS = 'subscriptions'
 USERNAME = 'username'
 MESSAGE_ID = 'message_id'
 ITEM = 'item'
+TIMESTAMP = 'timestamp'
 
 COL_SUB_USERNAME = 0
 COL_SUB_MESSAGE_ID = 1
 COL_SUB_ITEM = 2
+COL_SUB_TIMESTAMP = 3
 
 CREATE_TABLE_SUBSCRIPTIONS = "CREATE TABLE IF NOT EXISTS " + TABLE_SUBSCRIPTIONS + \
-               "(" + USERNAME + " TEXT, " + MESSAGE_ID + " TEXT, " + ITEM + " TEXT)"
+               "(" + USERNAME + " TEXT, " + MESSAGE_ID + " TEXT, " + ITEM + " TEXT, " + \
+               TIMESTAMP + " REAL)"
 
 INSERT_ROW_SUBMISSIONS = "INSERT INTO " + \
                          TABLE_SUBSCRIPTIONS + \
-                         " VALUES (?,?,?)"
+                         " VALUES (?,?,?,?)"
 
 REMOVE_ROW_SUBSCRIPTIONS = "DELETE FROM " + TABLE_SUBSCRIPTIONS + \
     " WHERE " + USERNAME + " = (?) " + \

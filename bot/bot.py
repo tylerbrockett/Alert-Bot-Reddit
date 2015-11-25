@@ -10,7 +10,9 @@ import os
 import praw
 import time
 import sqlite3
+from sys import stdout
 from data import dbhelper
+from helpers import timehelper
 from helpers import filehelper
 from helpers import colorhelper
 from private import accountinfo
@@ -30,11 +32,11 @@ file_helper = None
 gmail_helper = None
 inbox_helper = None
 exception_helper = None
-items = []
 
+start_time = None
 
 def run_bot():
-    global items
+    global start_time
     colorhelper.printcolor(
         'yellow',
         "================================================================\n" +
@@ -50,9 +52,9 @@ def run_bot():
     while True:
         read_inbox()
         colorhelper.printcolor('yellow', 'Starting to do work boss!')
-        items = db.execute(dbhelper.SELECT_DISTINCT_ITEMS).fetchall()
         crawl_subreddit(subreddit)
-        sleep()
+        colorhelper.printcolor('yellow', "I've been running for " + timehelper.getTimePassed(start_time))
+        sleep(SLEEP_SECONDS)
 
 
 def crawl_subreddit(subreddit):
@@ -68,31 +70,31 @@ def handle_item_match(username, item, message_id, title, permalink, url):
     colorhelper.printcolor(
         'magenta',
         "\n-------- SUBMISSION MATCH DETAILS ---------\n" \
-        "USERNAME:\t\t" + username + "\n"   + \
-        "MESSAGE ID:\t" + message_id + "\n" + \
-        "ITEM:\t\t\t"   + item +     "\n"   + \
-        "TITLE:\t\t"    + title +    "\n"   + \
-        "REDDIT URL:\t" + permalink+ "\n"   + \
-        "LINK:\t\t\t"   + url +     "\n\n")
+        "USERNAME:   " + username +   "\n"   + \
+        "MESSAGE ID: " + message_id + "\n" + \
+        "ITEM:       " + item +       "\n"   + \
+        "TITLE:      " + title +      "\n"   + \
+        "REDDIT URL: " + permalink+   "\n"   + \
+        "LINK:       " + url +        "\n\n")
 
     try:
         message = r.get_message(message_id)
         message.reply(inbox_helper.composeMatchMessage(username, item, title, permalink, url))
-        time.sleep(2)
+        cursor.execute(dbhelper.INSERT_ROW_MATCHES, (username, item, url))
+        db.commit()
+        sleep(2)
     except:
         colorhelper.printcolor('red', 'SEND MESSAGE FAILED')
 
-    cursor.execute(dbhelper.INSERT_ROW_MATCHES, (username, item, url))
-
 
 def check_for_subscription(submission):
-    global db, cursor, items
+    global db, cursor
 
     title = submission.title.lower()
     text = submission.selftext.lower()
     url = submission.url
 
-    for item in items:
+    for item in db.execute(dbhelper.SELECT_DISTINCT_ITEMS).fetchall():
         if item[0] in title or item[0] in text:
             cursor = db.execute(dbhelper.GET_SUBSCRIBED_USERS_WITHOUT_LINK, (item[0], url))
             for match in cursor.fetchall():
@@ -120,45 +122,77 @@ def read_inbox():
                                                unread_message.id,
                                                formatsubject(unread_message.subject.lower()),
                                                unread_message.body.lower())
-        request = (username, message_id, subject)
+        subscription = (username, message_id, subject, timehelper.getCurrentTimestamp())
 
         if 'unsubscribe' in body and 'all' in body:
             cursor.execute(dbhelper.REMOVE_ALL_SUBSCRIPTIONS_BY_USERNAME, (username,))
             cursor.execute(dbhelper.REMOVE_ALL_MATCHES_BY_USERNAME, (username,))
-            db.commit()
             unread_message.reply(inbox_helper.composeUnsubscribeAllMessage(username))
+            db.commit()
+            colorhelper.printcolor('red',
+                                   '-------------------------------\n' +
+                                   'Unsubscribe ALL:\n' +
+                                   'username: ' + username + "\n" +
+                                   '-------------------------------' +
+                                   '\n\n\n')
 
         elif body == 'unsubscribe' and subject.replace(' ', '') != '':
             cursor.execute(dbhelper.REMOVE_ROW_SUBSCRIPTIONS, (username, subject))
             cursor.execute(dbhelper.REMOVE_MATCHES_BY_USERNAME_AND_SUBJECT, (username, subject))
-            db.commit()
             unread_message.reply(inbox_helper.composeUnsubscribeMessage(username, subject))
+            db.commit()
+            colorhelper.printcolor('red',
+                                   '-------------------------------\n' +
+                                   'Unsubscribe:\n' +
+                                   'username: ' + username + "\n" +
+                                   'subject: ' + subject + '\n' +
+                                   'body: ' + body + '\n' +
+                                   '-------------------------------' +
+                                   '\n\n\n')
 
         # Subject must be longer than 2 non-space characters.
         elif body == 'subscribe' and len(formatsubject(subject).replace(' ', '')) > 2:
-            cursor.execute(dbhelper.INSERT_ROW_SUBMISSIONS, request)
+            cursor.execute(dbhelper.INSERT_ROW_SUBMISSIONS, subscription)
+            unread_message.reply(inbox_helper.composeSubscribeMessage(username, subject))
             db.commit()
             colorhelper.printcolor('green',
                                    '-------------------------------\n' +
                                    'New Subscription:\n' +
                                    'username: ' + username + "\n" +
-                                   'message_id: ' + message_id + '\n' +
                                    'subject: ' + subject + '\n' +
                                    'body: ' + body + '\n' +
                                    '-------------------------------' +
                                    '\n\n\n')
-            unread_message.reply(inbox_helper.composeSubscribeMessage(username, subject))
 
         elif subject == 'information':
             cursor.execute(dbhelper.GET_SUBSCRIPTIONS_BY_USERNAME, (username,))
             unread_message.reply(inbox_helper.composeInformationMessage(username, cursor.fetchall()))
+            colorhelper.printcolor('green',
+                                   '----------------------------\n'
+                                   'INFORMATION MESSAGE\n' +
+                                   'Username: ' + username + "\n" +
+                                   '----------------------------\n\n\n')
 
         elif subject == 'feedback':
             unread_message.reply(inbox_helper.composeFeedbackMessage(username))
+            colorhelper.printcolor('green',
+                                   '----------------------------\n'
+                                   'FEEDBACK MESSAGE\n' +
+                                   'Username: ' + username + "\n" +
+                                   'Body:     ' + body     + "\n" +
+                                   '----------------------------\n\n\n')
         else:
             unread_message.reply(inbox_helper.composeDefaultMessage(username, subject, body))
+            colorhelper.printcolor('green',
+                                   '----------------------------\n'
+                                   'DEFAULT MESSAGE\n' +
+                                   'Username: ' + username + "\n" +
+                                   'Subject:  ' + subject  + "\n" +
+                                   'Body:     ' + body     + "\n"
+                                   '----------------------------\n\n\n')
+
         unread_message.mark_as_read()
-        time.sleep(2)
+        sleep(2)
     colorhelper.printcolor('cyan', str(i) + ' UNREAD MESSAGES')
 
 
@@ -178,19 +212,17 @@ def connect_to_reddit():
     r.login(accountinfo.username, accountinfo.password, disable_warning=True)
 
 
-def sleep():
-    colorhelper.printcolor('yellow', "\n\nI'm exhausted, time to nap...")
-    for i in range(0, SLEEP_SECONDS, 1):
-        if i % 2 == 0:
-            colorhelper.printcolor('yellow', 'ZZzzZZzzZZzzZZzz')
-        else:
-            colorhelper.printcolor('yellow', 'zzZZzzZZzzZZzzZZ')
-        time.sleep(2)
-    colorhelper.printcolor('yellow', 'Yaaaaaawn... That was a nice nap!\n\n')
+def sleep(seconds):
+    print 'Sleeping',
+    for i in range(seconds):
+        stdout.write(".")
+        stdout.flush()
+        time.sleep(1)
 
 
 def initialize():
-    global exception_helper, gmail_helper, inbox_helper, file_helper, db, cursor
+    global start_time, exception_helper, gmail_helper, inbox_helper, file_helper, db, cursor
+    start_time = timehelper.getCurrentTimestamp()
     exception_helper = ExceptionHelper()
     file_helper = FileHelper()
     # Setup process_id.pid

@@ -5,7 +5,7 @@ from helpers import colorhelper
 from private import accountinfo
 from helpers.ledhelper import LedHelper
 from helpers.filehelper import FileHelper
-from helpers.timehelper import TimeHelper
+from helpers.quiethourshelper import TimeHelper
 from helpers.gmailhelper import GmailHelper
 from helpers.exceptionhelper import ExceptionHelper
 

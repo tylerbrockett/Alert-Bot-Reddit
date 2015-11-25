@@ -1,37 +1,35 @@
-import datetime
 import time
-from helpers import colorhelper
+from datetime import datetime
 
 
-class TimeHelper:
-    def __init__(self, quietstart = 0, quietend = 0):
-        if quietend < quietstart:
-            colorhelper.printcolor('red', 'Invalid Quiet Hours.')
-            exit()
-        self.quietstart = quietstart
-        self.quietstop = quietend
-        self.isquiet = False
+def getCurrentTimestamp():
+    return time.time()
 
-    # return true if state changes, false if it stays the same
-    def checkTime(self):
-        time = datetime.datetime.now().time()
-        if self.quietstart <= time.hour <= self.quietstop:
-            previous_state = self.isquiet
-            self.isquiet = True
-            if previous_state is False:
-                return True
-            else:
-                return False
-        else:
-            previous_state = self.isquiet
-            self.isquiet = False
-            if previous_state is True:
-                return True
-            else:
-                return False
 
-    def getIsQuietHours(self):
-        return self.isquiet
+def getTimePassed(time):
+    now = datetime.now()
+    then = datetime.fromtimestamp(time)
+    delta = now - then
+    seconds = delta.seconds
 
-    def getFormattedTime(self):
-        return time.strftime('%l:%M%p on %b %d, %Y')
+    if seconds == 0:
+        return '0s'
+
+    months, remainder = divmod(seconds, 2592000)
+    days, remainder = divmod(remainder, 86400)
+    hours, remainder = divmod(remainder, 3600)
+    minutes, seconds = divmod(remainder, 60)
+
+    result = ''
+    if months > 0:
+        result += '%smo ' % months
+    if days > 0:
+        result += '%sd ' % days
+    if hours > 0:
+        result += '%sh ' % hours
+    if minutes > 0:
+        result += '%sm ' % minutes
+    if seconds > 0:
+        result += '%ss' % seconds
+
+    return result
