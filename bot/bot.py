@@ -21,7 +21,7 @@ from helpers.gmailhelper import GmailHelper
 from helpers.inboxhelper import InboxHelper
 from helpers.exceptionhelper import ExceptionHelper
 
-SLEEP_SECONDS = 5
+SLEEP_SECONDS = 10
 NUM_POSTS_TO_CRAWL = 100
 subreddit = 'buildapcsales'
 botname = accountinfo.username
@@ -51,9 +51,9 @@ def run_bot():
 
     while True:
         read_inbox()
-        colorhelper.printcolor('yellow', 'Starting to do work boss!')
+        #colorhelper.printcolor('yellow', 'Starting to do work boss!')
         crawl_subreddit(subreddit)
-        colorhelper.printcolor('yellow', "I've been running for " + timehelper.getTimePassed(start_time))
+        colorhelper.printcolor('yellow', timehelper.getTimePassed(start_time))
         sleep(SLEEP_SECONDS)
 
 
@@ -218,6 +218,7 @@ def sleep(seconds):
         stdout.write(".")
         stdout.flush()
         time.sleep(1)
+    print ''
 
 
 def initialize():
