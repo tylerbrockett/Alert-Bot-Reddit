@@ -1,5 +1,5 @@
 import time
-import random
+import traceback
 from helpers import filehelper
 from helpers import colorhelper
 from private import accountinfo
@@ -7,9 +7,7 @@ from helpers.ledhelper import LedHelper
 from helpers.filehelper import FileHelper
 from helpers.quiethourshelper import TimeHelper
 from helpers.gmailhelper import GmailHelper
-from helpers.exceptionhelper import ExceptionHelper
 
-exception_helper = None
 led_helper = None
 gmail_helper = None
 time_helper = None
@@ -64,18 +62,16 @@ def check_on_bot():
 
 def initialize():
     global exception_helper, led_helper, gmail_helper, time_helper, file_helper
-    exception_helper = ExceptionHelper()
     led_helper = LedHelper()
     gmail_helper = GmailHelper()
     time_helper = TimeHelper()
     file_helper = FileHelper()
 
 
-def handle_crash():
+def handle_crash(stacktrace):
     global exception_helper
     colorhelper.printcolor('red', "Monitor Crashed")
     led_helper.monitorCrashed()
-    stacktrace = exception_helper.getStacktrace()
     gmail_helper.sendEmail(accountinfo.developeremail, "Boss... The monitor crashed", "The monitor crashed at " +
                            time_helper.getFormattedTime() + "\n\n\nHere's the stacktrace\n\n\n" + stacktrace)
 
@@ -92,5 +88,5 @@ if __name__ == "__main__":
         initialize()
         main()
     except:
-        handle_crash()
+        handle_crash(traceback.format_exc())
 

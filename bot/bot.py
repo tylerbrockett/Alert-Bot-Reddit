@@ -10,6 +10,7 @@ import os
 import praw
 import time
 import sqlite3
+import traceback
 from sys import stdout
 from data import dbhelper
 from helpers import timehelper
@@ -19,7 +20,6 @@ from private import accountinfo
 from helpers.filehelper import FileHelper
 from helpers.gmailhelper import GmailHelper
 from helpers.inboxhelper import InboxHelper
-from helpers.exceptionhelper import ExceptionHelper
 
 SLEEP_SECONDS = 10
 NUM_POSTS_TO_CRAWL = 100
@@ -31,7 +31,6 @@ cursor = None
 file_helper = None
 gmail_helper = None
 inbox_helper = None
-exception_helper = None
 
 start_time = None
 
@@ -51,7 +50,6 @@ def run_bot():
 
     while True:
         read_inbox()
-        #colorhelper.printcolor('yellow', 'Starting to do work boss!')
         crawl_subreddit(subreddit)
         colorhelper.printcolor('yellow', timehelper.getTimePassed(start_time))
         sleep(SLEEP_SECONDS)
@@ -59,7 +57,15 @@ def run_bot():
 
 def crawl_subreddit(subreddit):
     global NUM_POSTS_TO_CRAWL
-    submissions = r.get_subreddit(subreddit).get_new(limit=NUM_POSTS_TO_CRAWL)
+    submissions = []
+    try:
+        submissions = r.get_subreddit(subreddit).get_new(limit=NUM_POSTS_TO_CRAWL)
+    except:
+        colorhelper.printcolor('red', "\n" +
+                               "-------------------------------------------\n" +
+                               "ERROR: Couldn't get submissions\n" +
+                               "STACKTRACE:\n\n" + traceback.format_exc() + "\n" +
+                               "-------------------------------------------\n")
     for submission in submissions:
         # Make sure sale is not expired!
         if not submission.over_18:
@@ -222,9 +228,8 @@ def sleep(seconds):
 
 
 def initialize():
-    global start_time, exception_helper, gmail_helper, inbox_helper, file_helper, db, cursor
+    global start_time, gmail_helper, inbox_helper, file_helper, db, cursor
     start_time = timehelper.getCurrentTimestamp()
-    exception_helper = ExceptionHelper()
     file_helper = FileHelper()
     # Setup process_id.pid
     file_helper.writeToFile(filehelper.PROCESS_ID, str(os.getpid()))
@@ -235,8 +240,7 @@ def initialize():
     inbox_helper = InboxHelper()
 
 
-def handle_crash():
-    stacktrace = exception_helper.getStacktrace()
+def handle_crash(stacktrace):
     file_helper.eraseContents(filehelper.PROCESS_ID)
     file_helper.writeToFile(filehelper.STACKTRACE, stacktrace)
     db.close()
@@ -249,4 +253,4 @@ if __name__ == "__main__":
         initialize()
         run_bot()
     except:
-        handle_crash()
+        handle_crash(traceback.format_exc())
