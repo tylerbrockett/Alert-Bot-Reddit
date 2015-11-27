@@ -27,11 +27,12 @@ class InboxHelper:
     def formatsubscriptions(self, subscriptions):
         result = ''
         if len(subscriptions) > 0:
-            result += "\n\n--------------------------\n" + \
-                        "\tYour Subscription(s):\n"
-            for item in subscriptions:
-                result += "Item:\t\t" + item[dbhelper.COL_SUB_ITEM] + "\n"
-            result += "\n\n--------------------------\n\n"
+            if len(subscriptions) > 1:
+                result += "###Subscriptions\n\n" + \
+                "\# | Item" + "\n" + \
+                "--:|:--:" + "\n"
+            for i in range(len(subscriptions)):
+                result = result + str(i + 1) + " | " + subscriptions[i][dbhelper.COL_SUB_ITEM] + "\n"
         return result
 
     def composeUnsubscribeMessage(self, username, item):
@@ -72,7 +73,7 @@ class InboxHelper:
     def composeSalutation(self):
         result = SIGNATURE + "\n\t \n\t \n" + \
             "[Github Repository](https://github.com/tylerbrockett/reddit-bot-buildapcsales) | " + \
-            accountinfo.developeremail + "\n"
+            "[Developer Email](mailto://" + accountinfo.developeremail + ")\n"
         return result
 
     def composeMatchMessage(self, username, item, title, permalink, url):
@@ -94,35 +95,35 @@ class InboxHelper:
 
 SIGNATURE = "\n\t \n\t \n-sales__bot"
 
-INFORMATION = "Thanks for your interest in my abilities! This is how I work \n\n" + \
+INFORMATION = "Thanks for your interest in my abilities! This is how I work: \n\n" + \
             \
-            "SUBSCRIBING\n" + \
+            "###Subscribing\n" + \
             "Send me a private message with the subject line as the exact string you " + \
             "want me to keep an eye out for, and the body as 'subscribe'. Keep it " + \
             "semi-general as to not limit my search too much. For example, use " + \
             "'i5-4590' instead of 'Intel Core i5-4590 3.3GHz LGA 1150'. \n\n" + \
             \
-            "WHAT I DO\n" + \
+            "###What I do\n" + \
             "I will send you a message that contains a link to that item each time " + \
             "I come across a post in /r/buildapcsales that matches. It will be a reply " + \
             "to the original message you sent. This will happen until you send me a " + \
             "message unsubscribing from the part, which is described more in the next " + \
             "line. \n\n" + \
             \
-            "UNSUBSCRIBING\n" + \
+            "###Unsubscribing\n" + \
             "If or when you want to unsubscribe, send me another private message with " + \
             "the subject line as the item you want to unsubscribe from, and the body as " + \
             "'Unsubscribe'. If you want to unsubscribe from ALL of the parts you are " + \
             "subscribed to, make the body of the pm 'unsubscribe all' and the subject line " + \
-            "can be whatever four letter word you can think of. /s, kinda :D \n\n" + \
+            "can be whatever you want. \n\n" + \
             \
-            "GETTING HELP\n" + \
+            "###Getting Help\n" + \
             "Remember that you can always send me a message with the subject line as " + \
             "'Information' or 'Help' to get this message, and all of the parts you are " + \
             "subscribed to. If you want more specific help, send a private message to /u/" + \
             accountinfo.developerusername + " and I will try my absolute best to help you out.\n\n" + \
             \
-            "FEEDBACK\n" + \
+            "###Feedback\n" + \
             "I am always open to feedback, requests, or things of that nature. While I am " + \
             "very much still in the process of learning, I will try my best to take your " + \
             "feedback into consideration. Sending me feedback should use the subject line " + \

@@ -22,7 +22,7 @@ from helpers.gmailhelper import GmailHelper
 from helpers.inboxhelper import InboxHelper
 
 SLEEP_SECONDS = 15
-NUM_POSTS_TO_CRAWL = 100
+NUM_POSTS_TO_CRAWL = 20
 subreddit = 'buildapcsales'
 botname = accountinfo.username
 
@@ -187,7 +187,7 @@ def read_inbox():
                                    'Username: ' + username + "\n" +
                                    'Body:     ' + body     + "\n" +
                                    '----------------------------\n\n\n')
-            r.send_message(accountinfo.developerusername, inbox_helper.composeFeedbackForward(username, body))
+            r.send_message(accountinfo.developerusername, "Feedback for sales__bot", inbox_helper.composeFeedbackForward(username, body))
         else:
             unread_message.reply(inbox_helper.composeDefaultMessage(username, subject, body))
             colorhelper.printcolor('green',
