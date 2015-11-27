@@ -50,11 +50,11 @@ class InboxHelper:
 
     def composeFeedbackMessage(self, username):
         result = self.composeGreeting(username) + \
-            "Thank you very much for your feedback, however nice or harsh it may be! " + \
+            "Thank you very much for your feedback! " + \
             "I am still a student, in the process of learning, but I am open to whatever " + \
             "requests the community makes. If your message is urgent, please feel free to " + \
-            "PM me at /u/XdrummerXboy or email me at the email address linked below. Thanks " + \
-            "again!" + self.composeSalutation()
+            "PM me at /u/" + accountinfo.developerusername + " or email me at the email address " + \
+            "linked below. Thanks again!" + self.composeSalutation()
         return result
 
     def composeDefaultMessage(self, username, item, request):
@@ -73,7 +73,7 @@ class InboxHelper:
     def composeSalutation(self):
         result = SIGNATURE + "\n\t \n\t \n" + \
             "[Github Repository](https://github.com/tylerbrockett/reddit-bot-buildapcsales) | " + \
-            "[Developer Email](mailto://" + accountinfo.developeremail + ")\n"
+            "/u/" + accountinfo.developerusername + " | [Developer Email](mailto://" + accountinfo.developeremail + ")\n"
         return result
 
     def composeMatchMessage(self, username, item, title, permalink, url):
