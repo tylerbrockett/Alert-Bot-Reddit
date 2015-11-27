@@ -21,7 +21,7 @@ from helpers.filehelper import FileHelper
 from helpers.gmailhelper import GmailHelper
 from helpers.inboxhelper import InboxHelper
 
-SLEEP_SECONDS = 10
+SLEEP_SECONDS = 15
 NUM_POSTS_TO_CRAWL = 100
 subreddit = 'buildapcsales'
 botname = accountinfo.username
@@ -88,7 +88,7 @@ def handle_item_match(username, item, message_id, title, permalink, url):
         message.reply(inbox_helper.composeMatchMessage(username, item, title, permalink, url))
         cursor.execute(dbhelper.INSERT_ROW_MATCHES, (username, item, url))
         db.commit()
-        sleep(2)
+        sleep(1)
     except:
         colorhelper.printcolor('red', 'SEND MESSAGE FAILED')
 
@@ -170,7 +170,7 @@ def read_inbox():
                                    '-------------------------------' +
                                    '\n\n\n')
 
-        elif subject == 'information':
+        elif subject == 'information' or subject == 'help':
             cursor.execute(dbhelper.GET_SUBSCRIPTIONS_BY_USERNAME, (username,))
             unread_message.reply(inbox_helper.composeInformationMessage(username, cursor.fetchall()))
             colorhelper.printcolor('green',
@@ -187,6 +187,7 @@ def read_inbox():
                                    'Username: ' + username + "\n" +
                                    'Body:     ' + body     + "\n" +
                                    '----------------------------\n\n\n')
+            r.send_message(accountinfo.developerusername, inbox_helper.composeFeedbackForward(username, body))
         else:
             unread_message.reply(inbox_helper.composeDefaultMessage(username, subject, body))
             colorhelper.printcolor('green',
@@ -198,7 +199,7 @@ def read_inbox():
                                    '----------------------------\n\n\n')
 
         unread_message.mark_as_read()
-        sleep(2)
+        sleep(1)
     colorhelper.printcolor('cyan', str(i) + ' UNREAD MESSAGES')
 
 

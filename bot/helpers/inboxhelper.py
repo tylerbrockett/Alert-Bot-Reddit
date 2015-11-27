@@ -86,6 +86,12 @@ class InboxHelper:
             self.composeSalutation()
         return result
 
+    def composeFeedbackForward(self, username, message):
+        result = self.composeGreeting(accountinfo.developerusername) + \
+            "You have received feedback from /u/" + username + ". The feedback is quoted below:\n\n'" + \
+            message + "'" + self.composeSalutation()
+        return result
+
 SIGNATURE = "\n\t \n\t \n-sales__bot"
 
 INFORMATION = "Thanks for your interest in my abilities! This is how I work \n\n" + \
@@ -112,10 +118,9 @@ INFORMATION = "Thanks for your interest in my abilities! This is how I work \n\n
             \
             "GETTING HELP\n" + \
             "Remember that you can always send me a message with the subject line as " + \
-            "'Information' to get this message, and all of the parts you are subscribed to. " + \
-            "If you want more specific help, send me a private message with the subject " + \
-            "'Help' and the body as whatever you need help with and I will try my absolute " + \
-            "best to keep up with my mail and help you out.\n\n" + \
+            "'Information' or 'Help' to get this message, and all of the parts you are " + \
+            "subscribed to. If you want more specific help, send a private message to /u/" + \
+            accountinfo.developerusername + " and I will try my absolute best to help you out.\n\n" + \
             \
             "FEEDBACK\n" + \
             "I am always open to feedback, requests, or things of that nature. While I am " + \
