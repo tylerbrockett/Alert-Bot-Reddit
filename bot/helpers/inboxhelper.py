@@ -11,10 +11,10 @@ class InboxHelper:
 
     def composeSubscribeMessage(self, username, item):
         result = self.composeGreeting(username) + \
-            "Thanks for your subscription to '" + item + "'. " + \
-            "You will continue to receive updates to part sales that contain that " + \
-            "in its title until you send me a message with the subject as 'Unsubscribe' " + \
-            "and the message body the same as the subscription message you sent to me." + \
+            "Thanks for your subscription. " + \
+            "You will continue to receive updates to part sales that contain '" + item + "' " + \
+            "in its title. To unsubscribe, send me a message with the subject '" + item + "' " + \
+            "and the message body 'Unsubscribe'." + \
             self.composeSalutation()
         return result
 
