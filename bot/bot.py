@@ -242,6 +242,7 @@ def initialize():
 
 
 def handle_crash(stacktrace):
+    r.send_message(accountinfo.developerusername, "Bot Crashed", stacktrace)
     file_helper.eraseContents(filehelper.PROCESS_ID)
     file_helper.writeToFile(filehelper.STACKTRACE, stacktrace)
     db.close()
