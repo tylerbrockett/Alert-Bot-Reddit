@@ -8,6 +8,7 @@ Date:           12/14/2015
 
 import os
 import sqlite3
+import time
 import traceback
 from sys import stdout
 import praw
@@ -49,7 +50,7 @@ def run_alerts():
         entry = (username, 1)  # 1 == True
         try:
             connection.cursor().execute(database.INSERT_ROW_ALERTS, entry)
-            reddit.send_message(username, compose_alert(username))
+            reddit.send_message(username, subject, compose_alert(username))
             connection.commit()
             color.print_color('blue', 'message sent to ' + username)
         except:
@@ -87,10 +88,10 @@ def connect_to_reddit():
 
 def sleep(seconds):
     print 'Sleeping',
-    for i in range(seconds * 2):
+    for i in range(seconds):
         stdout.write(".")
         stdout.flush()
-        sleep(0.5)
+        sleep(1)
     print ''
 
 

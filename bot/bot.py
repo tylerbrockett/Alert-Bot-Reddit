@@ -189,7 +189,7 @@ def sleep(seconds):
     for i in range(seconds):
         stdout.write(".")
         stdout.flush()
-        time.sleep(1)
+        sleep(1)
     print ''
 
 
