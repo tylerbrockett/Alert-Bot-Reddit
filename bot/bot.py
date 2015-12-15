@@ -38,6 +38,7 @@ def run_bot():
 
 
 def crawl_subreddit(subreddit):
+    global reddit
     submissions = []
     try:
         submissions = reddit.get_subreddit(subreddit).get_new(limit=NUM_POSTS_TO_CRAWL)
@@ -50,6 +51,7 @@ def crawl_subreddit(subreddit):
 
 
 def handle_item_match(username, item, message_id, title, permalink, url):
+    global connection, reddit
     try:
         message = reddit.get_message(message_id)
         message.reply(inbox.compose_match_message(username, item, title, permalink, url))
@@ -84,7 +86,7 @@ def check_for_subscription(submission):
 
 
 def read_inbox():
-    global connection
+    global connection, reddit
     i = 0
 
     for unread_message in reddit.get_unread(limit=None):
@@ -189,7 +191,7 @@ def sleep(seconds):
     for i in range(seconds):
         stdout.write(".")
         stdout.flush()
-        sleep(1)
+        time.sleep(1)
     print ''
 
 
