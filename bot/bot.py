@@ -7,65 +7,42 @@ Date:           11/13/2015
 """
 
 import os
-import praw
 import time
 import sqlite3
 import traceback
 from sys import stdout
-from data import dbhelper
-from helpers import timehelper
-from helpers import filehelper
-from helpers import colorhelper
+
+import praw
+
+from helpers import color, times, database, inbox, files, output
 from private import accountinfo
-from helpers.filehelper import FileHelper
-from helpers.gmailhelper import GmailHelper
-from helpers.inboxhelper import InboxHelper
 
 SLEEP_SECONDS = 15
 NUM_POSTS_TO_CRAWL = 20
-subreddit = 'buildapcsales'
-botname = accountinfo.username
+bot = accountinfo.username
 
-db = None
-cursor = None
-file_helper = None
-gmail_helper = None
-inbox_helper = None
+connection = None
+reddit = None
 
 start_time = None
 
+
 def run_bot():
     global start_time
-    colorhelper.printcolor(
-        'yellow',
-        "================================================================\n" +
-        "\t\tSALES__BOT - A Sales Notifier Bot\n" +
-        "================================================================\n\n")
-
-    colorhelper.printcolor(
-        'blue',
-        '\n--------------------------------------------------\n' +
-        '\t\twww.reddit.com/r/' + str(subreddit) + '\n' +
-        '--------------------------------------------------\n')
-
+    output.about_message()
     while True:
         read_inbox()
-        crawl_subreddit(subreddit)
-        colorhelper.printcolor('yellow', timehelper.getTimePassed(start_time))
+        crawl_subreddit('buildapcsales')
+        color.print_color('yellow', times.get_time_passed(start_time))
         sleep(SLEEP_SECONDS)
 
 
 def crawl_subreddit(subreddit):
-    global NUM_POSTS_TO_CRAWL
     submissions = []
     try:
-        submissions = r.get_subreddit(subreddit).get_new(limit=NUM_POSTS_TO_CRAWL)
+        submissions = reddit.get_subreddit(subreddit).get_new(limit=NUM_POSTS_TO_CRAWL)
     except:
-        colorhelper.printcolor('red', "\n" +
-                               "-------------------------------------------\n" +
-                               "ERROR: Couldn't get submissions\n" +
-                               "STACKTRACE:\n\n" + traceback.format_exc() + "\n" +
-                               "-------------------------------------------\n")
+        output.get_submissions_exception()
     for submission in submissions:
         # Make sure sale is not expired!
         if not submission.over_18:
@@ -73,150 +50,138 @@ def crawl_subreddit(subreddit):
 
 
 def handle_item_match(username, item, message_id, title, permalink, url):
-    colorhelper.printcolor(
-        'magenta',
-        "\n-------- SUBMISSION MATCH DETAILS ---------\n" \
-        "USERNAME:   " + username +   "\n"   + \
-        "MESSAGE ID: " + message_id + "\n" + \
-        "ITEM:       " + item +       "\n"   + \
-        "TITLE:      " + title +      "\n"   + \
-        "REDDIT URL: " + permalink+   "\n"   + \
-        "LINK:       " + url +        "\n\n")
-
     try:
-        message = r.get_message(message_id)
-        message.reply(inbox_helper.composeMatchMessage(username, item, title, permalink, url))
-        cursor.execute(dbhelper.INSERT_ROW_MATCHES, (username, item, url))
-        db.commit()
-        sleep(1)
+        message = reddit.get_message(message_id)
+        message.reply(inbox.compose_match_message(username, item, title, permalink, url))
+        connection.cursor().execute(database.INSERT_ROW_MATCHES, (username, item, permalink))
+        connection.commit()
     except:
-        colorhelper.printcolor('red', 'SEND MESSAGE FAILED')
+        connection.rollback()
+        output.match_exception(username, item, message_id, title, permalink, url)
+    output.match(username, item, message_id, title, permalink, url)
+    sleep(1)
 
 
 def check_for_subscription(submission):
-    global db, cursor
+    global connection
 
     title = submission.title.lower()
     text = submission.selftext.lower()
+    permalink = submission.permalink
     url = submission.url
 
-    for item in db.execute(dbhelper.SELECT_DISTINCT_ITEMS).fetchall():
+    for item in connection.cursor().execute(database.SELECT_DISTINCT_ITEMS).fetchall():
         if item[0] in title or item[0] in text:
-            cursor = db.execute(dbhelper.GET_SUBSCRIBED_USERS_WITHOUT_LINK, (item[0], url))
-            for match in cursor.fetchall():
-                handle_item_match(match[dbhelper.COL_SUB_USERNAME],
-                                  match[dbhelper.COL_SUB_ITEM],
-                                  match[dbhelper.COL_SUB_MESSAGE_ID],
+            matches = connection.cursor().execute(database.GET_SUBSCRIBED_USERS_WITHOUT_LINK,
+                                                  (item[0], permalink)).fetchall()
+            for match in matches:
+                handle_item_match(match[database.COL_SUB_USERNAME],
+                                  match[database.COL_SUB_ITEM],
+                                  match[database.COL_SUB_MESSAGE_ID],
                                   title,
-                                  submission.permalink,
+                                  permalink,
                                   url)
 
 
 def read_inbox():
-    def formatsubject(subject):
-        temp = subject.replace('re:', '')
-        while len(temp) > 0 and temp[0] == ' ':
-            temp = temp[1:]
-        return temp
-
-    global db, cursor
+    global connection
     i = 0
-    for unread_message in r.get_unread(limit=None):
-        i += 1
-        # print unread_message
-        username, message_id, subject, body = (str(unread_message.author).lower(),
-                                               unread_message.id,
-                                               formatsubject(unread_message.subject.lower()),
-                                               unread_message.body.lower())
-        subscription = (username, message_id, subject, timehelper.getCurrentTimestamp())
 
-        if 'unsubscribe' in body and 'all' in body:
-            cursor.execute(dbhelper.REMOVE_ALL_SUBSCRIPTIONS_BY_USERNAME, (username,))
-            cursor.execute(dbhelper.REMOVE_ALL_MATCHES_BY_USERNAME, (username,))
-            unread_message.reply(inbox_helper.composeUnsubscribeAllMessage(username))
-            db.commit()
-            colorhelper.printcolor('red',
-                                   '-------------------------------\n' +
-                                   'Unsubscribe ALL:\n' +
-                                   'username: ' + username + "\n" +
-                                   '-------------------------------' +
-                                   '\n\n\n')
+    for unread_message in reddit.get_unread(limit=None):
+        i += 1
+        username, message_id, subject, body = \
+            (str(unread_message.author).lower(),
+             unread_message.id,
+             inbox.format_subject(unread_message.subject.lower()),
+             unread_message.body.lower())
+
+        if ('unsubscribe' in body and 'all' in body) \
+                or ('unsubscribe' in subject and 'all' in subject):
+            try:
+                cursor = connection.cursor()
+                cursor.execute(database.REMOVE_ALL_SUBSCRIPTIONS_BY_USERNAME, (username,))
+                cursor.execute(database.REMOVE_ALL_MATCHES_BY_USERNAME, (username,))
+                unread_message.reply(inbox.compose_unsubscribe_all_message(username))
+                unread_message.mark_as_read()
+                connection.commit()
+            except:
+                connection.rollback()
+                output.unsubscribe_all_exception(username)
+            output.unsubscribe_all(username)
 
         elif body == 'unsubscribe' and subject.replace(' ', '') != '':
-            cursor.execute(dbhelper.REMOVE_ROW_SUBSCRIPTIONS, (username, subject))
-            cursor.execute(dbhelper.REMOVE_MATCHES_BY_USERNAME_AND_SUBJECT, (username, subject))
-            unread_message.reply(inbox_helper.composeUnsubscribeMessage(username, subject))
-            db.commit()
-            colorhelper.printcolor('red',
-                                   '-------------------------------\n' +
-                                   'Unsubscribe:\n' +
-                                   'username: ' + username + "\n" +
-                                   'subject: ' + subject + '\n' +
-                                   'body: ' + body + '\n' +
-                                   '-------------------------------' +
-                                   '\n\n\n')
+            try:
+                cursor = connection.cursor()
+                cursor.execute(database.REMOVE_ROW_SUBSCRIPTIONS, (username, subject))
+                cursor.execute(database.REMOVE_MATCHES_BY_USERNAME_AND_SUBJECT, (username, subject))
+                unread_message.reply(inbox.compose_unsubscribe_message(username, subject))
+                unread_message.mark_as_read()
+                connection.commit()
+            except:
+                connection.rollback()
+                output.unsubscribe_exception(username, subject)
+            output.unsubscribe(username, subject)
 
-        # Subject must be longer than 2 non-space characters.
-        elif body == 'subscribe' and len(formatsubject(subject).replace(' ', '')) > 2:
-            cursor.execute(dbhelper.INSERT_ROW_SUBMISSIONS, subscription)
-            unread_message.reply(inbox_helper.composeSubscribeMessage(username, subject))
-            db.commit()
-            colorhelper.printcolor('green',
-                                   '-------------------------------\n' +
-                                   'New Subscription:\n' +
-                                   'username: ' + username + "\n" +
-                                   'subject: ' + subject + '\n' +
-                                   'body: ' + body + '\n' +
-                                   '-------------------------------' +
-                                   '\n\n\n')
+        # Item must be longer than 2 non-space characters.
+        elif body == 'subscribe' and len(inbox.format_subject(subject).replace(' ', '')) > 2:
+            subscription = (username, message_id, subject, times.get_current_timestamp())
+            try:
+                cursor = connection.cursor()
+                cursor.execute(database.INSERT_ROW_SUBMISSIONS, subscription)
+                unread_message.reply(inbox.compose_subscribe_message(username, subject))
+                unread_message.mark_as_read()
+                connection.commit()
+            except:
+                connection.rollback()
+                output.subscribe_exception(username, subject)
+            output.subscribe(username, subject)
 
         elif subject == 'information' or subject == 'help':
-            cursor.execute(dbhelper.GET_SUBSCRIPTIONS_BY_USERNAME, (username,))
-            unread_message.reply(inbox_helper.composeInformationMessage(username, cursor.fetchall()))
-            colorhelper.printcolor('green',
-                                   '----------------------------\n'
-                                   'INFORMATION MESSAGE\n' +
-                                   'Username: ' + username + "\n" +
-                                   '----------------------------\n\n\n')
+            try:
+                cursor = connection.cursor()
+                cursor.execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, (username,))
+                unread_message.reply(inbox.compose_information_message(username, cursor.fetchall()))
+                unread_message.mark_as_read()
+            except:
+                output.information_exception(username)
+            output.information(username)
 
         elif subject == 'feedback':
-            unread_message.reply(inbox_helper.composeFeedbackMessage(username))
-            colorhelper.printcolor('green',
-                                   '----------------------------\n'
-                                   'FEEDBACK MESSAGE\n' +
-                                   'Username: ' + username + "\n" +
-                                   'Body:     ' + body     + "\n" +
-                                   '----------------------------\n\n\n')
-            r.send_message(accountinfo.developerusername, "Feedback for sales__bot", inbox_helper.composeFeedbackForward(username, body))
+            try:
+                reddit.send_message(accountinfo.developerusername, "Feedback for sales__bot",
+                                    inbox.compose_feedback_forward(username, body))
+                unread_message.reply(inbox.compose_feedback_message(username))
+                unread_message.mark_as_read()
+            except:
+                output.feedback_exception(username, body)
+            output.feedback(username, body)
         else:
-            unread_message.reply(inbox_helper.composeDefaultMessage(username, subject, body))
-            colorhelper.printcolor('green',
-                                   '----------------------------\n'
-                                   'DEFAULT MESSAGE\n' +
-                                   'Username: ' + username + "\n" +
-                                   'Subject:  ' + subject  + "\n" +
-                                   'Body:     ' + body     + "\n"
-                                   '----------------------------\n\n\n')
-
-        unread_message.mark_as_read()
+            try:
+                unread_message.reply(inbox.compose_default_message(username, subject, body))
+                unread_message.mark_as_read()
+            except:
+                output.default_exception(username, subject, body)
+            output.default(username, subject, body)
         sleep(1)
-    colorhelper.printcolor('cyan', str(i) + ' UNREAD MESSAGES')
+    color.print_color('cyan', str(i) + ' UNREAD MESSAGES')
 
 
-def open_or_create_database():
-    conn = sqlite3.connect(os.path.dirname(__file__) + dbhelper.DATABASE_LOCATION)
-    conn.execute(dbhelper.CREATE_TABLE_SUBSCRIPTIONS)
-    conn.execute(dbhelper.CREATE_TABLE_MATCHES)
-    return conn
+def open_database():
+    global connection
+    connection = sqlite3.connect(os.path.realpath('.') + database.DATABASE_LOCATION)
+    cursor = connection.cursor()
+    cursor.execute(database.CREATE_TABLE_SUBSCRIPTIONS)
+    cursor.execute(database.CREATE_TABLE_MATCHES)
+    cursor.execute(database.CREATE_TABLE_ALERTS)
 
 
 def connect_to_reddit():
+    global reddit
     # Connecting to Reddit
     user_agent = 'SALES__B0T - A Sales Notifier R0B0T'
-    global r
-    r = praw.Reddit(user_agent=user_agent)
-    # TODO - TAKE OUT DISABLE WARNING AND FIGURE OUT REPLACEMENT CODE
-    r.login(accountinfo.username, accountinfo.password, disable_warning=True)
+    reddit = praw.Reddit(user_agent=user_agent)
+    # TODO Use OAuth instead of this login method
+    reddit.login(accountinfo.username, accountinfo.password, disable_warning=True)
 
 
 def sleep(seconds):
@@ -229,23 +194,20 @@ def sleep(seconds):
 
 
 def initialize():
-    global start_time, gmail_helper, inbox_helper, file_helper, db, cursor
-    start_time = timehelper.getCurrentTimestamp()
-    file_helper = FileHelper()
+    global start_time
+    start_time = times.get_current_timestamp()
     # Setup process_id.pid
-    file_helper.writeToFile(filehelper.PROCESS_ID, str(os.getpid()))
-    gmail_helper = GmailHelper()
+    files.write_to_file(files.PROCESS_ID, str(os.getpid()))
     connect_to_reddit()
-    db = open_or_create_database()
-    cursor = db.cursor()
-    inbox_helper = InboxHelper()
+    open_database()
 
 
 def handle_crash(stacktrace):
-    r.send_message(accountinfo.developerusername, "Bot Crashed", stacktrace)
-    file_helper.eraseContents(filehelper.PROCESS_ID)
-    file_helper.writeToFile(filehelper.STACKTRACE, stacktrace)
-    db.close()
+    global connection, reddit
+    reddit.send_message(accountinfo.developerusername, "Bot Crashed", stacktrace)
+    files.erase_contents(files.PROCESS_ID)
+    files.write_to_file(files.STACKTRACE, stacktrace)
+    connection.close()
     exit()
 
 

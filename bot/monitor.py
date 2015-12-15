@@ -1,12 +1,12 @@
-import time
+import times
 import traceback
-from helpers import filehelper
-from helpers import colorhelper
+from helpers import files
+from helpers import color
 from private import accountinfo
-from helpers.ledhelper import LedHelper
-from helpers.filehelper import FileHelper
-from helpers.quiethourshelper import TimeHelper
-from helpers.gmailhelper import GmailHelper
+from helpers.led_lights import LedHelper
+from helpers.files import FileHelper
+from helpers.times import TimeHelper
+from helpers.gmail import GmailHelper
 
 led_helper = None
 gmail_helper = None
@@ -20,37 +20,37 @@ QUIET_STOP = 8   # PM
 
 def check_time():
     global time_helper
-    if time_helper.checkTime():
+    if time_helper.check_time():
         if time_helper.isQuietHours:
-            led_helper.turnOff()
+            led_helper.turn_off()
         else:
-            led_helper.turnOn()
+            led_helper.turn_on()
 
 
 def check_on_bot():
     def handle_bot_is_running():
         global CHECK_INTERVAL
-        if not led_helper.getGreenState():
-            colorhelper.printcolor('green', 'BOT STARTED RUNNING')
-            led_helper.setGreenState(True)
+        if not led_helper.get_green_state():
+            color.print_color('green', 'BOT STARTED RUNNING')
+            led_helper.set_green_state(True)
             CHECK_INTERVAL = 2
-            gmail_helper.sendEmail(accountinfo.developeremail, 'Boss, the bot is running again', 'The bot started running at ' + time_helper.getFormattedTime())
+            gmail_helper.send_email(accountinfo.developeremail, 'Boss, the bot is running again', 'The bot started running at ' + time_helper.get_formatted_time())
         print 'Carry on.'
 
     def handle_bot_not_running():
         global CHECK_INTERVAL
-        if led_helper.getGreenState():
-            colorhelper.printcolor('red', 'BOT NOT RUNNING ANYMORE')
-            led_helper.setGreenState(False)
+        if led_helper.get_green_state():
+            color.print_color('red', 'BOT NOT RUNNING ANYMORE')
+            led_helper.set_green_state(False)
             CHECK_INTERVAL = 4
-            stacktrace = file_helper.readFile(filehelper.STACKTRACE)
-            file_helper.eraseContents(filehelper.STACKTRACE)
-            gmail_helper.sendEmail(accountinfo.developeremail, 'Boss, the bot crashed', 'The bot crashed at ' +
-                                   time_helper.getFormattedTime() + "\n\n\nThe Stacktrace is: \n\n\n" + stacktrace)
+            stacktrace = file_helper.read_file(files.STACKTRACE)
+            file_helper.eraseContents(files.STACKTRACE)
+            gmail_helper.send_email(accountinfo.developeremail, 'Boss, the bot crashed', 'The bot crashed at ' +
+                                    time_helper.get_formatted_time() + "\n\n\nThe Stacktrace is: \n\n\n" + stacktrace)
         print 'Bot not running.'
 
-    colorhelper.printcolor('random', 'Checking')
-    contents = file_helper.readFile(filehelper.PROCESS_ID)
+    color.print_color('random', 'Checking')
+    contents = file_helper.read_file(files.PROCESS_ID)
     if contents == '':
         print 'PID: EMPTY'
         handle_bot_not_running()
@@ -70,15 +70,15 @@ def initialize():
 
 def handle_crash(stacktrace):
     global exception_helper
-    colorhelper.printcolor('red', "Monitor Crashed")
-    led_helper.monitorCrashed()
-    gmail_helper.sendEmail(accountinfo.developeremail, "Boss... The monitor crashed", "The monitor crashed at " +
-                           time_helper.getFormattedTime() + "\n\n\nHere's the stacktrace\n\n\n" + stacktrace)
+    color.print_color('red', "Monitor Crashed")
+    led_helper.monitor_crashed()
+    gmail_helper.send_email(accountinfo.developeremail, "Boss... The monitor crashed", "The monitor crashed at " +
+                            time_helper.get_formatted_time() + "\n\n\nHere's the stacktrace\n\n\n" + stacktrace)
 
 
 def main():
     while True:
-        time.sleep(CHECK_INTERVAL)
+        times.sleep(CHECK_INTERVAL)
         # Just to make following the output easier, since all output is basically the same.
         check_on_bot()
 

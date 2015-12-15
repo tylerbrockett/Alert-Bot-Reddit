@@ -1,16 +1,16 @@
-from helpers import colorhelper
+from helpers import color
 
-class GmailHelper:
 
-    def __init__(self):
-        self.temp = 0
+def __init__(self):
+    self.temp = 0
 
-    def sendEmail(self, destination, subject, message):
-        colorhelper.printcolor('cyan', '\n\n' +
-                               '----------- MESSAGE SENT -----------\n'
-                               'destination: ' + destination + '\n' +
-                               'subject:     ' + subject + '\n' +
-                               'message:     ' + message + '\n\n\n')
+
+def send_email(self, destination, subject, message):
+    color.print_color('cyan', '\n\n' +
+                            '----------- MESSAGE SENT -----------\n' +
+                            'destination: ' + destination + '\n' +
+                            'subject:     ' + subject + '\n' +
+                            'message:     ' + message + '\n\n\n')
 
 """Send an email message from the user's account.
 """
@@ -119,5 +119,3 @@ def CreateMessageWithAttachment(sender, to, subject, message_text, file_dir,
   return {'raw': base64.b64encode(message.as_string())}
 
 '''
-
-
