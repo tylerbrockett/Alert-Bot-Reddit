@@ -23,8 +23,8 @@ reddit = None
 subject = "buildapcsales bot - message from developer"
 signature = "\n\t \n\t \n-tylerbrockett"
 
-select_usernames = ['bumpkinspicefatte', 'jincosoad', 'ninja0675',
-             'saumyag8', 'toshio_drift', 'wienercheney', 'xilegamer']
+select_users = []
+
 
 def compose_alert(username):
     # Insert alert message here!
@@ -45,8 +45,9 @@ def compose_alert(username):
 
 
 def run_alerts():
-    global connection, select_usernames
-    if not select_usernames:
+    global connection, select_users
+    # if selected_users is empty, send to all, otherwise just send to selected_users
+    if not select_users:
         needs_alert = connection.cursor().execute(database.GET_USERNAMES_THAT_NEED_ALERT).fetchall()
         for row in needs_alert:
             username = row[database.COL_ALERTS_USERNAME]
@@ -63,7 +64,7 @@ def run_alerts():
                 exit()
             sleep(2)
     else:
-        for username in select_usernames:
+        for username in select_users:
             try:
                 reddit.send_message(username, subject, compose_alert(username))
             except:
