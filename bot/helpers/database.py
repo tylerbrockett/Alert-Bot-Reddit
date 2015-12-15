@@ -83,7 +83,7 @@ GET_SUBSCRIBED_USERS_WITHOUT_LINK = \
 
 INSERT_ROW_MATCHES = "INSERT INTO " + \
                          TABLE_MATCHES + \
-                         " VALUES (?,?,?)"
+                         " VALUES (?,?,?,?)"
 
 REMOVE_ALL_MATCHES_BY_USERNAME = "DELETE FROM " + TABLE_MATCHES + \
     " WHERE " + USERNAME + " = ? "

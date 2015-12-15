@@ -23,6 +23,8 @@ reddit = None
 subject = "buildapcsales bot - message from developer"
 signature = "\n\t \n\t \n-tylerbrockett"
 
+select_usernames = ['bumpkinspicefatte', 'jincosoad', 'ninja0675',
+             'saumyag8', 'toshio_drift', 'wienercheney', 'xilegamer']
 
 def compose_alert(username):
     # Insert alert message here!
@@ -43,22 +45,30 @@ def compose_alert(username):
 
 
 def run_alerts():
-    global connection
-    needs_alert = connection.cursor().execute(database.GET_USERNAMES_THAT_NEED_ALERT).fetchall()
-    for row in needs_alert:
-        username = row[database.COL_ALERTS_USERNAME]
-        entry = (username, 1)  # 1 == True
-        try:
-            connection.cursor().execute(database.INSERT_ROW_ALERTS, entry)
-            reddit.send_message(username, subject, compose_alert(username))
-            connection.commit()
-            color.print_color('blue', 'message sent to ' + username)
-        except:
-            color.print_color('red', traceback.format_exc())
-            connection.rollback()
-            connection.close()
-            exit()
-        sleep(2)
+    global connection, select_usernames
+    if not select_usernames:
+        needs_alert = connection.cursor().execute(database.GET_USERNAMES_THAT_NEED_ALERT).fetchall()
+        for row in needs_alert:
+            username = row[database.COL_ALERTS_USERNAME]
+            entry = (username, 1)  # 1 == True
+            try:
+                connection.cursor().execute(database.INSERT_ROW_ALERTS, entry)
+                reddit.send_message(username, subject, compose_alert(username))
+                connection.commit()
+                color.print_color('blue', 'message sent to ' + username)
+            except:
+                color.print_color('red', traceback.format_exc())
+                connection.rollback()
+                connection.close()
+                exit()
+            sleep(2)
+    else:
+        for username in select_usernames:
+            try:
+                reddit.send_message(username, subject, compose_alert(username))
+            except:
+                color.print_color('red', "ALERT FAILED: " + username)
+
 
 
 def compose_salutation():
@@ -91,7 +101,7 @@ def sleep(seconds):
     for i in range(seconds):
         stdout.write(".")
         stdout.flush()
-        sleep(1)
+        time.sleep(1)
     print ''
 
 

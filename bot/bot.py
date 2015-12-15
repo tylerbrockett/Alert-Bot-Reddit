@@ -54,8 +54,8 @@ def handle_item_match(username, item, message_id, title, permalink, url):
     global connection, reddit
     try:
         message = reddit.get_message(message_id)
+        connection.cursor().execute(database.INSERT_ROW_MATCHES, (username, item, permalink, times.get_current_timestamp()))
         message.reply(inbox.compose_match_message(username, item, title, permalink, url))
-        connection.cursor().execute(database.INSERT_ROW_MATCHES, (username, item, permalink))
         connection.commit()
     except:
         connection.rollback()

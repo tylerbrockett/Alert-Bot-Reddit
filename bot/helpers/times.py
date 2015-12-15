@@ -39,7 +39,7 @@ def get_formatted_time():
 
 
 def get_current_timestamp():
-    return time.clock()
+    return time.time()
 
 
 def get_time_passed(timestamp):
