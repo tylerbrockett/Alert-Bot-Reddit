@@ -57,10 +57,10 @@ def handle_item_match(username, item, message_id, title, permalink, url):
         connection.cursor().execute(database.INSERT_ROW_MATCHES, (username, item, permalink, times.get_current_timestamp()))
         message.reply(inbox.compose_match_message(username, item, title, permalink, url))
         connection.commit()
+        output.match(username, item, message_id, title, permalink, url)
     except:
         connection.rollback()
         output.match_exception(username, item, message_id, title, permalink, url)
-    output.match(username, item, message_id, title, permalink, url)
     sleep(1)
 
 
@@ -106,10 +106,10 @@ def read_inbox():
                 unread_message.reply(inbox.compose_unsubscribe_all_message(username))
                 unread_message.mark_as_read()
                 connection.commit()
+                output.unsubscribe_all(username)
             except:
                 connection.rollback()
                 output.unsubscribe_all_exception(username)
-            output.unsubscribe_all(username)
 
         elif body == 'unsubscribe' and subject.replace(' ', '') != '':
             try:
@@ -119,10 +119,10 @@ def read_inbox():
                 unread_message.reply(inbox.compose_unsubscribe_message(username, subject))
                 unread_message.mark_as_read()
                 connection.commit()
+                output.unsubscribe(username, subject)
             except:
                 connection.rollback()
                 output.unsubscribe_exception(username, subject)
-            output.unsubscribe(username, subject)
 
         # Item must be longer than 2 non-space characters.
         elif body == 'subscribe' and len(inbox.format_subject(subject).replace(' ', '')) > 2:
@@ -133,10 +133,10 @@ def read_inbox():
                 unread_message.reply(inbox.compose_subscribe_message(username, subject))
                 unread_message.mark_as_read()
                 connection.commit()
+                output.subscribe(username, subject)
             except:
                 connection.rollback()
                 output.subscribe_exception(username, subject)
-            output.subscribe(username, subject)
 
         elif subject == 'information' or subject == 'help':
             try:
@@ -144,9 +144,9 @@ def read_inbox():
                 cursor.execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, (username,))
                 unread_message.reply(inbox.compose_information_message(username, cursor.fetchall()))
                 unread_message.mark_as_read()
+                output.information(username)
             except:
                 output.information_exception(username)
-            output.information(username)
 
         elif subject == 'feedback':
             try:
@@ -154,17 +154,17 @@ def read_inbox():
                                     inbox.compose_feedback_forward(username, body))
                 unread_message.reply(inbox.compose_feedback_message(username))
                 unread_message.mark_as_read()
+                output.feedback(username, body)
             except:
                 output.feedback_exception(username, body)
-            output.feedback(username, body)
         else:
             try:
                 unread_message.reply(inbox.compose_default_message(username, subject, body))
                 unread_message.mark_as_read()
+                output.default(username, subject, body)
             except:
                 output.default_exception(username, subject, body)
-            output.default(username, subject, body)
-        sleep(1)
+        sleep(2)
     color.print_color('cyan', str(i) + ' UNREAD MESSAGES')
 
 
