@@ -8,11 +8,10 @@ Date:           11/13/2015
 
 import os
 import time
+import praw
 import sqlite3
 import traceback
 from sys import stdout
-
-import praw
 
 from helpers import color, times, database, inbox, files, output
 from private import accountinfo
@@ -23,7 +22,6 @@ bot = accountinfo.username
 
 connection = None
 reddit = None
-
 start_time = None
 
 
@@ -44,6 +42,7 @@ def crawl_subreddit(subreddit):
         submissions = reddit.get_subreddit(subreddit).get_new(limit=NUM_POSTS_TO_CRAWL)
     except:
         output.get_submissions_exception()
+        reddit.send_message(accountinfo.developerusername, "Bot Exception - Crawl Subreddit", traceback.format_exc())
     for submission in submissions:
         # Make sure sale is not expired!
         if not submission.over_18:
@@ -54,14 +53,16 @@ def handle_item_match(username, item, message_id, title, permalink, url):
     global connection, reddit
     try:
         message = reddit.get_message(message_id)
-        connection.cursor().execute(database.INSERT_ROW_MATCHES, (username, item, permalink, times.get_current_timestamp()))
+        connection.cursor().execute(database.INSERT_ROW_MATCHES,
+                                    (username, item, permalink, times.get_current_timestamp()))
         message.reply(inbox.compose_match_message(username, item, title, permalink, url))
         connection.commit()
         output.match(username, item, message_id, title, permalink, url)
     except:
         connection.rollback()
         output.match_exception(username, item, message_id, title, permalink, url)
-    sleep(1)
+        reddit.send_message(accountinfo.developerusername, "Bot Exception - Handle Item Match", traceback.format_exc())
+    sleep(2)
 
 
 def check_for_subscription(submission):
@@ -89,7 +90,14 @@ def read_inbox():
     global connection, reddit
     i = 0
 
-    for unread_message in reddit.get_unread(limit=None):
+    unread_messages = []
+    try:
+        unread_messages = reddit.get_unread(limit=None)
+    except:
+        output.read_inbox_exception()
+        reddit.send_message(accountinfo.developerusername, "Bot Exception - Read Inbox", traceback.format_exc())
+
+    for unread_message in unread_messages:
         i += 1
         username, message_id, subject, body = \
             (str(unread_message.author).lower(),
@@ -110,6 +118,7 @@ def read_inbox():
             except:
                 connection.rollback()
                 output.unsubscribe_all_exception(username)
+                reddit.send_message(accountinfo.developerusername, "Bot Exception - Unsubscribe All", traceback.format_exc())
 
         elif body == 'unsubscribe' and subject.replace(' ', '') != '':
             try:
@@ -123,6 +132,7 @@ def read_inbox():
             except:
                 connection.rollback()
                 output.unsubscribe_exception(username, subject)
+                reddit.send_message(accountinfo.developerusername, "Bot Exception - Unsubscribe", traceback.format_exc())
 
         # Item must be longer than 2 non-space characters.
         elif body == 'subscribe' and len(inbox.format_subject(subject).replace(' ', '')) > 2:
@@ -137,6 +147,7 @@ def read_inbox():
             except:
                 connection.rollback()
                 output.subscribe_exception(username, subject)
+                reddit.send_message(accountinfo.developerusername, "Bot Exception - Subscribe", traceback.format_exc())
 
         elif subject == 'information' or subject == 'help':
             try:
@@ -147,6 +158,7 @@ def read_inbox():
                 output.information(username)
             except:
                 output.information_exception(username)
+                reddit.send_message(accountinfo.developerusername, "Bot Exception - Information", traceback.format_exc())
 
         elif subject == 'feedback':
             try:
@@ -157,6 +169,7 @@ def read_inbox():
                 output.feedback(username, body)
             except:
                 output.feedback_exception(username, body)
+                reddit.send_message(accountinfo.developerusername, "Bot Exception - Feedback", traceback.format_exc())
         else:
             try:
                 unread_message.reply(inbox.compose_default_message(username, subject, body))
@@ -164,6 +177,7 @@ def read_inbox():
                 output.default(username, subject, body)
             except:
                 output.default_exception(username, subject, body)
+                reddit.send_message(accountinfo.developerusername, "Bot Exception - Default", traceback.format_exc())
         sleep(2)
     color.print_color('cyan', str(i) + ' UNREAD MESSAGES')
 
@@ -218,5 +232,8 @@ if __name__ == "__main__":
     try:
         initialize()
         run_bot()
+    except KeyboardInterrupt:
+        color.print_color('red', 'Interrupted')
+        exit()
     except:
         handle_crash(traceback.format_exc())

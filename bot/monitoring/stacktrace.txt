@@ -1,14 +1,19 @@
 Traceback (most recent call last):
-  File "bot.py", line 220, in <module>
+  File "bot.py", line 227, in <module>
     run_bot()
-  File "bot.py", line 35, in run_bot
-    crawl_subreddit('buildapcsales')
-  File "bot.py", line 50, in crawl_subreddit
-    check_for_subscription(submission)
-  File "bot.py", line 85, in check_for_subscription
-    url)
-  File "bot.py", line 64, in handle_item_match
-    sleep(1)
-  File "bot.py", line 194, in sleep
-    time.sleep(1)
-KeyboardInterrupt
+  File "bot.py", line 32, in run_bot
+    read_inbox()
+  File "bot.py", line 93, in read_inbox
+    for unread_message in reddit.get_unread(limit=None):
+  File "/home/tyler/.local/lib/python2.7/site-packages/praw/__init__.py", line 557, in get_content
+    page_data = self.request_json(url, params=params)
+  File "<decorator-gen-8>", line 2, in request_json
+  File "/home/tyler/.local/lib/python2.7/site-packages/praw/decorators.py", line 113, in raise_api_exceptions
+    return_value = function(*args, **kwargs)
+  File "/home/tyler/.local/lib/python2.7/site-packages/praw/__init__.py", line 612, in request_json
+    retry_on_error=retry_on_error)
+  File "/home/tyler/.local/lib/python2.7/site-packages/praw/__init__.py", line 445, in _request
+    _raise_response_exceptions(response)
+  File "/home/tyler/.local/lib/python2.7/site-packages/praw/internal.py", line 212, in _raise_response_exceptions
+    raise HTTPException(_raw=exc.response)
+HTTPException: HTTP error

@@ -65,6 +65,11 @@ def get_submissions_exception():
                       "stacktrace:\n" + traceback.format_exc() + "\n\n")
 
 
+def read_inbox_exception():
+    color.print_color('red', "read inbox exception caught\n" +
+                      "stacktrace:\n" + traceback.format_exc() + "\n\n")
+
+
 def subscribe(username, item):
     color.print_color('green',
                       '-------------------------------\n' +
