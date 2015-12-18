@@ -15,9 +15,10 @@ def compose_greeting(username):
 
 def compose_salutation():
     result = SIGNATURE + "\n\t \n\t \n" + \
-             "[Github Repository](https://github.com/tylerbrockett/reddit-bot-buildapcsales) | " + \
-             "/u/" + accountinfo.developerusername + \
-             " | [Developer Email](mailto://" + accountinfo.developeremail + ")\n"
+             "[Github Repository](https://github.com/tylerbrockett/reddit-bot-buildapcsales)" + \
+             " | /u/" + accountinfo.developerusername + \
+             " | " + accountinfo.developeremail + \
+             " | r/buildapcsales\n"
     return result
 
 
