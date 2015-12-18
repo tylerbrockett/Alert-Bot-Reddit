@@ -184,7 +184,7 @@ def read_inbox():
 
 def open_database():
     global connection
-    connection = sqlite3.connect(os.path.realpath('.') + database.DATABASE_LOCATION)
+    connection = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + database.DATABASE_LOCATION)
     cursor = connection.cursor()
     cursor.execute(database.CREATE_TABLE_SUBSCRIPTIONS)
     cursor.execute(database.CREATE_TABLE_MATCHES)
