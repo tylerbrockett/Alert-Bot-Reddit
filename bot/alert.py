@@ -13,9 +13,10 @@ import traceback
 from sys import stdout
 import praw
 
-from helpers import database, color
+from helpers.colorize import colorize
+from helpers import database
 from helpers import inbox
-from private import accountinfo
+from private import accounts
 
 connection = None
 reddit = None
@@ -56,9 +57,9 @@ def run_alerts():
                 connection.cursor().execute(database.INSERT_ROW_ALERTS, entry)
                 reddit.send_message(username, subject, compose_alert(username))
                 connection.commit()
-                color.print_color('blue', 'message sent to ' + username)
+                colorize('blue', 'message sent to ' + username)
             except:
-                color.print_color('red', traceback.format_exc())
+                colorize('red', traceback.format_exc())
                 connection.rollback()
                 connection.close()
                 exit()
@@ -68,14 +69,13 @@ def run_alerts():
             try:
                 reddit.send_message(username, subject, compose_alert(username))
             except:
-                color.print_color('red', "ALERT FAILED: " + username)
-
+                colorize('red', "ALERT FAILED: " + username)
 
 
 def compose_salutation():
     result = signature + "\n\t \n\t \n" + \
         "[Github Repository](https://github.com/tylerbrockett/reddit-bot-buildapcsales) | " + \
-        "[Developer Email](mailto://" + accountinfo.developeremail + ")\n"
+        "[Developer Email](mailto://" + accounts.developeremail + ")\n"
     return result
 
 
@@ -94,7 +94,7 @@ def connect_to_reddit():
     user_agent = 'tylerbrockett - developer'
     reddit = praw.Reddit(user_agent=user_agent)
     # TODO - TAKE OUT DISABLE WARNING AND FIGURE OUT REPLACEMENT CODE
-    reddit.login(accountinfo.developerusername, accountinfo.developerpassword, disable_warning=True)
+    reddit.login(accounts.developer, accounts.developerpassword, disable_warning=True)
 
 
 def sleep(seconds):
@@ -120,8 +120,8 @@ def finish_up():
 
 def handle_crash(stacktrace):
     global connection, reddit
-    color.print_color('red', stacktrace)
-    reddit.send_message(accountinfo.developerusername, "Bot Alerts Crashed", stacktrace)
+    colorize('red', stacktrace)
+    reddit.send_message(accounts.developer, "Bot Alerts Crashed", stacktrace)
     connection.close()
     exit()
 
