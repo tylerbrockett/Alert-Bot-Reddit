@@ -35,9 +35,9 @@ class GUI:
         self.export_events = ExportEvents(self)
         self.event_list = Events(self)
         self.frame.protocol("WM_DELETE_WINDOW", self.on_closing)
-        self.bot = RedditBot(self)
         mainloop()
         self.start_uptime_thread()
+        self.bot = RedditBot(self)
 
     def start_uptime_thread(self):
         self.uptime_thread = ThreadUptime(self)
