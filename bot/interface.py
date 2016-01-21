@@ -12,12 +12,12 @@ from ui.text_title import Title
 from ui.text_uptime import Uptime
 from ui.text_status import Status
 from workers.thread_uptime import ThreadUptime
+from workers.thread_bot import ThreadBot
 from bot import RedditBot
 
 
 class GUI:
     def __init__(self):
-        self.bot_thread = None
         self.uptime_thread = None
         self.buffer = EventBuffer(25)
 
@@ -35,15 +35,16 @@ class GUI:
         self.export_events = ExportEvents(self)
         self.event_list = Events(self)
         self.frame.protocol("WM_DELETE_WINDOW", self.on_closing)
-        mainloop()
-        self.start_uptime_thread()
-        self.bot = RedditBot(self)
 
-    def start_uptime_thread(self):
+        mainloop()
+
+        self.bot = RedditBot(self)
+        self.bot_thread = ThreadBot(self)
+        self.bot_thread.daemon = True
         self.uptime_thread = ThreadUptime(self)
         self.uptime_thread.daemon = True
         self.uptime_thread.start()
-
+        
     def on_closing(self):
         if (self.bot_thread or self.uptime_thread) and \
                 tkMessageBox.askokcancel("Quit", "Are you sure you want to quit? There are processes running"):
