@@ -11,7 +11,7 @@ class Run:
         self.text.pack()
 
     def run(self):
-        if not self.gui.bot.run:
+        if self.gui.bot.force_kill and not self.gui.bot.run:
             self.gui.bot_thread.start()
             print 'run'
         else:

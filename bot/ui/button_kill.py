@@ -11,7 +11,7 @@ class Kill:
         self.text.pack()
 
     def kill(self):
-        if self.gui.bot.run:
+        if not self.gui.bot.force_kill and self.gui.bot.run:
             self.gui.bot_thread.kill()
             print "Successfully killing"
         else:

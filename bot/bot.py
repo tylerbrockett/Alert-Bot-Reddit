@@ -34,18 +34,19 @@ class RedditBot:
         self.gui.uptime_thread.start_time = times.get_current_timestamp()
         self.initialize()
         while not self.force_kill:
-            try:
-                self.check_token_refresh()
-                self.check_for_commands()
-                if self.run:
-                    self.read_inbox()
-                    self.crawl_subreddit("buildapcsales")
-            except KeyboardInterrupt:
-                log.interrupted()
-                exit()
-            except:
-                self.handle_crash(traceback.format_exc())
-        self.sleep(self.sleep_seconds, "Sleeping")
+            while self.run:
+                try:
+                    self.check_token_refresh()
+                    self.check_for_commands()
+                    if self.run:
+                        self.read_inbox()
+                        self.crawl_subreddit("buildapcsales")
+                except KeyboardInterrupt:
+                    log.interrupted()
+                    exit()
+                except:
+                    self.handle_crash(traceback.format_exc())
+                self.sleep(self.sleep_seconds, "Sleeping")
 
     '''
     ========================================
