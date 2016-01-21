@@ -31,8 +31,8 @@ class GUI:
         self.time_started = TimeStarted(self)
         self.run = Run(self)
         self.kill = Kill(self)
-        self.refresh = Refresh(self)
         self.export_events = ExportEvents(self)
+        self.refresh = Refresh(self)
         self.event_list = Events(self)
         self.frame.protocol("WM_DELETE_WINDOW", self.on_closing)
 
