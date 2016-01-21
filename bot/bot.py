@@ -57,7 +57,12 @@ class RedditBot:
         self.update_status("Checking commands")
         unread_messages = []
         try:
-            unread_messages = self.reddit.get_unread(limit=None)
+            j = 0
+            temp = self.reddit.get_unread(limit=None)
+            for t in temp:
+                j += 1
+                unread_messages.append(t)
+            colorize('magenta', 'NUM: ' + str(j))
         except:
             log.read_inbox_exception()
             self.reddit.send_message(accounts.developer, "Exception Handled - Read Inbox", traceback.format_exc())
@@ -146,7 +151,12 @@ class RedditBot:
         i = 0
         unread_messages = []
         try:
-            unread_messages = self.reddit.get_unread(limit=None)
+            j = 0
+            temp = self.reddit.get_unread(limit=None)
+            for t in temp:
+                j += 1
+                unread_messages.append(t)
+            colorize('magenta', 'NUM: ' + str(j))
         except:
             log.read_inbox_exception()
             self.reddit.send_message(accounts.developer, "Exception Handled - Read Inbox", traceback.format_exc())
@@ -253,7 +263,7 @@ class RedditBot:
                 except:
                     log.default_exception(username, subject, body)
                     self.reddit.send_message(accounts.developer, "Bot Exception - Default", traceback.format_exc())
-            self.sleep(2, "Reading inbox (" + str(i) + "/" + "?)  ")  # '''str(len(unread_messages)) + ")  ")'''
+            self.sleep(2, "Reading inbox (" + str(i) + "/" + str(len(unread_messages)) + ")  ")
 
         colorize('cyan', str(i) + ' unread messages')
 
