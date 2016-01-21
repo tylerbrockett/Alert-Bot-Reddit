@@ -12,7 +12,8 @@ class Kill:
 
     def kill(self):
         if not self.gui.bot.force_kill and self.gui.bot.run:
-            self.gui.bot_thread.kill()
+            self.gui.bot.force_kill = True
+            self.gui.bot.run = False
             self.gui.uptime_thread.start_time = -1
             print "Successfully killing"
         else:
