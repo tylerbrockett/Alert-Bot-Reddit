@@ -6,7 +6,7 @@ colors = [['black', '\033[30m'], ['red', '\033[31m'],     ['green', '\033[32m'],
           ['blue', '\033[34m'],  ['magenta', '\033[35m'], ['cyan', '\033[36m'],  ['white', '\033[37m']]
 
 
-def print_color(c, string):
+def colorize(c, string):
     try:
         col = None
         if c == 'random':
@@ -15,7 +15,7 @@ def print_color(c, string):
         else:
             match = [color for color in colors if color[0] == c.lower()]
             if len(match) != 1:
-                print_color('red', 'Color not defined')
+                colorize('red', 'Color not defined')
                 exit()
             else:
                 col = match[0][1]
