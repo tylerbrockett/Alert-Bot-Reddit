@@ -46,7 +46,7 @@ class GUI:
         mainloop()
 
     def on_closing(self):
-        if (self.bot_thread or self.uptime_thread) and \
+        if ((self.bot.run and not self.bot.force_kill) or self.uptime_thread.is_running) and \
                 tkMessageBox.askokcancel("Quit", "Are you sure you want to quit? There are processes running"):
             self.uptime_thread.kill()
             self.frame.destroy()

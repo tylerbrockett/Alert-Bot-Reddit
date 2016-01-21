@@ -9,13 +9,11 @@ class Refresh:
         self.text.pack()
 
     def refresh(self):
-        if self.gui.bot_thread and self.gui.bot_thread.is_running():
+        if self.gui.bot.run and not self.gui.bot.force_kill:
             tkMessageBox.showerror("Kill Process First",
                                    "You must kill the running process(es) first before running 'Refresh'")
         else:
-            self.gui.bot.disconnect_from_database()
-            self.gui.bot.refresh_token()
-            self.gui.bot.connect_to_database()
-            self.gui.status.update_status("Refreshed")
+            self.gui.bot.destroy()
+            self.gui.bot.initialize()
             self.gui.event_list.clear()
             tkMessageBox.showinfo("Success", "Refresh Successful!")
