@@ -16,10 +16,8 @@ from bot import RedditBot
 
 class GUI:
     def __init__(self):
-        self.bot = RedditBot(self)
         self.bot_thread = None
         self.uptime_thread = None
-        self.bot = RedditBot(self)
         self.buffer = EventBuffer(25)
 
         self.frame = Tk()
@@ -36,6 +34,9 @@ class GUI:
         self.export_events = ExportEvents(self)
         self.event_list = Events(self)
         self.frame.protocol("WM_DELETE_WINDOW", self.on_closing)
+
+        self.bot = RedditBot(self)
+
         mainloop()
 
     def on_closing(self):

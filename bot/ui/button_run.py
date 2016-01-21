@@ -1,6 +1,5 @@
 from Tkinter import Button
 
-from helpers import times
 from workers.thread_uptime import ThreadUptime
 from workers.thread_bot import ThreadBot
 import tkMessageBox
@@ -14,11 +13,12 @@ class Run:
 
     def run(self):
         if not self.gui.uptime_thread and not self.gui.bot_thread:
-            self.gui.uptime_thread = ThreadUptime(self.gui, times.get_current_timestamp())
+            self.gui.uptime_thread = ThreadUptime(self.gui)
             self.gui.uptime_thread.daemon = True
-            self.gui.uptime_thread.start()
             self.gui.bot_thread = ThreadBot(self.gui)
             self.gui.bot_thread.daemon = True
+
+            self.gui.uptime_thread.start()
             self.gui.bot_thread.start()
             print 'run'
         else:
