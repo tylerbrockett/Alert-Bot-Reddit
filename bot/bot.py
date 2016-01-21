@@ -57,7 +57,7 @@ class RedditBot:
         self.update_status("Checking commands")
         unread_messages = []
         try:
-            unread_messages = self.reddit.get_unread(limit=None)
+            unread_messages = self.reddit.get_unread(limit=None)[:]
         except:
             log.read_inbox_exception()
             self.reddit.send_message(accounts.developer, "Exception Handled - Read Inbox", traceback.format_exc())
@@ -146,7 +146,7 @@ class RedditBot:
         i = 0
         unread_messages = []
         try:
-            unread_messages = self.reddit.get_unread(limit=None)
+            unread_messages = self.reddit.get_unread(limit=None)[:]
         except:
             log.read_inbox_exception()
             self.reddit.send_message(accounts.developer, "Exception Handled - Read Inbox", traceback.format_exc())
