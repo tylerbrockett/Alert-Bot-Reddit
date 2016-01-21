@@ -43,7 +43,7 @@ class GUI:
         mainloop()
 
     def start_uptime_thread(self):
-        self.uptime_thread = ThreadUptime(self.gui)
+        self.uptime_thread = ThreadUptime(self)
         self.uptime_thread.daemon = True
         self.uptime_thread.start()
 
