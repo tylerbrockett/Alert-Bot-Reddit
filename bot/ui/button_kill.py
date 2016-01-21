@@ -11,9 +11,8 @@ class Kill:
         self.text.pack()
 
     def kill(self):
-        if self.gui.bot_thread:
+        if self.gui.bot.run:
             self.gui.bot_thread.kill()
-            self.gui.bot_thread = None
             print "Successfully killing"
         else:
             tkMessageBox.showerror("Start Process First",

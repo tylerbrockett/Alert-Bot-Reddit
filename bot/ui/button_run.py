@@ -11,9 +11,7 @@ class Run:
         self.text.pack()
 
     def run(self):
-        if not self.gui.bot_thread:
-            self.gui.bot_thread = ThreadBot(self.gui)
-            self.gui.bot_thread.daemon = True
+        if not self.gui.bot.run:
             self.gui.bot_thread.start()
             print 'run'
         else:
