@@ -152,11 +152,7 @@ class RedditBot:
         unread_messages = []
         try:
             j = 0
-            temp = self.reddit.get_unread(limit=None)
-            for t in temp:
-                j += 1
-                unread_messages.append(t)
-            colorize('magenta', 'NUM: ' + str(j))
+            unread_messages = self.reddit.get_unread(limit=None)
         except:
             log.read_inbox_exception()
             self.reddit.send_message(accounts.developer, "Exception Handled - Read Inbox", traceback.format_exc())
