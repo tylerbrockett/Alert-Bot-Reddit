@@ -12,7 +12,7 @@ class RedditBot:
 
     def __init__(self, gui):
         self.force_kill = True
-        self.run = True
+        self.run = False
         self.gui = gui
         self.num_posts = 20
         self.sleep_seconds = 15
