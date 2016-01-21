@@ -259,7 +259,8 @@ class RedditBot:
                 except:
                     log.default_exception(username, subject, body)
                     self.reddit.send_message(accounts.developer, "Bot Exception - Default", traceback.format_exc())
-            self.sleep(2, "Reading inbox (" + str(i) + "/" + str(len(unread_messages)) + ")  ")
+            self.sleep(2, "Reading inbox (" + str(i) + "/?)  ")
+            #self.sleep(2, "Reading inbox (" + str(i) + "/" + str(len(unread_messages)) + ")  ")
         colorize('cyan', str(i) + ' unread messages')
 
     '''
