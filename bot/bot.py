@@ -11,7 +11,7 @@ from helpers.colorize import colorize
 class RedditBot:
 
     def __init__(self, gui):
-        self.force_kill = False
+        self.force_kill = True
         self.run = True
         self.gui = gui
         self.num_posts = 20
