@@ -36,15 +36,15 @@ class GUI:
         self.event_list = Events(self)
         self.frame.protocol("WM_DELETE_WINDOW", self.on_closing)
 
-        mainloop()
-
         self.bot = RedditBot(self)
         self.bot_thread = ThreadBot(self)
         self.bot_thread.daemon = True
         self.uptime_thread = ThreadUptime(self)
         self.uptime_thread.daemon = True
         self.uptime_thread.start()
-        
+
+        mainloop()
+
     def on_closing(self):
         if (self.bot_thread or self.uptime_thread) and \
                 tkMessageBox.askokcancel("Quit", "Are you sure you want to quit? There are processes running"):
