@@ -62,7 +62,7 @@ class RedditBot:
             for t in temp:
                 j += 1
                 unread_messages.append(t)
-            colorize('magenta', 'NUM: ' + str(j))
+            # colorize('magenta', 'NUM: ' + str(j))
         except:
             log.read_inbox_exception()
             self.reddit.send_message(accounts.developer, "Exception Handled - Read Inbox", traceback.format_exc())
@@ -209,7 +209,7 @@ class RedditBot:
                     self.reddit.send_message(accounts.developer, "Bot Exception - Unsubscribe", traceback.format_exc())
 
             # Item must be longer than 2 non-space characters.
-            elif body == 'subscribe' and len(inbox.format_subject(subject).replace(' ', '')) > 2:
+            elif body == 'subscribe' and len(inbox.format_subject(subject).replace(' ', '')) > 1:
                 subscription = (username, message_id, subject, times.get_current_timestamp())
                 try:
                     cursor = self.database.cursor()
@@ -264,7 +264,6 @@ class RedditBot:
                     log.default_exception(username, subject, body)
                     self.reddit.send_message(accounts.developer, "Bot Exception - Default", traceback.format_exc())
             self.sleep(2, "Reading inbox (" + str(i) + "/" + str(len(unread_messages)) + ")  ")
-
         colorize('cyan', str(i) + ' unread messages')
 
     '''
