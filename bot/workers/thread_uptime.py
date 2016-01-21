@@ -18,7 +18,7 @@ class ThreadUptime(threading.Thread):
                 self.gui.uptime.set_uptime(times.get_time_passed(self.start_time))
             else:
                 self.gui.uptime.set_uptime("0s")
-            time.sleep(1)
+            time.sleep(0.25)
         self.on_stop_running()
 
     def is_running(self):
