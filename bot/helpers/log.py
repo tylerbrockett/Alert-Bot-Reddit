@@ -79,7 +79,7 @@ def default(username, subject, body):
 
 
 def match(username, item, message_id, title, permalink, url):
-    colorize("purple",
+    colorize("magenta",
              '-------------------------------\n' +
              '        SUBMISSION MATCH\n' +
              'timestamp:  ' + times.get_formatted_time() + "\n" +

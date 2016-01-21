@@ -15,7 +15,7 @@ class RedditBot:
         self.run = False
         self.gui = gui
         self.num_posts = 20
-        self.sleep_seconds = 15
+        self.sleep_seconds = 45
         self.start_time = 0
         self.database = None
         self.reddit = None
@@ -57,12 +57,7 @@ class RedditBot:
         self.update_status("Checking commands")
         unread_messages = []
         try:
-            j = 0
-            temp = self.reddit.get_unread(limit=None)
-            for t in temp:
-                j += 1
-                unread_messages.append(t)
-            # colorize('magenta', 'NUM: ' + str(j))
+            unread_messages = self.reddit.get_unread(limit=None)
         except:
             log.read_inbox_exception()
             self.reddit.send_message(accounts.developer, "Exception Handled - Read Inbox", traceback.format_exc())
@@ -151,8 +146,9 @@ class RedditBot:
         i = 0
         unread_messages = []
         try:
-            j = 0
-            unread_messages = self.reddit.get_unread(limit=None)
+            temp = self.reddit.get_unread(limit=None)
+            for t in temp:
+                unread_messages.append(t)
         except:
             log.read_inbox_exception()
             self.reddit.send_message(accounts.developer, "Exception Handled - Read Inbox", traceback.format_exc())
@@ -190,7 +186,7 @@ class RedditBot:
                     log.unsubscribe_all_exception(username)
                     self.reddit.send_message(accounts.developer, "Bot Exception - Unsubscribe All", traceback.format_exc())
 
-            elif body == 'unsubscribe' and subject.replace(' ', '') != '':
+            elif (body == 'unsubscribe' or body == 'unsub') and subject.replace(' ', '') != '':
                 try:
                     cursor = self.database.cursor()
                     cursor.execute(database.REMOVE_ROW_SUBSCRIPTIONS, (username, subject))
@@ -205,7 +201,7 @@ class RedditBot:
                     self.reddit.send_message(accounts.developer, "Bot Exception - Unsubscribe", traceback.format_exc())
 
             # Item must be longer than 2 non-space characters.
-            elif body == 'subscribe' and len(inbox.format_subject(subject).replace(' ', '')) > 1:
+            elif (body == 'subscribe' or body == 'sub') and len(inbox.format_subject(subject).replace(' ', '')) > 1:
                 subscription = (username, message_id, subject, times.get_current_timestamp())
                 try:
                     cursor = self.database.cursor()
@@ -219,7 +215,7 @@ class RedditBot:
                     log.subscribe_exception(username, subject)
                     self.reddit.send_message(accounts.developer, "Bot Exception - Subscribe", traceback.format_exc())
 
-            elif subject == 'information' or subject == 'help':
+            elif subject == 'information' or subject == 'help' or subject == 'info':
                 try:
                     cursor = self.database.cursor()
                     cursor.execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, (username,))
@@ -259,8 +255,7 @@ class RedditBot:
                 except:
                     log.default_exception(username, subject, body)
                     self.reddit.send_message(accounts.developer, "Bot Exception - Default", traceback.format_exc())
-            self.sleep(2, "Reading inbox (" + str(i) + "/?)  ")
-            #self.sleep(2, "Reading inbox (" + str(i) + "/" + str(len(unread_messages)) + ")  ")
+            self.sleep(2, "Reading inbox (" + str(i) + "/" + str(len(unread_messages)) + ")  ")
         colorize('cyan', str(i) + ' unread messages')
 
     '''
