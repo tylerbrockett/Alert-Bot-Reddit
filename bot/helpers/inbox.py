@@ -44,7 +44,7 @@ def format_subscriptions(subscriptions):
         for i in range(len(subscriptions)):
             result = result + str(i + 1) + " | " + subscriptions[i][database.COL_SUB_ITEM] + "\n"
     else:
-        result = "No subscriptions"
+        result = "###No subscriptions"
     return result
 
 
