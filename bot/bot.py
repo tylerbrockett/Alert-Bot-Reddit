@@ -255,7 +255,7 @@ class RedditBot:
                     self.reddit.send_message(accounts.developer, "Bot Exception - Default", traceback.format_exc())
             self.sleep(2, "Reading inbox (" + str(i) + "/" + str(len(unread_messages)) + ")  ")
 
-        print str(i) + ' UNREAD MESSAGES'
+        colorize('cyan', str(i) + ' unread messages')
 
     '''
     --------------------------------------------------------------------------------------------------------------------
