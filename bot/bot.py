@@ -57,15 +57,13 @@ class RedditBot:
         self.update_status("Checking commands")
         unread_messages = []
         try:
-            temp = self.reddit.get_unread(limit=None)
-            for t in temp:
-                unread_messages.append(t)
+            unread_messages = self.reddit.get_unread(limit=None)
         except:
             log.read_inbox_exception()
             self.reddit.send_message(accounts.developer, "Exception Handled - Read Inbox", traceback.format_exc())
 
         for unread_message in unread_messages:
-            self.check_token_refresh() # Potentially long-running operation, check between each message read
+            self.check_token_refresh()  # Potentially long-running operation, check between each message read
             username, message_id, subject, body = \
                 (str(unread_message.author).lower(),
                  unread_message.id,
@@ -148,9 +146,7 @@ class RedditBot:
         i = 0
         unread_messages = []
         try:
-            temp = self.reddit.get_unread(limit=None)
-            for t in temp:
-                unread_messages.append(t)
+            unread_messages = self.reddit.get_unread(limit=None)
         except:
             log.read_inbox_exception()
             self.reddit.send_message(accounts.developer, "Exception Handled - Read Inbox", traceback.format_exc())
@@ -257,7 +253,7 @@ class RedditBot:
                 except:
                     log.default_exception(username, subject, body)
                     self.reddit.send_message(accounts.developer, "Bot Exception - Default", traceback.format_exc())
-            self.sleep(2, "Reading inbox (" + str(i) + "/" + str(len(unread_messages)) + ")  ")
+            self.sleep(2, "Reading inbox (" + str(i) + "/" + "?)  ")  # '''str(len(unread_messages)) + ")  ")'''
 
         colorize('cyan', str(i) + ' unread messages')
 
