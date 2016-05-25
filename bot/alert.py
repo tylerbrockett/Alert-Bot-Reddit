@@ -13,10 +13,9 @@ import traceback
 from sys import stdout
 import praw
 
-from helpers.colorize import colorize
-from helpers import database
+from helpers import database, color
 from helpers import inbox
-from private import accounts
+from private import accountinfo
 
 connection = None
 reddit = None
@@ -30,17 +29,40 @@ select_users = []
 def compose_alert(username):
     # Insert alert message here!
     result = inbox.compose_greeting(username) + \
-        "As you're probably aware, the buildapcsales bot has been offline for the " + \
-        "last week or so due to a pretty severe bug. Many users were receiving several " + \
-        "messages for the same item match. I have been looking through the database to try " + \
-        "to figure out if there was a pattern to what was causing it. I found a handful of " + \
-        "duplicate subscriptions, which would cause some problems, but didn't explain the " + \
-        "rest of the users' problems. I made some changes to the code and made the database " + \
-        "more robust which should fix the duplicate database entry bug. Hopefully these changes " + \
-        "will fix the issue, but if it doesn't, it will certainly help me isolate it so I can " + \
-        "diagnose it a bit more easily. The major changes are done, and the bot will be back up " + \
-        "shortly, but I will be making minor tweaks for a while. Feel free to reply to this " + \
-        "message if you have any questions or anything. Thank you for your patience! :)"
+        "**I have a question for you all!** And an apology for some. So let's start with the apology. " + \
+        "One user requested that things like 'amazon' be subscribable (is that a word?) so I made " + \
+        "a quick change to the code so it would check the URL of the submissions, and bestbuy " + \
+        "happened to have a URL which contained the sku '11**6700**9'. You all " + \
+        "can probably guess where I'm going with that. Sorry to all of you that were subscribed to " + \
+        "that... \n\t \n\t \n" + \
+        "***Anyways***, now to my question for you all. A few of you have requested being able to " + \
+        "filter notifications by website. I currently see two options for that.\n\t \n\t \n" + \
+        "1. People can just subscribe to something like 'amazon' as they normally would, and I " + \
+        "put a check in the code to see if there is a match against a whitelist of sites, and if " + \
+        "so THEN check the url against it. The catch here is that the site would ***have*** to be " + \
+        "in the whitelist. \n" + \
+        "2. People subscribe to something like 'site: amazon'. You could continue to " + \
+        "subscribe to items for all sites the normal way, this would only matter for subscribing to " + \
+        "all items only for a specific site. This would pave the way for being able to subscribe to " + \
+        "something like 'site: amazon item: 6700' which is what a few of you have been requesting. " + \
+        "\n\t \n\t \n" + \
+        "I will be taking an unofficial vote by tallying responses. I may post in " + \
+        "/r/buildapcsalesmeta as well, we'll see. **Unfortunately**, if I make any changes it " + \
+        "probably won't happen until I'm out of school in a couple months. This is my last semester, " + \
+        "and things are getting pretty crazy! I hope you all understand. \n\t \n\t \n" + \
+        "Also, a random PSA I've been meaning to tell everyone. I used to have a length requirement " + \
+        "of 2 (or 3?) characters for subscriptions to prevent stupid stuff from happening. But... it " + \
+        "was pretty short-sighted. Now there is a length requirement of just 1 character, to prevent " + \
+        "empty subscriptions, because who knows what would happen. But, what's cool, ***and I'm an " + \
+        "idiot for not seeing it sooner***, is that you can subscribe to things like '**i3**', " + \
+        "'**i5**', and '**i7**' now! Sorry if you guys tried to subscribe to those in the past. " + \
+        "Also, I haven't tried it yet, but in theory if you wanted to be subscribed to ***ALL*** " + \
+        "posts (some have wanted this, but be warned, you **will** get a lot of PMs), if you " + \
+        "subscribe to '**[**' or '**]**' you can effectively achieve that because of the post flair " + \
+        "like **[**CPU**]**. But again, that's untested and I make no guarantees, since weird stuff " + \
+        "definitely happens. \n\t \n\t \n" + \
+        "Thanks again for using the bot!"
+
     result += compose_salutation()
     return result
 
@@ -48,34 +70,46 @@ def compose_alert(username):
 def run_alerts():
     global connection, select_users
     # if selected_users is empty, send to all, otherwise just send to selected_users
+    i = 0
+    num = 0
     if not select_users:
         needs_alert = connection.cursor().execute(database.GET_USERNAMES_THAT_NEED_ALERT).fetchall()
+        num = len(needs_alert)
         for row in needs_alert:
             username = row[database.COL_ALERTS_USERNAME]
             entry = (username, 1)  # 1 == True
             try:
-                connection.cursor().execute(database.INSERT_ROW_ALERTS, entry)
                 reddit.send_message(username, subject, compose_alert(username))
+                connection.cursor().execute(database.INSERT_ROW_ALERTS, entry)
                 connection.commit()
-                colorize('blue', 'message sent to ' + username)
+                color.print_color('blue', 'message sent to ' + username)
+                i += 1
             except:
-                colorize('red', traceback.format_exc())
+                color.print_color('red', "ALERT FAILED: " + username + \
+                                  "\n\t \n\t \n" + traceback.format_exc())
                 connection.rollback()
                 connection.close()
                 exit()
             sleep(2)
     else:
+        num = len(select_users)
         for username in select_users:
             try:
                 reddit.send_message(username, subject, compose_alert(username))
+                color.print_color('blue', 'message sent to ' + username)
+                i += 1
             except:
-                colorize('red', "ALERT FAILED: " + username)
+                color.print_color('red', "ALERT FAILED: " + username + \
+                                  "\n\t \n\t \n" + traceback.format_exc())
+            sleep(2)
+    print "Sent message to " + str(i) + "/" + str(num) + " users."
 
 
 def compose_salutation():
     result = signature + "\n\t \n\t \n" + \
-        "[Github Repository](https://github.com/tylerbrockett/reddit-bot-buildapcsales) | " + \
-        "[Developer Email](mailto://" + accounts.developeremail + ")\n"
+             "[code](https://github.com/tylerbrockett/reddit-bot-buildapcsales)" + \
+             " | /u/" + accountinfo.developerusername + \
+             " | /r/buildapcsales\n"
     return result
 
 
@@ -94,7 +128,7 @@ def connect_to_reddit():
     user_agent = 'tylerbrockett - developer'
     reddit = praw.Reddit(user_agent=user_agent)
     # TODO - TAKE OUT DISABLE WARNING AND FIGURE OUT REPLACEMENT CODE
-    reddit.login(accounts.developer, accounts.developerpassword, disable_warning=True)
+    reddit.login(accountinfo.developerusername, accountinfo.developerpassword, disable_warning=True)
 
 
 def sleep(seconds):
@@ -120,8 +154,8 @@ def finish_up():
 
 def handle_crash(stacktrace):
     global connection, reddit
-    colorize('red', stacktrace)
-    reddit.send_message(accounts.developer, "Bot Alerts Crashed", stacktrace)
+    color.print_color('red', stacktrace)
+    reddit.send_message(accountinfo.developerusername, "Bot Alerts Crashed", stacktrace)
     connection.close()
     exit()
 
@@ -133,3 +167,4 @@ if __name__ == "__main__":
         finish_up()
     except:
         handle_crash(traceback.format_exc())
+

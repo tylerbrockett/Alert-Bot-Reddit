@@ -1,4 +1,4 @@
-from helpers import colorize
+from helpers import color
 
 
 def __init__(self):
@@ -6,7 +6,7 @@ def __init__(self):
 
 
 def send_email(self, destination, subject, message):
-    colorize.print_color('cyan', '\n\n' +
+    color.print_color('cyan', '\n\n' +
                             '----------- MESSAGE SENT -----------\n' +
                             'destination: ' + destination + '\n' +
                             'subject:     ' + subject + '\n' +
