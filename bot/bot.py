@@ -13,11 +13,11 @@ import sqlite3
 import traceback
 from sys import stdout
 
-from helpers import color, times, database, inbox, files, output
+from helpers import color, times, database, inbox, output
 from private import accountinfo
 
 SLEEP_SECONDS = 45
-NUM_POSTS_TO_CRAWL = 50
+NUM_POSTS_TO_CRAWL = 20
 bot = accountinfo.username
 
 connection = None
@@ -91,6 +91,7 @@ def check_for_commands():
                     unread_message.mark_as_read()
                 except:
                     handle_crash(traceback.format_exc())
+
 
 def crawl_subreddit(subreddit):
     global reddit
@@ -169,6 +170,36 @@ def read_inbox():
             except:
                 handle_crash(traceback.format_exc())
 
+        elif subject == 'statistics':
+            try:
+                cursor = connection.cursor()
+
+                cursor.execute(database.COUNT_USERS)
+                users = cursor.fetchall()
+                cursor.execute(database.COUNT_SUBSCRIPTIONS)
+                subscriptions = cursor.fetchall()
+                cursor.execute(database.COUNT_UNIQUE_SUBSCRIPTIONS)
+                items = cursor.fetchall()
+                cursor.execute(database.COUNT_MATCHES)
+                matches = cursor.fetchall()
+
+                unread_message.reply(inbox.compose_statistics(username, users, subscriptions, items, matches))
+                unread_message.mark_as_read()
+            except:
+                connection.rollback()
+                output.subscribe_exception(username, subject)
+                reddit.send_message(accountinfo.developerusername, "Bot Exception - Subscribe", traceback.format_exc())
+
+        elif subject == 'username mention':
+            output.username_mention(username, body)
+            unread_message.mark_as_read()
+            reddit.send_message(accountinfo.developerusername, "Bot - Username Mention", 'username: ' + username + '\n\n' + body)
+
+        elif subject == 'post reply':
+            output.post_reply(username, body)
+            unread_message.mark_as_read()
+            reddit.send_message(accountinfo.developerusername, "Bot - Post Reply", 'username: ' + username + '\n\n' + body)
+
         elif ('unsubscribe' in body and 'all' in body) \
                 or ('unsubscribe' in subject and 'all' in subject):
             try:
@@ -208,6 +239,9 @@ def read_inbox():
                 unread_message.mark_as_read()
                 connection.commit()
                 output.subscribe(username, subject)
+            except sqlite3.IntegrityError:
+                unread_message.mark_as_read()
+                reddit.send_message(accountinfo.developerusername, "Bot Exception - IntegrityError", traceback.format_exc())
             except:
                 connection.rollback()
                 output.subscribe_exception(username, subject)
@@ -313,4 +347,4 @@ if __name__ == "__main__":
     except:
         color.print_color('red', traceback.format_exc())
         exit()
- 
+

@@ -103,6 +103,20 @@ def compose_match_message(username, item, title, permalink, url):
     return result
 
 
+def compose_statistics(username, users, subscriptions, items, matches):
+    result = compose_greeting(username) + \
+        "###Statistics\n" + \
+        "Statistic|Value\n" + \
+        "--:|:--:" + "\n" + \
+        "Current Users Subscribed|" + str(users) + "\n" + \
+        "Active Subscriptions|" + str(subscriptions) + "\n" + \
+        "Unique Items Being Watched|" + str(items) + "\n" + \
+        "Total Matches to Date|" + str(matches) + "\n\n\n" + \
+        "Thank ***YOU*** for being a part of that!\n" + \
+        compose_salutation()
+    return result
+
+
 def compose_feedback_forward(username, message):
     result = compose_greeting(accountinfo.developerusername) + \
              "You have received feedback from /u/" + username + ". The feedback is quoted below:\n\n'" + \
@@ -113,7 +127,7 @@ def compose_feedback_forward(username, message):
 SIGNATURE = "\n\t \n\t \n-sales__bot"
 
 INFORMATION = \
-    "Thanks for your interest in my abilities! This is how I work: \n\n" + \
+    "Thanks for your interest in the bot! This is how it works: \n\n" + \
     \
     "###Subscribing\n" + \
     "Send me a private message with the subject line as the exact string you " + \

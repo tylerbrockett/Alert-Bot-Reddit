@@ -118,3 +118,14 @@ GET_USERNAMES_THAT_NEED_ALERT = "SELECT DISTINCT s.username " + \
 INSERT_ROW_ALERTS = "INSERT INTO " + TABLE_ALERTS + " VALUES (?,?)"
 
 DROP_TABLE_ALERTS = "DROP TABLE " + TABLE_ALERTS
+
+
+# ======================================================================================================
+#           OTHER
+# ======================================================================================================
+
+COUNT_USERS = "SELECT " + USERNAME + " DISTINCT FROM " + TABLE_SUBSCRIPTIONS
+COUNT_SUBSCRIPTIONS = "SELECT * FROM " + TABLE_SUBSCRIPTIONS
+COUNT_UNIQUE_SUBSCRIPTIONS = "SELECT * DISTINCT FROM " + TABLE_SUBSCRIPTIONS
+COUNT_MATCHES = "SELECT * FROM " + TABLE_MATCHES
+
