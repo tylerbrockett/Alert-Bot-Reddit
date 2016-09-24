@@ -183,6 +183,7 @@ def read_inbox():
                 cursor.execute(database.COUNT_MATCHES)
                 matches = len(cursor.fetchall())
 
+                output.statistics(username, users, subscriptions, items, matches)
                 unread_message.reply(inbox.compose_statistics(username, users, subscriptions, items, matches))
                 unread_message.mark_as_read()
             except:

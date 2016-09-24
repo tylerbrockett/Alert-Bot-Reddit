@@ -26,7 +26,9 @@ def compose_subscribe_message(username, item):
              "Thanks for your subscription. " + \
              "You will continue to receive updates to part sales that contain '" + item + "' " + \
              "in its title. To unsubscribe, send me a message with the subject '" + item + "' " + \
-             "and the message body 'Unsubscribe'." + \
+             "and the message body 'Unsubscribe'.\n\nAlternatively, you can reply to this " + \
+             "message or any replies from the bot in regards to this subscription and reply with " + \
+             "'Unsubscribe' as the body." + \
              compose_salutation()
     return result
 
