@@ -121,11 +121,10 @@ DROP_TABLE_ALERTS = "DROP TABLE " + TABLE_ALERTS
 
 
 # ======================================================================================================
-#           OTHER
+#           STATISTICS
 # ======================================================================================================
 
-COUNT_USERS = "SELECT " + USERNAME + " DISTINCT FROM " + TABLE_SUBSCRIPTIONS
+COUNT_USERS = "SELECT DISTINCT " + USERNAME + " FROM " + TABLE_SUBSCRIPTIONS
 COUNT_SUBSCRIPTIONS = "SELECT * FROM " + TABLE_SUBSCRIPTIONS
-COUNT_UNIQUE_SUBSCRIPTIONS = "SELECT * DISTINCT FROM " + TABLE_SUBSCRIPTIONS
+COUNT_UNIQUE_SUBSCRIPTIONS = "SELECT DISTINCT " + ITEM + " FROM " + TABLE_SUBSCRIPTIONS
 COUNT_MATCHES = "SELECT * FROM " + TABLE_MATCHES
-
