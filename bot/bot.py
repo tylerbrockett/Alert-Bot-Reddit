@@ -175,13 +175,13 @@ def read_inbox():
                 cursor = connection.cursor()
 
                 cursor.execute(database.COUNT_USERS)
-                users = cursor.fetchall()
+                users = len(cursor.fetchall())
                 cursor.execute(database.COUNT_SUBSCRIPTIONS)
-                subscriptions = cursor.fetchall()
+                subscriptions = len(cursor.fetchall())
                 cursor.execute(database.COUNT_UNIQUE_SUBSCRIPTIONS)
-                items = cursor.fetchall()
+                items = len(cursor.fetchall())
                 cursor.execute(database.COUNT_MATCHES)
-                matches = cursor.fetchall()
+                matches = len(cursor.fetchall())
 
                 unread_message.reply(inbox.compose_statistics(username, users, subscriptions, items, matches))
                 unread_message.mark_as_read()
