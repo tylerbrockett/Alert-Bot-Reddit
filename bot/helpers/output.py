@@ -167,10 +167,10 @@ def statistics(username, users, subscriptions, items, matches):
         "-------------------------------\n" +
         "        SUBMISSION MATCH\n" +
         "username:      " + username + "\n" +
-        "user count:    " + users + "\n" +
-        "subscriptions: " + subscriptions + "\n" +
-        "unique items:  " + items + "\n" +
-        "matches:       " + matches + "\n" +
+        "user count:    " + str(users) + "\n" +
+        "subscriptions: " + str(subscriptions) + "\n" +
+        "unique items:  " + str(items) + "\n" +
+        "matches:       " + str(matches) + "\n" +
         '-------------------------------\n\n')
 
 
