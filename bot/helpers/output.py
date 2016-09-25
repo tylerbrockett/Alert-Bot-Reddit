@@ -51,6 +51,15 @@ def information_exception(username):
         traceback.format_exc() + "\n\n")
 
 
+def subscriptions_exception(username):
+    color.print_color(
+        'red',
+        'subscriptions exception caught\n' +
+        "username:   " + username + "\n" +
+        "stacktrace: " + "\n" +
+        traceback.format_exc() + "\n\n")
+
+
 def feedback_exception(username, user_feedback):
     color.print_color(
         'red',
@@ -126,6 +135,15 @@ def information(username):
         '-------------------------------\n\n')
 
 
+def subscriptions(username):
+    color.print_color(
+        'green',
+        '-------------------------------\n' +
+        '         SUBSCRIPTIONS\n' +
+        'username: ' + username + "\n" +
+        '-------------------------------\n\n')
+
+
 def feedback(username, user_feedback):
     color.print_color(
         'yellow',
@@ -165,7 +183,7 @@ def statistics(username, users, subscriptions, items, matches):
     color.print_color(
         'green',
         "-------------------------------\n" +
-        "        SUBMISSION MATCH\n" +
+        "        STATISTICS\n" +
         "username:      " + username + "\n" +
         "user count:    " + str(users) + "\n" +
         "subscriptions: " + str(subscriptions) + "\n" +

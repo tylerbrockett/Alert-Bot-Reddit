@@ -42,7 +42,8 @@ SELECT_DISTINCT_ITEMS = "SELECT DISTINCT " + ITEM + " FROM " + TABLE_SUBSCRIPTIO
 
 GET_SUBSCRIPTIONS_BY_USERNAME = "SELECT * " + \
                                 "FROM " + TABLE_SUBSCRIPTIONS + " " + \
-                                "WHERE username = ?"
+                                "WHERE username = ? " + \
+                                "ORDER BY " + ITEM + " ASC"
 
 # ======================================================================================================
 #           DATABASE MATCHES TABLE

@@ -170,7 +170,7 @@ def read_inbox():
             except:
                 handle_crash(traceback.format_exc())
 
-        elif subject == 'statistics':
+        elif subject == 'statistics' or subject == 'stats':
             try:
                 cursor = connection.cursor()
 
@@ -190,6 +190,17 @@ def read_inbox():
                 connection.rollback()
                 output.subscribe_exception(username, subject)
                 reddit.send_message(accountinfo.developerusername, "Bot Exception - Subscribe", traceback.format_exc())
+
+        elif subject == 'subscriptions' or subject == 'subs':
+            try:
+                cursor = connection.cursor()
+                cursor.execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, (username,))
+                unread_message.reply(inbox.compose_subscriptions_message(username, cursor.fetchall()))
+                unread_message.mark_as_read()
+                output.subscriptions(username)
+            except:
+                output.subscriptions_exception(username)
+                reddit.send_message(accountinfo.developerusername, "Bot Exception - Subscriptions", traceback.format_exc())
 
         elif subject == 'username mention':
             output.username_mention(username, body)
@@ -236,7 +247,9 @@ def read_inbox():
             try:
                 cursor = connection.cursor()
                 cursor.execute(database.INSERT_ROW_SUBMISSIONS, subscription)
-                unread_message.reply(inbox.compose_subscribe_message(username, subject))
+                cursor = connection.cursor()
+                cursor.execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, (username,))
+                unread_message.reply(inbox.compose_subscribe_message(username, subject, cursor.fetchall()))
                 unread_message.mark_as_read()
                 connection.commit()
                 output.subscribe(username, subject)

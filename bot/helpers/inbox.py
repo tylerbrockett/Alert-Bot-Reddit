@@ -21,14 +21,22 @@ def compose_salutation():
     return result
 
 
-def compose_subscribe_message(username, item):
+def compose_subscribe_message(username, item, subscriptions):
     result = compose_greeting(username) + \
              "Thanks for your subscription. " + \
              "You will continue to receive updates to part sales that contain '" + item + "' " + \
              "in its title. To unsubscribe, send me a message with the subject '" + item + "' " + \
              "and the message body 'Unsubscribe'.\n\nAlternatively, you can reply to this " + \
              "message or any replies from the bot in regards to this subscription and reply with " + \
-             "'Unsubscribe' as the body." + \
+             "'Unsubscribe' as the body.\n\n" + \
+             format_subscriptions(subscriptions) + \
+             compose_salutation()
+    return result
+
+
+def compose_subscriptions_message(username, subscriptions):
+    result = compose_greeting(username) + \
+             format_subscriptions(subscriptions) + \
              compose_salutation()
     return result
 
@@ -36,10 +44,9 @@ def compose_subscribe_message(username, item):
 def format_subscriptions(subscriptions):
     result = ''
     if len(subscriptions) > 0:
-        if len(subscriptions) > 1:
-            result += "###Subscriptions\n\n" + \
-                      "\# | Item" + "\n" + \
-                      "--:|:--:" + "\n"
+        result += "###Subscriptions\n\n" + \
+                  "\# | Item" + "\n" + \
+                  "--:|:--:" + "\n"
         for i in range(len(subscriptions)):
             result = result + str(i + 1) + " | " + subscriptions[i][database.COL_SUB_ITEM] + "\n"
     return result
@@ -81,8 +88,8 @@ def compose_feedback_message(username):
 def compose_default_message(username, item, request):
     result = compose_greeting(username) + \
              "**There was an error processing your request.** Please review your message and " + \
-             "make sure it follows the guidelines I have set. Please private message me " + \
-             "with the subject 'Information' to get detailed information on how I work, " + \
+             "make sure it follows the guidelines that have been set. Please private message the bot " + \
+             "with the subject 'Information' to get detailed information on how the bot works, " + \
              "or message /u/tylerbrockett if you want specialized help or have any " + \
              "questions for me. Thank you for your patience! \n\t \n\t \n" + \
              "**Your request:** \t \n" + \
@@ -132,27 +139,27 @@ INFORMATION = \
     "Thanks for your interest in the bot! This is how it works: \n\n" + \
     \
     "###Subscribing\n" + \
-    "Send me a private message with the subject line as the exact string you " + \
-    "want me to keep an eye out for, and the body as 'subscribe'. Keep it " + \
-    "semi-general as to not limit my search too much. For example, use " + \
+    "Send the bot a private message with the subject line as the exact string you " + \
+    "want it to keep an eye out for, and the body as 'subscribe'. Keep it " + \
+    "semi-general as to not limit the search too much. For example, use " + \
     "'i5-4590' instead of 'Intel Core i5-4590 3.3GHz LGA 1150'. \n\n" + \
     \
-    "###What I do\n" + \
-    "I will send you a message that contains a link to that item each time " + \
-    "I come across a post in /r/buildapcsales that matches. It will be a reply " + \
-    "to the original message you sent. This will happen until you send me a " + \
+    "###What the bot does\n" + \
+    "The bot will send you a message that contains a link to that item each time " + \
+    "it come across a post in /r/buildapcsales that matches. It will be a reply " + \
+    "to the original message you sent. This will happen until you send the bot a " + \
     "message unsubscribing from the part, which is described more in the next " + \
     "line. \n\n" + \
     \
     "###Unsubscribing\n" + \
-    "If or when you want to unsubscribe, send me another private message with " + \
+    "If or when you want to unsubscribe, send the bot another private message with " + \
     "the subject line as the item you want to unsubscribe from, and the body as " + \
     "'Unsubscribe'. If you want to unsubscribe from ALL of the parts you are " + \
     "subscribed to, make the body of the pm 'unsubscribe all' and the subject line " + \
     "can be whatever you want. \n\n" + \
     \
     "###Getting Help\n" + \
-    "Remember that you can always send me a message with the subject line as " + \
+    "Remember that you can always send the bot a message with the subject line as " + \
     "'Information' or 'Help' to get this message, and all of the parts you are " + \
     "subscribed to. If you want more specific help, send a private message to /u/" + \
     accountinfo.developerusername + " and I will try my absolute best to help you out.\n\n" + \
