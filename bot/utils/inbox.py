@@ -1,4 +1,4 @@
-from helpers import database
+from utils import database
 from private import accountinfo
 
 
@@ -41,6 +41,29 @@ def compose_subscriptions_message(username, subscriptions):
     return result
 
 
+def compose_invalid_subscription_message(username, sub):
+    result = compose_greeting(username) + \
+             '**OH NO!** It seems like you\'re not speaking the bot\'s language! Below is the text ' + \
+             'the bot is trying to understand. If you believe there has been an error, please PM ' + \
+             '/u/' + accountinfo.developeremail + '. \n\n' + sub + \
+             compose_salutation()
+    return result
+
+
+def compose_duplicate_subscription_message(username, existing, new):
+    result = compose_greeting(username) + \
+             'We think you alread have an existing subscription matching the criteria specified. Below ' + \
+             'both subscriptions are listed. If you believe there has been a mistake, please PM me at ' + \
+             '/u/' + accountinfo.developerusername + ' and let me know.\n\n' + \
+             '###Existing\n' + \
+             existing.to_string() + '\n\n' + \
+             '###New\n' + \
+             new.to_string() + '\n' + \
+             compose_salutation()
+    return result
+
+
+# TODO Change this to use subscription objects
 def format_subscriptions(subscriptions):
     result = ''
     if len(subscriptions) > 0:
@@ -112,15 +135,17 @@ def compose_match_message(username, item, title, permalink, url):
     return result
 
 
-def compose_statistics(username, users, subscriptions, items, matches):
+def compose_statistics(username, current_users, all_users, unique_subs, all_subs, unique_subreddits, all_matches):
     result = compose_greeting(username) + \
-        "###Statistics\n" + \
-        "Statistic|Value\n" + \
-        "--:|:--:" + "\n" + \
-        "Current Users Subscribed|" + str(users) + "\n" + \
-        "Active Subscriptions|" + str(subscriptions) + "\n" + \
-        "Unique Items Being Watched|" + str(items) + "\n" + \
-        "Total Matches to Date|" + str(matches) + "\n\n\n" + \
+        '###Statistics\n' + \
+        'Statistic|Value\n' + \
+        '--:|:--:' + '\n' + \
+        'Current Users Subscribed|' + str(current_users) + '\n' + \
+        'Total Users|' + str(all_users) + '\n' + \
+        'Unique Subscriptions|' + str(unique_subs) + '\n' + \
+        'Active Subscriptions|' + str(all_subs) + '\n' + \
+        'Unique Subreddits|' + str(unique_subreddits) + '\n' + \
+        "Total Matches to Date|" + str(all_matches) + "\n\n\n" + \
         "Thank ***YOU*** for being a part of that!\n" + \
         compose_salutation()
     return result
@@ -133,7 +158,7 @@ def compose_feedback_forward(username, message):
     return result
 
 
-SIGNATURE = "\n\t \n\t \n-sales__bot"
+SIGNATURE = '\n\t \n\t \n-' + accountinfo.username
 
 INFORMATION = \
     "Thanks for your interest in the bot! This is how it works: \n\n" + \

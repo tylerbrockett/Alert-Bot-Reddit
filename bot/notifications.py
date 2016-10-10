@@ -13,8 +13,8 @@ import traceback
 from sys import stdout
 import praw
 
-from helpers import database, color
-from helpers import inbox
+from utils import database, logger
+from utils import inbox
 from private import accountinfo
 
 connection = None
@@ -82,10 +82,10 @@ def run_alerts():
                 reddit.send_message(username, subject, compose_alert(username))
                 connection.cursor().execute(database.INSERT_ROW_ALERTS, entry)
                 connection.commit()
-                color.print_color('blue', 'message sent to ' + username)
+                logger.log('blue', 'message sent to ' + username)
                 i += 1
             except:
-                color.print_color('red', "ALERT FAILED: " + username + \
+                logger.log('red', "ALERT FAILED: " + username + \
                                   "\n\t \n\t \n" + traceback.format_exc())
                 connection.rollback()
                 connection.close()
@@ -96,10 +96,10 @@ def run_alerts():
         for username in select_users:
             try:
                 reddit.send_message(username, subject, compose_alert(username))
-                color.print_color('blue', 'message sent to ' + username)
+                logger.log('blue', 'message sent to ' + username)
                 i += 1
             except:
-                color.print_color('red', "ALERT FAILED: " + username + \
+                logger.log('red', "ALERT FAILED: " + username + \
                                   "\n\t \n\t \n" + traceback.format_exc())
             sleep(2)
     print "Sent message to " + str(i) + "/" + str(num) + " users."
@@ -154,7 +154,7 @@ def finish_up():
 
 def handle_crash(stacktrace):
     global connection, reddit
-    color.print_color('red', stacktrace)
+    logger.log('red', stacktrace)
     reddit.send_message(accountinfo.developerusername, "Bot Alerts Crashed", stacktrace)
     connection.close()
     exit()

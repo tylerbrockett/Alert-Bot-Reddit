@@ -1,9 +1,9 @@
 import traceback
-from helpers import color
+from utils import logger
 
 
 def subscribe_exception(username, item):
-    color.print_color(
+    logger.log(
         'red',
         'subscribe exception caught\n' +
         "username:   " + username + "\n" +
@@ -13,7 +13,7 @@ def subscribe_exception(username, item):
 
 
 def unsubscribe_all_exception(username):
-    color.print_color(
+    logger.log(
         'red',
         'unsubscribe all exception caught\n' +
         "username:   " + username + "\n" +
@@ -22,7 +22,7 @@ def unsubscribe_all_exception(username):
 
 
 def unsubscribe_exception(username, item):
-    color.print_color(
+    logger.log(
         'red',
         'unsubscribe exception caught\n' +
         "username:   " + username + "\n" +
@@ -32,7 +32,7 @@ def unsubscribe_exception(username, item):
 
 
 def default_exception(username, subject, body):
-    color.print_color(
+    logger.log(
         'red',
         'unsubscribe exception caught\n' +
         "username:   " + username + "\n" +
@@ -43,7 +43,7 @@ def default_exception(username, subject, body):
 
 
 def information_exception(username):
-    color.print_color(
+    logger.log(
         'red',
         'information exception caught\n' +
         "username:   " + username + "\n" +
@@ -52,7 +52,7 @@ def information_exception(username):
 
 
 def subscriptions_exception(username):
-    color.print_color(
+    logger.log(
         'red',
         'subscriptions exception caught\n' +
         "username:   " + username + "\n" +
@@ -61,7 +61,7 @@ def subscriptions_exception(username):
 
 
 def feedback_exception(username, user_feedback):
-    color.print_color(
+    logger.log(
         'red',
         'feedback exception caught\n' +
         "username:   " + username + "\n" +
@@ -71,7 +71,7 @@ def feedback_exception(username, user_feedback):
 
 
 def match_exception(username, item, message_id, title, permalink, url):
-    color.print_color(
+    logger.log(
         'red',
         "match exception caught\n" +
         "username:   " + username + "\n" +
@@ -84,21 +84,21 @@ def match_exception(username, item, message_id, title, permalink, url):
 
 
 def get_submissions_exception():
-    color.print_color(
+    logger.log(
         'red',
         "get submissions exception caught\n" +
         "stacktrace:\n" + traceback.format_exc() + "\n\n")
 
 
 def read_inbox_exception():
-    color.print_color(
+    logger.log(
         'red',
         "read inbox exception caught\n" +
         "stacktrace:\n" + traceback.format_exc() + "\n\n")
 
 
 def subscribe(username, item):
-    color.print_color(
+    logger.log(
         'green',
         '-------------------------------\n' +
         '           SUBSCRIBE\n' +
@@ -108,7 +108,7 @@ def subscribe(username, item):
 
 
 def unsubscribe_all(username):
-    color.print_color(
+    logger.log(
         'red',
         '-------------------------------\n' +
         '         UNSUBSCRIBE ALL\n' +
@@ -117,7 +117,7 @@ def unsubscribe_all(username):
 
 
 def unsubscribe(username, item):
-    color.print_color(
+    logger.log(
         'red',
         '-------------------------------\n' +
         '           UNSUBSCRIBE\n' +
@@ -127,7 +127,7 @@ def unsubscribe(username, item):
 
 
 def information(username):
-    color.print_color(
+    logger.log(
         'green',
         '-------------------------------\n' +
         '         INFORMATION\n' +
@@ -136,7 +136,7 @@ def information(username):
 
 
 def subscriptions(username):
-    color.print_color(
+    logger.log(
         'green',
         '-------------------------------\n' +
         '         SUBSCRIPTIONS\n' +
@@ -145,7 +145,7 @@ def subscriptions(username):
 
 
 def feedback(username, user_feedback):
-    color.print_color(
+    logger.log(
         'yellow',
         '-------------------------------\n' +
         '            FEEDBACK\n' +
@@ -155,7 +155,7 @@ def feedback(username, user_feedback):
 
 
 def default(username, subject, body):
-    color.print_color(
+    logger.log(
         'yellow',
         '-------------------------------\n' +
         "             DEFAULT\n" +
@@ -166,7 +166,7 @@ def default(username, subject, body):
 
 
 def match(username, item, message_id, title, permalink, url):
-    color.print_color(
+    logger.log(
         'magenta',
         "-------------------------------\n" +
         "        SUBMISSION MATCH\n" +
@@ -180,7 +180,7 @@ def match(username, item, message_id, title, permalink, url):
 
 
 def statistics(username, users, subscriptions, items, matches):
-    color.print_color(
+    logger.log(
         'green',
         "-------------------------------\n" +
         "        STATISTICS\n" +
@@ -193,7 +193,7 @@ def statistics(username, users, subscriptions, items, matches):
 
 
 def username_mention(username, body):
-    color.print_color(
+    logger.log(
         'green',
         "-------------------------------\n" +
         "        USERNAME MENTION\n" +
@@ -203,7 +203,7 @@ def username_mention(username, body):
 
 
 def post_reply(username, body):
-    color.print_color(
+    logger.log(
         'green',
         "-------------------------------\n" +
         "        POST REPLY\n" +
@@ -213,12 +213,12 @@ def post_reply(username, body):
 
 
 def about_message():
-    color.print_color(
+    logger.log(
         'yellow',
         "================================================================\n" +
         "\t\tSALES__BOT - A Sales Notifier Bot\n" +
         "================================================================\n\n")
-    color.print_color(
+    logger.log(
         'blue',
         '\n--------------------------------------------------\n' +
         '\t\twww.reddit.com/r/buildapcsales' + '\n' +

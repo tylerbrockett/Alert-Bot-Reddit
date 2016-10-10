@@ -1,12 +1,12 @@
 from datetime import datetime
 import time
-from helpers import color
+from utils import logger
 
 
 class TimeHelper:
     def __init__(self, quiet_start=0, quiet_end=0):
         if quiet_end < quiet_start:
-            color.print_color('red', 'Invalid Quiet Hours.')
+            logger.log('red', 'Invalid Quiet Hours.')
             exit()
         self.quiet_start = quiet_start
         self.quiet_stop = quiet_end

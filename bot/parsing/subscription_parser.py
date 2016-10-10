@@ -19,6 +19,8 @@ class SubscriptionParser:
         self.sites = []
         self.ignore_items = []
         self.ignore_sites = []
+        self.redditors = []
+        self.ignore_redditors = []
         self.subreddits = []
         self.settings = []
         self.index = -1
