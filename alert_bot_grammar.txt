@@ -1,0 +1,48 @@
+'''
+---------------------------
+    GRAMMAR
+---------------------------
+
+program -> subscription
+
+subscription -> statement_list
+subscription -> list statement_list
+subscription -> list
+
+statement_list -> statement
+statement_list -> statement statement_list
+
+statement -> item_statement
+statement -> site_statement
+statement -> redditor_statement
+statement -> subreddit_statement
+statement -> email_statement
+statement -> nsfw_statement
+statement -> ignore_item_statement
+statement -> ignore_site_statement
+statement -> ignore_redditor_statement
+
+item_statement -> -ITEM list
+item_statement -> -ITEMS list
+site_statement -> -SITE list
+site_statement -> -SITES list
+redditor_statement -> -REDDITOR list
+redditor_statement -> -REDDITORS list
+subreddit_statement -> -SUBREDDIT list
+subreddit_statement -> -SUBREDDITS list
+email_statement -> -EMAIL
+nsfw_statement -> -HIDE-NSFW
+
+ignore_item_statement -> -IGNORE-ITEM list
+ignore_item_statement -> -IGNORE-ITEMS list
+ignore_site_statement -> -IGNORE-SITE list
+ignore_site_statement -> -IGNORE-SITES list
+ignore_redditor_statement -> -IGNORE-REDDITOR list
+ignore_redditor_statement -> -IGNORE-REDDITORS list
+
+list -> element
+list -> element COMMA list
+
+element -> TOKEN
+element -> TOKEN element
+

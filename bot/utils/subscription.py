@@ -21,14 +21,14 @@ class Subscription:
     def parse_items(self):
         try:
             parser = SubscriptionParser(self.original_string)
-            self.items = parser.items
-            self.ignore_items = parser.ignore_items
-            self.sites = parser.sites
-            self.ignore_sites = parser.ignore_sites
-            self.redditors = parser.redditors
-            self.ignore_redditors = parser.ignore_redditors
-            self.subreddits = parser.subreddits
-            self.settings = parser.settings
+            self.items = list(set(parser.items))
+            self.ignore_items = list(set(parser.ignore_items))
+            self.sites = list(set(parser.sites))
+            self.ignore_sites = list(set(parser.ignore_sites))
+            self.redditors = list(set(parser.redditors))
+            self.ignore_redditors = list(set(parser.ignore_redditors))
+            self.subreddits = list(set(parser.subreddits))
+            self.settings = list(set(parser.settings))
             self.valid = True
         except SubscriptionParserException:
             self.valid = False

@@ -24,19 +24,12 @@ connection = None
 reddit = None
 start_time = None
 
-run = True
-
 
 def run_bot():
-    global start_time, run
-    output.about_message()
+    global start_time
     while True:
         try:
-            check_for_commands()
-            if run:
-                read_inbox()
-                crawl_subreddit('buildapcsales')
-                logger.log('yellow', times.get_time_passed(start_time))
+            read_inbox()
         except KeyboardInterrupt:
             logger.log('red', 'Interrupted')
             exit()
@@ -246,7 +239,7 @@ def read_inbox():
             subscription = (username, message_id, subject, times.get_current_timestamp())
             try:
                 cursor = connection.cursor()
-                cursor.execute(database.INSERT_ROW_SUBMISSIONS, subscription)
+                cursor.execute(database.INSERT_ROW_SUBSCRIPTIONS, subscription)
                 cursor = connection.cursor()
                 cursor.execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, (username,))
                 unread_message.reply(inbox.compose_subscribe_message(username, subject, cursor.fetchall()))
@@ -265,7 +258,7 @@ def read_inbox():
             try:
                 cursor = connection.cursor()
                 cursor.execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, (username,))
-                unread_message.reply(inbox.compose_information_message(username, cursor.fetchall()))
+                unread_message.reply(inbox.compose_help_message(username, cursor.fetchall()))
                 unread_message.mark_as_read()
                 output.information(username)
             except:

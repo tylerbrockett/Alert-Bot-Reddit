@@ -1,0 +1,43 @@
+
+Ignore things like
+
+[Desktop]
+[Combo]
+[Prebuilt]
+[J              (??? Got deleted...)
+Refurb
+MIR
+Rebate
+(prime)
+[META]
+(Used)
+[Mini-PC]
+
+Regions - going to be taken care of with the '-subreddit' tag
+
+
+Add functionality to edit the subscription:
+    - add SOMETHING to FIELD
+    - remove SOMETHING from FIELD
+    - edit #1 blaaahhhhh
+
+
+Filter by username for /r/HardwareSwap
+    -redditors
+    -ignore-redditors
+
+Add '_____ User have been alerted to this post. Thank you for posting useful content!' as a comment to each post
+    -Save in table based on post permalink
+
+Add ability to set reddit messages to false if email messages are set to true
+
+Change parsing tags to things like -IGNORE-ITEMS etc
+
+Add -HIDE-NSFW tag for /r/buildapcsales expired sales
+
+
+
+
+
+USER TO NOTIFY OF CHANGE:
+ -cswksu

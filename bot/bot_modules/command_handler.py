@@ -16,7 +16,7 @@ class CommandHandler:
         unread_messages = reddit.get_unread(limit=None)
         for message in unread_messages:
             username = str(message.author).lower()
-            if username is accountinfo.developerusername:
+            if username == accountinfo.developerusername:
                 dev_messages.append(message)
         return dev_messages
 

@@ -9,19 +9,22 @@ class SubscriptionLexer:
     active_token = False
     token = ''
     token_type = TokenType.NO_TOKEN
-    KEYWORDS = 8
     reserved_tokens = [
         '',
-        'site',
-        'sites',
-        'item',
-        'items',
-        'ignore',
-        'email',
-        'subreddit',
-        'subreddits',
-        ':',
-        ';',
+        '-site',
+        '-sites',
+        '-item',
+        '-items',
+        '-subreddit',
+        '-subreddits',
+        '-ignore-site',
+        '-ignore-sites',
+        '-ignore-item',
+        '-ignore-items',
+        '-ignore-subreddit',
+        '-ignore-subreddits',
+        '-hide-nsfw',
+        '-email',
         ','
     ]
 
@@ -36,9 +39,22 @@ class SubscriptionLexer:
             self.unget_char()
 
     def is_keyword(self, token):
-        for i in range(1, self.KEYWORDS + 1):
-            if self.reserved_tokens[i] == token.lower():
-                return i
+        if token.lower() == '-site' or token.lower() == '-sites':
+            return TokenType.SITES
+        elif token.lower() == '-item' or token.lower() == '-items':
+            return TokenType.ITEMS
+        elif token.lower() == '-subreddit' or token.lower() == '-subreddits':
+            return TokenType.SUBREDDITS
+        elif token.lower() == '-ignore-site' or token.lower() == '-ignore-sites':
+            return TokenType.IGNORE_SITES
+        elif token.lower() == '-ignore-item' or token.lower() == '-ignore-items':
+            return TokenType.IGNORE_ITEMS
+        elif token.lower() == '-ignore-redditor' or token.lower() == '-ignore-redditors':
+            return TokenType.IGNORE_REDDITORS
+        elif token.lower() == '-email':
+            return TokenType.EMAIL
+        elif token.lower() == '-hide-nsfw':
+            return TokenType.NSFW
         return self.FALSE
 
     def unget_token(self):
@@ -78,13 +94,7 @@ class SubscriptionLexer:
         self.token = ''
 
         c = self.get_char()
-        if c == ':':
-            self.token_type = TokenType.COLON
-            self.token = c
-        elif c == ';':
-            self.token_type = TokenType.SEMICOLON
-            self.token = c
-        elif c == ',':
+        if c == ',':
             self.token_type = TokenType.COMMA
             self.token = c
         else:

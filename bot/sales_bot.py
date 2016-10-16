@@ -13,12 +13,13 @@ import sqlite3
 import traceback
 from sys import stdout
 
-from utils import logger, times, database, inbox, output
+from utils import inbox
+from utils.color import Color
+from utils.logger import Logger
 from private import accountinfo
 
 SLEEP_SECONDS = 45
 NUM_POSTS_TO_CRAWL = 20
-bot = accountinfo.username
 
 connection = None
 reddit = None
@@ -31,110 +32,11 @@ def run_bot():
         try:
             read_inbox()
         except KeyboardInterrupt:
-            logger.log('red', 'Interrupted')
+            Logger.log(Color.RED, 'Interrupted')
             exit()
         except:
             handle_crash(traceback.format_exc())
         sleep(SLEEP_SECONDS)
-
-
-def check_for_commands():
-    global reddit, run
-
-    unread_messages = []
-    try:
-        unread_messages = reddit.get_unread(limit=None)
-    except:
-        output.read_inbox_exception()
-        reddit.send_message(accountinfo.developerusername, "Bot Exception - Read Inbox", traceback.format_exc())
-
-    for unread_message in unread_messages:
-        username, message_id, subject, body = \
-            (str(unread_message.author).lower(),
-             unread_message.id,
-             inbox.format_subject(unread_message.subject.lower()),
-             unread_message.body.lower())
-
-        if username == accountinfo.developerusername:
-
-            if subject == 'kill' or subject == 'stop' or subject == 'pause':
-                run = False
-                try:
-                    unread_message.reply("Standing by for further instructions.")
-                    unread_message.mark_as_read()
-                    logger.log('red', '--------- Bot paused by developer ---------')
-                except:
-                    handle_crash(traceback.format_exc())
-            if subject == 'run' or subject == 'start' or subject == 'resume':
-                run = True
-                try:
-                    unread_message.reply("Thanks, I was getting bored!")
-                    unread_message.mark_as_read()
-                    logger.log('green', '--------- Bot resumed by developer ---------')
-                except:
-                    handle_crash(traceback.format_exc())
-
-            if subject == 'test':
-                logger.log('blue', '--------- I am being tested ---------')
-                try:
-                    if run:
-                        unread_message.reply("Bot is active!")
-                    else:
-                        unread_message.reply("Bot is INACTIVE!")
-                    unread_message.mark_as_read()
-                except:
-                    handle_crash(traceback.format_exc())
-
-
-def crawl_subreddit(subreddit):
-    global reddit
-    submissions = []
-    try:
-        submissions = reddit.get_subreddit(subreddit).get_new(limit=NUM_POSTS_TO_CRAWL)
-    except:
-        output.get_submissions_exception()
-        reddit.send_message(accountinfo.developerusername, "Bot Exception - Crawl Subreddit", traceback.format_exc())
-    for submission in submissions:
-        # Make sure sale is not expired!
-        if not submission.over_18:
-            check_for_subscription(submission)
-
-
-def handle_item_match(username, item, message_id, title, permalink, url):
-    global connection, reddit
-    try:
-        message = reddit.get_message(message_id)
-        connection.cursor().execute(database.INSERT_ROW_MATCHES,
-                                    (username, item, permalink, times.get_current_timestamp()))
-        message.reply(inbox.compose_match_message(username, item, title, permalink, url))
-        connection.commit()
-        output.match(username, item, message_id, title, permalink, url)
-    except:
-        connection.rollback()
-        output.match_exception(username, item, message_id, title, permalink, url)
-        reddit.send_message(accountinfo.developerusername, "Bot Exception - Handle Item Match", traceback.format_exc())
-    sleep(2)
-
-
-def check_for_subscription(submission):
-    global connection
-
-    title = submission.title.lower()
-    text = submission.selftext.lower()
-    permalink = submission.permalink
-    url = submission.url
-
-    for item in connection.cursor().execute(database.SELECT_DISTINCT_ITEMS).fetchall():
-        if item[0] in title or item[0] in text:
-            matches = connection.cursor().execute(database.GET_SUBSCRIBED_USERS_WITHOUT_LINK,
-                                                  (item[0], permalink)).fetchall()
-            for match in matches:
-                handle_item_match(match[database.COL_SUB_USERNAME],
-                                  match[database.COL_SUB_ITEM],
-                                  match[database.COL_SUB_MESSAGE_ID],
-                                  title,
-                                  permalink,
-                                  url)
 
 
 def read_inbox():
@@ -145,146 +47,46 @@ def read_inbox():
     try:
         unread_messages = reddit.get_unread(limit=None)
     except:
-        output.read_inbox_exception()
-        reddit.send_message(accountinfo.developerusername, "Bot Exception - Read Inbox", traceback.format_exc())
+        reddit.send_message(accountinfo.developerusername, "SALES_BOT Exception - Read Inbox", traceback.format_exc())
 
     for unread_message in unread_messages:
-        i += 1
         username, message_id, subject, body = \
             (str(unread_message.author).lower(),
              unread_message.id,
              inbox.format_subject(unread_message.subject.lower()),
              unread_message.body.lower())
 
-        if username == 'reddit':
-            try:
-                reddit.send_message(accountinfo.developerusername, "FORWARD: " + subject, body)
-                unread_message.mark_as_read()
-            except:
-                handle_crash(traceback.format_exc())
+        reddit.send_message(accountinfo.developerusername, "FORWARD: " + subject + ' USERNAME: ' + username, body)
 
-        elif subject == 'statistics' or subject == 'stats':
-            try:
-                cursor = connection.cursor()
-
-                cursor.execute(database.COUNT_USERS)
-                users = len(cursor.fetchall())
-                cursor.execute(database.COUNT_SUBSCRIPTIONS)
-                subscriptions = len(cursor.fetchall())
-                cursor.execute(database.COUNT_UNIQUE_SUBSCRIPTIONS)
-                items = len(cursor.fetchall())
-                cursor.execute(database.COUNT_MATCHES)
-                matches = len(cursor.fetchall())
-
-                output.statistics(username, users, subscriptions, items, matches)
-                unread_message.reply(inbox.compose_statistics(username, users, subscriptions, items, matches))
-                unread_message.mark_as_read()
-            except:
-                connection.rollback()
-                output.subscribe_exception(username, subject)
-                reddit.send_message(accountinfo.developerusername, "Bot Exception - Subscribe", traceback.format_exc())
-
-        elif subject == 'subscriptions' or subject == 'subs':
-            try:
-                cursor = connection.cursor()
-                cursor.execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, (username,))
-                unread_message.reply(inbox.compose_subscriptions_message(username, cursor.fetchall()))
-                unread_message.mark_as_read()
-                output.subscriptions(username)
-            except:
-                output.subscriptions_exception(username)
-                reddit.send_message(accountinfo.developerusername, "Bot Exception - Subscriptions", traceback.format_exc())
-
-        elif subject == 'username mention':
-            output.username_mention(username, body)
+        if subject == 'username mention':
             unread_message.mark_as_read()
             reddit.send_message(accountinfo.developerusername, "Bot - Username Mention", 'username: ' + username + '\n\n' + body)
 
         elif subject == 'post reply':
-            output.post_reply(username, body)
             unread_message.mark_as_read()
             reddit.send_message(accountinfo.developerusername, "Bot - Post Reply", 'username: ' + username + '\n\n' + body)
-
-        elif ('unsubscribe' in body and 'all' in body) \
-                or ('unsubscribe' in subject and 'all' in subject):
-            try:
-                cursor = connection.cursor()
-                cursor.execute(database.REMOVE_ALL_SUBSCRIPTIONS_BY_USERNAME, (username,))
-                cursor.execute(database.REMOVE_ALL_MATCHES_BY_USERNAME, (username,))
-                unread_message.reply(inbox.compose_unsubscribe_all_message(username))
-                unread_message.mark_as_read()
-                connection.commit()
-                output.unsubscribe_all(username)
-            except:
-                connection.rollback()
-                output.unsubscribe_all_exception(username)
-                reddit.send_message(accountinfo.developerusername, "Bot Exception - Unsubscribe All", traceback.format_exc())
-
-        elif body == 'unsubscribe' and subject.replace(' ', '') != '':
-            try:
-                cursor = connection.cursor()
-                cursor.execute(database.REMOVE_ROW_SUBSCRIPTIONS, (username, subject))
-                cursor.execute(database.REMOVE_MATCHES_BY_USERNAME_AND_SUBJECT, (username, subject))
-                unread_message.reply(inbox.compose_unsubscribe_message(username, subject))
-                unread_message.mark_as_read()
-                connection.commit()
-                output.unsubscribe(username, subject)
-            except:
-                connection.rollback()
-                output.unsubscribe_exception(username, subject)
-                reddit.send_message(accountinfo.developerusername, "Bot Exception - Unsubscribe", traceback.format_exc())
-
-        # Item must be 1+ non-space characters.
-        elif body == 'subscribe' and len(inbox.format_subject(subject).replace(' ', '')) > 0:
-            subscription = (username, message_id, subject, times.get_current_timestamp())
-            try:
-                cursor = connection.cursor()
-                cursor.execute(database.INSERT_ROW_SUBMISSIONS, subscription)
-                cursor = connection.cursor()
-                cursor.execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, (username,))
-                unread_message.reply(inbox.compose_subscribe_message(username, subject, cursor.fetchall()))
-                unread_message.mark_as_read()
-                connection.commit()
-                output.subscribe(username, subject)
-            except sqlite3.IntegrityError:
-                unread_message.mark_as_read()
-                reddit.send_message(accountinfo.developerusername, "Bot Exception - IntegrityError", traceback.format_exc())
-            except:
-                connection.rollback()
-                output.subscribe_exception(username, subject)
-                reddit.send_message(accountinfo.developerusername, "Bot Exception - Subscribe", traceback.format_exc())
-
-        elif subject == 'information' or subject == 'help':
-            try:
-                cursor = connection.cursor()
-                cursor.execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, (username,))
-                unread_message.reply(inbox.compose_information_message(username, cursor.fetchall()))
-                unread_message.mark_as_read()
-                output.information(username)
-            except:
-                output.information_exception(username)
-                reddit.send_message(accountinfo.developerusername, "Bot Exception - Information", traceback.format_exc())
-
-        elif subject == 'feedback':
-            try:
-                reddit.send_message(accountinfo.developerusername, "Feedback for sales__bot",
-                                    inbox.compose_feedback_forward(username, body))
-                unread_message.reply(inbox.compose_feedback_message(username))
-                unread_message.mark_as_read()
-                output.feedback(username, body)
-            except:
-                output.feedback_exception(username, body)
-                reddit.send_message(accountinfo.developerusername, "Bot Exception - Feedback", traceback.format_exc())
         else:
             try:
-                unread_message.reply(inbox.compose_default_message(username, subject, body))
+                unread_message.reply()
                 unread_message.mark_as_read()
-                output.default(username, subject, body)
             except:
-                output.default_exception(username, subject, body)
                 reddit.send_message(accountinfo.developerusername, "Bot Exception - Default", traceback.format_exc())
         sleep(2)
-    logger.log('cyan', str(i) + ' UNREAD MESSAGES')
+
+
+def compose_message(username):
+    ret = 'Hi /u/' + username + ',\n' \
+        'There have been ***HUGE*** changes to the /r/buildapcsales bot. \n\t\n' \
+        'First off, it has changed to /u/AlertBot. Even with this change, the new bot still has all your ' \
+        'previous subscriptions (if you had any).\n\n' \
+        'You can continue to use /u/AlertBot exactly as you have been, but there have been MANY new features ' \
+        'you may want to take note of:\n\n' \
+        '1. Ability to specify ***multiple*** subreddits to check in (if none are specified, it defaults to ' \
+        '/r/buildapcsales. For example, you can now search for games in /r/GameDeals\n' \
+        '2. Specify sites to whitelist or blacklist (e.g. Amazon.com or Jet.com)\n' \
+        '3. Specify multiple terms to check against in the post. This way you don\'t have to worry of an exact string match.\n' \
+        '4. Specify specific redditors to whitelist or blacklist (helpful for /r/HardwareSwap because of scammers)\n' \
+        ''
 
 
 def open_database():

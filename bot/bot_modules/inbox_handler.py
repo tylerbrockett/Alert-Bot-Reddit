@@ -1,5 +1,6 @@
-from utils import inbox
+from utils import inbox, times
 from bot_modules.sleep_handler import SleepHandler
+from bot_modules.database_handler import DBHandlerException
 from utils.logger import Logger
 from utils.color import Color
 from private import accountinfo
@@ -10,13 +11,14 @@ class InboxHandler:
 
     @staticmethod
     def handle_reddit_message(reddit, message):
-        print('message from reddit')
+        print('Message from reddit')
         reddit.send_message(accountinfo.developerusername, 'FORWARD: ' + message.subject, message.body)
         reddit.send_message(accountinfo.developerusername2, 'FORWARD: ' + message.subject, message.body)
         message.mark_as_read()
 
     @staticmethod
     def handle_statistics_message(database, message):
+        print('Stats message')
         current_users = database.count_current_users()
         all_users = database.count_all_users()
         unique_subs = database.count_unique_subscriptions()
@@ -36,6 +38,7 @@ class InboxHandler:
 
     @staticmethod
     def handle_get_subscriptions_message(database, message):
+        print('Get subs message')
         subscriptions = database.get_subscriptions_by_username(message.author)
         formatted_message = inbox.compose_subscriptions_message(message.author, subscriptions)
         message.reply(formatted_message)
@@ -43,6 +46,7 @@ class InboxHandler:
 
     @staticmethod
     def handle_subscription_message(database, message):
+        print('Sub message')
         new_sub = Subscription(inbox.format_subject(message.subject))
         if not new_sub.valid:
             message.reply(inbox.compose_invalid_subscription_message(message.username, message.subject))
@@ -55,46 +59,66 @@ class InboxHandler:
                 message.reply(inbox.compose_duplicate_subscription_message(
                     message.author,
                     existing_sub.to_string(),
-                    new_sub))
+                    new_sub.to_string()))
                 message.mark_as_read()
                 return
-        database.insert_subscription(message.author, message.subject)
-        message.reply(inbox.compose_subscriptions_message(message.author, new_sub.to_string()))
+        all_subs = database.get_subscriptions_by_username(message.author)
+        database.insert_subscription(message.author, message.message_id, message.subject, times.get_current_timestamp())
+        message.reply(inbox.compose_subscriptions_message(message.author, new_sub, all_subs))
         message.mark_as_read()
 
     @staticmethod
     def handle_unsubscribe_message(database, message):
-        database.remove_subscription(message.author, inbox.format_subject(message.subject))
-        message.reply(inbox.compose_unsubscribe_message(message.author, message.subject))
-        message.mark_as_read()
+        print('Unsub message')
+        sub = Subscription(message.body)
+        if sub.valid:
+            database.remove_subscription(message.author, inbox.format_subject(message.subject))
+            message.reply(inbox.compose_unsubscribe_message(message.author, message.subject))
+            message.mark_as_read()
 
     @staticmethod
     def handle_unsubscribe_all_message(database, message):
+        print('Unsub all message')
         database.remove_all_subscriptions(message.author)
         message.reply(inbox.compose_unsubscribe_all_message(message.author))
         message.mark_as_read()
 
     @staticmethod
     def handle_help_message(database, message):
+        print('Help message')
         subs = database.get_subscriptions_by_username(message.author)
-        
-        print('help message')
+        message.reply(inbox.compose_help_message(message.author, subs))
+        message.mark_as_read()
 
     @staticmethod
     def handle_feedback_message(reddit, message):
-        print('feedback message')
+        print('Feedback message')
+        reddit.send_message(accountinfo.developerusername,  'FEEDBACK', inbox.compose_feedback_forward(message.author, message.body))
+        reddit.send_message(accountinfo.developerusername2, 'FEEDBACK', inbox.compose_feedback_forward(message.author, message.body))
+        message.reply(inbox.compose_feedback_message(message.author))
+        message.mark_as_read()
 
     @staticmethod
-    def handle_username_mention_message(message):
-        print('username mention')
+    def handle_username_mention_message(reddit, message):
+        print('Username mention message')
+        reddit.send_message(accountinfo.developerusername,  'USERNAME MENTION', inbox.compose_username_mention_forward(message.author, message.body))
+        reddit.send_message(accountinfo.developerusername2, 'USERNAME MENTION', inbox.compose_username_mention_forward(message.author, message.body))
+        message.mark_as_read()
 
     @staticmethod
-    def handle_post_reply_message(message):
-        print('post reply')
+    def handle_post_reply_message(reddit, message):
+        reddit.send_message(accountinfo.developerusername, 'USERNAME MENTION', inbox.compose_username_mention_forward(message.author, message.body))
+        reddit.send_message(accountinfo.developerusername, 'USERNAME MENTION', inbox.compose_username_mention_forward(message.author, message.body))
+        message.mark_as_read()
+        print('Post reply message')
 
     @staticmethod
-    def handle_reject_message(message):
+    def handle_reject_message(reddit, message):
         print('handle reject message')
+        message.reply(inbox.compose_reject_message(message.author, message.subject, message.body))
+        reddit.send_message(accountinfo.developerusername,  'REJECT MESSAGE - ' + message.author, inbox.compose_reject_message(message.author, message.subject, message.body))
+        reddit.send_message(accountinfo.developerusername2, 'REJECT MESSAGE - ' + message.author, inbox.compose_reject_message(message.author, message.subject, message.body))
+        message.mark_as_read()
 
     @staticmethod
     def read_inbox(database, reddit):
@@ -104,32 +128,44 @@ class InboxHandler:
             unread = reddit.get_unread()
         except:
             raise InboxHelperException(InboxHelperException.READ_MESSAGES_EXCEPTION)
+
         for message in unread:
             username = str(message.author).lower()
             subject  = inbox.format_subject(message.subject.lower())
             body     = message.body.lower()
-            if username is 'reddit':
-                InboxHandler.handle_reddit_message(reddit, message)
-            elif subject in ['statistics', 'stats'] or body in ['statistics', 'stats']:
-                InboxHandler.handle_statistics_message(database, message)
-            elif subject in ['subscriptions', 'subs'] or body in ['subscriptions, subs']:
-                InboxHandler.handle_get_subscriptions_message(database, message)
-            elif subject is 'username mention':
-                InboxHandler.handle_username_mention_message(message)
-            elif subject is 'post reply':
-                InboxHandler.handle_post_reply_message(message)
-            elif ['unsubscribe', 'all'] in body or ['unsubscribe', 'all'] in subject:
-                InboxHandler.handle_unsubscribe_all_message(database, message)
-            elif body in ['unsubscribe', 'unsub'] and subject.replace(' ', '') != '':
-                InboxHandler.handle_unsubscribe_message(database, message)
-            elif body in ['subscribe', 'sub'] and len(inbox.format_subject(subject).replace(' ', '')) > 0:
-                InboxHandler.handle_subscription_message(database, message)
-            elif subject in ['information', 'info', 'help'] or body in ['information', 'info', 'help']:
-                InboxHandler.handle_help_message(database, message)
-            elif subject is 'feedback':
-                InboxHandler.handle_feedback_message(reddit, message)
-            else:
-                InboxHandler.handle_reject_message(message)
+            try:
+                if username == 'reddit':
+                    InboxHandler.handle_reddit_message(reddit, message)
+                elif subject in ['statistics', 'stats'] or body in ['statistics', 'stats']:
+                    InboxHandler.handle_statistics_message(database, message)
+                elif subject in ['subscriptions', 'subs'] or body in ['subscriptions, subs']:
+                    InboxHandler.handle_get_subscriptions_message(database, message)
+                elif subject == 'username mention':
+                    InboxHandler.handle_username_mention_message(reddit, message)
+                elif subject == 'post reply':
+                    InboxHandler.handle_post_reply_message(reddit, message)
+                elif ['unsubscribe', 'all'] in body or ['unsubscribe', 'all'] in subject:
+                    InboxHandler.handle_unsubscribe_all_message(database, message)
+                elif body in ['unsubscribe', 'unsub'] and subject.replace(' ', '') != '':
+                    InboxHandler.handle_unsubscribe_message(database, message)
+                elif body in ['subscribe', 'sub'] and len(inbox.format_subject(subject).replace(' ', '')) > 0:
+                    InboxHandler.handle_subscription_message(database, message)
+                elif subject in ['information', 'info', 'help'] or body in ['information', 'info', 'help']:
+                    InboxHandler.handle_help_message(database, message)
+                elif subject == 'feedback':
+                    InboxHandler.handle_feedback_message(reddit, message)
+                else:
+                    InboxHandler.handle_reject_message(reddit, message)
+            except DBHandlerException as ex:
+                if ex.errorArgs == DBHandlerException.INTEGRITY_ERROR:
+                    message.mark_as_read()
+                    reddit.send_message(accountinfo.developerusername, 'Integrity Error',
+                                        'SUBJECT: ' + str(message.subject) +
+                                        'BODY:\n' + str(message.body))
+                    continue
+            except:
+                raise InboxHelperException('Error handling inbox message')
+
             SleepHandler.sleep(2)
         Logger.log(Color.CYAN, str(len(unread)) + ' unread messages handled')
 

@@ -3,10 +3,12 @@ from private import accountinfo
 
 
 def format_subject(s):
-    temp = s.replace('re:', '')
-    while len(temp) > 0 and temp[0] == ' ':
-        temp = temp[1:]
-    return temp
+    print(s[:3].lower())
+    while len(s) >= 3 and s[:3].lower() == 're:':
+        s = s[3:]
+    while len(s) > 0 and s[0] == ' ':
+        s = s[1:]
+    return s
 
 
 def compose_greeting(username):
@@ -34,9 +36,9 @@ def compose_subscribe_message(username, item, subscriptions):
     return result
 
 
-def compose_subscriptions_message(username, subscriptions):
+def compose_subscriptions_message(username, new_sub, all_subscriptions):
     result = compose_greeting(username) + \
-             format_subscriptions(subscriptions) + \
+             format_subscriptions(all_subscriptions) + \
              compose_salutation()
     return result
 
@@ -75,7 +77,7 @@ def format_subscriptions(subscriptions):
     return result
 
 
-def compose_information_message(username, subscriptions):
+def compose_help_message(username, subscriptions):
     result = compose_greeting(username) + \
              INFORMATION + "\n\n" + format_subscriptions(subscriptions) + \
              compose_salutation()
@@ -108,7 +110,7 @@ def compose_feedback_message(username):
     return result
 
 
-def compose_default_message(username, item, request):
+def compose_reject_message(username, subject, body):
     result = compose_greeting(username) + \
              "**There was an error processing your request.** Please review your message and " + \
              "make sure it follows the guidelines that have been set. Please private message the bot " + \
@@ -116,8 +118,8 @@ def compose_default_message(username, item, request):
              "or message /u/tylerbrockett if you want specialized help or have any " + \
              "questions for me. Thank you for your patience! \n\t \n\t \n" + \
              "**Your request:** \t \n" + \
-             "Subject:\t" + item + "\t \n" + \
-             "Body:\t\t" + request + \
+             "Subject:\t" + subject + "\t \n" + \
+             "Body:\t\t" + body + \
              compose_salutation()
     return result
 
@@ -151,10 +153,24 @@ def compose_statistics(username, current_users, all_users, unique_subs, all_subs
     return result
 
 
-def compose_feedback_forward(username, message):
+def compose_feedback_forward(username, body):
     result = compose_greeting(accountinfo.developerusername) + \
              "You have received feedback from /u/" + username + ". The feedback is quoted below:\n\n'" + \
-             message + "'" + compose_salutation()
+             body + "'" + compose_salutation()
+    return result
+
+
+def compose_username_mention_forward(username, body):
+    result = compose_greeting(accountinfo.developerusername) + \
+             'The bot has been mentioned in a post! the body of the message is quoted below:\n\n' + \
+             'USERNAME: ' + username + '\nBODY:\n' + body
+    return result
+
+
+def compose_post_reply_forward(username, body):
+    result = compose_greeting(accountinfo.developerusername) + \
+             'Someone has responded to a post by the bot! the comment is quoted below:\n\n' + \
+             'USERNAME: ' + username + '\nBODY:\n' + body
     return result
 
 

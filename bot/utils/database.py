@@ -1,9 +1,9 @@
 
+DATABASE_LOCATION = '/database/subscriptions.db'
+
 # ======================================================================================================
 #           DATABASE SUBSCRIPTIONS TABLE
 # ======================================================================================================
-
-DATABASE_LOCATION = '/database/subscriptions.db'
 
 TABLE_SUBSCRIPTIONS = 'subscriptions'
 
@@ -27,8 +27,8 @@ CREATE_TABLE_SUBSCRIPTIONS = \
     "PRIMARY KEY(" + USERNAME + ", " + ITEM + ")) " + \
     "WITHOUT ROWID;"
 
-INSERT_ROW_SUBMISSIONS = "INSERT INTO " + \
-                         TABLE_SUBSCRIPTIONS + \
+INSERT_ROW_SUBSCRIPTIONS = "INSERT INTO " + \
+                           TABLE_SUBSCRIPTIONS + \
                          " VALUES (?,?,?,?)"
 
 REMOVE_ROW_SUBSCRIPTIONS = "DELETE FROM " + TABLE_SUBSCRIPTIONS + \
@@ -45,11 +45,31 @@ GET_SUBSCRIPTIONS_BY_USERNAME = "SELECT * " + \
                                 "WHERE username = ? " + \
                                 "ORDER BY " + ITEM + " ASC"
 
+GET_ALL_SUBSCRIPTIONS = 'SELECT * FROM ' + TABLE_SUBSCRIPTIONS
+GET_UNIQUE_SUBSCRIPTIONS = 'SELECT DISTINCT ' + ITEM + ' FROM ' + TABLE_SUBSCRIPTIONS
+
 # ======================================================================================================
-#           DATABASE MATCHES TABLE
+#           DATABASE USERS TABLE
+# ======================================================================================================
+
+TABLE_ALL_USERS = 'all_users'
+
+CREATE_TABLE_ALL_USERS = \
+    'CREATE TABLE IF NOT EXISTS ' + TABLE_ALL_USERS + '(' + \
+    USERNAME + ' TEXT NOT NULL ,' + \
+    'PRIMARY KEY(' + USERNAME + ')) ' + \
+    'WITHOUT ROWID;'
+
+GET_ALL_USERS = 'SELECT DISTINCT * FROM ' + TABLE_ALL_USERS
+
+GET_ACTIVE_USERS = 'SELECT DISTINCT ' + USERNAME + ' FROM ' + TABLE_SUBSCRIPTIONS
+
+# ======================================================================================================
+#           DATABASE MATCHES TABLES
 # ======================================================================================================
 
 TABLE_MATCHES = 'matches'
+TABLE_ALL_MATCHES = 'all_matches'
 
 COL_MATCHES_USERNAME = 0
 COL_MATCHES_ITEM = 1
@@ -67,23 +87,23 @@ CREATE_TABLE_MATCHES = \
     "PRIMARY KEY(" + USERNAME + ", " + ITEM + ", " + LINK + ")) " + \
     "WITHOUT ROWID;"
 
-# HORRIBLY suboptimal query, SQL was never a strong point...
-GET_SUBSCRIBED_USERS_WITHOUT_LINK = \
-    "SELECT DISTINCT * " + \
-    "FROM " + TABLE_SUBSCRIPTIONS + " s " + \
-    "WHERE s." + ITEM + " = (?) and NOT EXISTS " + \
-        "(SELECT * " + \
-        "FROM " + TABLE_SUBSCRIPTIONS + " b " + \
-        "WHERE s." + USERNAME + " = b." + USERNAME + " and " + \
-              "s." + ITEM + " = b." + ITEM + " and EXISTS " + \
-            "(SELECT * " + \
-            "FROM " + TABLE_MATCHES + " m " + \
-            "WHERE b." + ITEM + " = m." + ITEM + " and " + \
-                  "b." + USERNAME + " = m." + USERNAME + " and " + \
-                  "m." + LINK + " = (?) ))"
+CREATE_TABLE_ALL_MATCHES = \
+    "CREATE TABLE IF NOT EXISTS " + TABLE_ALL_MATCHES + "(" + \
+    USERNAME + " TEXT NOT NULL, " + \
+    ITEM + " TEXT NOT NULL, " + \
+    LINK + " TEXT NOT NULL, " + \
+    TIMESTAMP + " REAL NOT NULL, " + \
+    "PRIMARY KEY(" + USERNAME + ", " + ITEM + ", " + LINK + ")) " + \
+    "WITHOUT ROWID;"
+
+GET_ALL_MATCHES = 'SELECT * ' + ' FROM ' + TABLE_ALL_MATCHES
 
 INSERT_ROW_MATCHES = "INSERT INTO " + \
                          TABLE_MATCHES + \
+                         " VALUES (?,?,?,?)"
+
+INSERT_ROW_ALL_MATCHES = "INSERT INTO " + \
+                         TABLE_ALL_MATCHES + \
                          " VALUES (?,?,?,?)"
 
 REMOVE_ALL_MATCHES_BY_USERNAME = "DELETE FROM " + TABLE_MATCHES + \
@@ -91,6 +111,9 @@ REMOVE_ALL_MATCHES_BY_USERNAME = "DELETE FROM " + TABLE_MATCHES + \
 
 REMOVE_MATCHES_BY_USERNAME_AND_SUBJECT = "DELETE FROM " + TABLE_MATCHES + \
     " WHERE " + USERNAME + " = (?) " + " AND " + ITEM + " = (?)"
+
+PURGE_OLD_MATCHES = 'DELETE FROM ' + TABLE_MATCHES + \
+    ' WHERE ' + TIMESTAMP + ' <= (?)'
 
 
 # ======================================================================================================

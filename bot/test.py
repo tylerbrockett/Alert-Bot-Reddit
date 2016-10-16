@@ -1,8 +1,9 @@
 
 from parsing.subscription_parser import SubscriptionParser
-
+from utils import inbox
 
 if __name__ == '__main__':
+    '''
     sub = 'this is a test; of how well , the, parser actually works; yay! Site: google.com, youtube.com Items: funny cat videos Subreddits: funny, all, videos Sites: vine Ignore Items: cats being mean, cats getting hurt Ignore Sites: somevideosite.com Email'
     parser = SubscriptionParser(sub)
     print('\n\n\n')
@@ -14,3 +15,8 @@ if __name__ == '__main__':
     print("Subreddits:\t\t" + str(parser.subreddits))
     print("Settings:\t\t" + str(parser.settings))
     print("------------ END ------------")
+    '''
+    s = 'RE:RE:RE: YOOOOO re: yooooo'
+    print('FORMAT: ' + s)
+    print(inbox.format_subject(s))
+
