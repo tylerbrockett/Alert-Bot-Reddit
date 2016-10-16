@@ -45,12 +45,12 @@ class DatabaseHandler:
         subs = []
         results = self.connection.cursor().execute(database.GET_ALL_SUBSCRIPTIONS).fetchall()
         for temp in results:
+            item = temp[database.COL_SUB_ITEM]
             username = temp[database.COL_SUB_USERNAME]
             message_id = temp[database.COL_SUB_MESSAGE_ID]
-            sub = Subscription(temp[database.COL_SUB_ITEM])
-            timestamp = temp[database.COL_SUB_TIMESTAMP]
+            sub = Subscription(item, username, message_id)
             if sub.valid:
-                subs.append((username, message_id, sub, timestamp))
+                subs.append((username, message_id, sub))
             else:
                 raise DBHandlerException('ERROR - get_subscriptions')
         return subs
@@ -68,7 +68,7 @@ class DatabaseHandler:
     def purge_old_matches(self):
         print('purging')
         current_time = times.get_current_timestamp()
-        quarter_of_year = 31556926 / 4
+        quarter_of_year = 31556926 / 43
         marked_old_time = current_time - quarter_of_year
         try:
             self.connection.cursor().execute(database.PURGE_OLD_MATCHES, (marked_old_time,))
@@ -81,9 +81,12 @@ class DatabaseHandler:
         subs = []
         result = self.connection.cursor().execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, (username,)).fetchall()
         for temp in result:
-            sub = Subscription(temp[database.COL_SUB_ITEM])
+            item = temp[database.COL_SUB_ITEM]
+            username = temp[database.COL_SUB_USERNAME]
+            message_id = temp[database.COL_SUB_MESSAGE_ID]
+            sub = Subscription(item, username, message_id)
             if sub.valid:
-                subs.append(sub)
+                subs.append((username, message_id, sub))
             else:
                 raise DBHandlerException('ERROR - get_subscriptions - subscription not valid')
         return subs
@@ -96,6 +99,7 @@ class DatabaseHandler:
         except:
             raise DBHandlerException('ERROR - insert_subscription')
 
+    # TODO - Check if subscription exists first
     def remove_subscription(self, username, sub):
         try:
             self.connection.cursor().execute(database.REMOVE_ROW_SUBSCRIPTIONS, (username, sub,))
@@ -103,6 +107,7 @@ class DatabaseHandler:
         except:
             raise DBHandlerException('ERROR - remove_subscription')
 
+    # TODO - Check if subscription exists first
     def remove_all_subscriptions(self, username):
         try:
             self.connection.cursor().execute(database.REMOVE_ALL_SUBSCRIPTIONS_BY_USERNAME, (username,))

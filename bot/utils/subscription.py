@@ -4,8 +4,10 @@ from parsing.subscription_parser import SubscriptionParserException
 
 class Subscription:
 
-    def __init__(self, sub):
+    def __init__(self, sub, username, message_id):
         self.original_string = sub
+        self.username = username
+        self.message_id = message_id
         self.items = []
         self.ignore_items = []
         self.sites = []
