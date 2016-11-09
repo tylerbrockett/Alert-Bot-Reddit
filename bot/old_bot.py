@@ -188,7 +188,7 @@ def read_inbox():
             try:
                 cursor = connection.cursor()
                 cursor.execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, (username,))
-                unread_message.reply(inbox.compose_subscriptions_message(username, cursor.fetchall()))
+                unread_message.reply(inbox.compose_all_subscriptions_message(username, cursor.fetchall()))
                 unread_message.mark_as_read()
                 output.subscriptions(username)
             except:

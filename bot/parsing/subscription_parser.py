@@ -4,11 +4,28 @@ from token_type import TokenType
 
 
 class SubscriptionParser:
-    statement_token_types = [TokenType.ITEMS, TokenType.SITES, TokenType.REDDITORS, TokenType.SUBREDDITS, TokenType.IGNORE_ITEMS,
-                             TokenType.IGNORE_SITES, TokenType.IGNORE_REDDITORS, TokenType.EMAIL]
+    statement_token_types = [TokenType.TITLE, TokenType.BODY, TokenType.REDDITORS, TokenType.SUBREDDITS, TokenType.IGNORE_TITLE,
+                             TokenType.IGNORE_BODY, TokenType.IGNORE_REDDITORS, TokenType.EMAIL, TokenType.NSFW]
 
-    statement_tokens = ['-site', '-sites', '-item', '-items', '-subreddit', '-subreddits', '-ignore-site', '-ignore-sites',
-                        '-ignore-item', '-ignore-items', '-ignore-subreddit', '-ignore-subreddits', '-email', '-hide-nsfw']
+    statement_tokens = [
+        # TITLE
+        '-title', '-item', '-items',
+        # BODY
+        '-body', '-site', '-sites', '-url',
+        # SUBREDDIT
+        '-subreddit', '-subreddits',
+        # REDDITORS
+        '-redditor', '-redditors',
+        # IGNORE BODY
+        '-ignore-body', '-ignore-site', '-ignore-sites',
+        # IGNORE TITLE
+        '-ignore-title', '-ignore-item', '-ignore-items',
+        # IGNORE REDDITORS
+        '-ignore-redditor', '-ignore-redditors',
+        # FLAGS
+        '-email',
+        '-nsfw', '-show-nsfw'
+    ]
 
     def unget_token(self):
         self.index -= 1
@@ -20,16 +37,16 @@ class SubscriptionParser:
         return self.tokens[self.index]
 
     def __init__(self, sub):
-        self.items = []
-        self.sites = []
-        self.ignore_items = []
-        self.ignore_sites = []
+        self.index = -1
+        self.tokens = []
+        self.title = []
+        self.body = []
+        self.ignore_title = []
+        self.ignore_body = []
         self.redditors = []
         self.ignore_redditors = []
         self.subreddits = []
-        self.settings = []
-        self.index = -1
-        self.tokens = []
+        self.flags = []
         try:
             self.tokens = SubscriptionLexer(sub).tokenize()
         except:
@@ -40,7 +57,7 @@ class SubscriptionParser:
         token, ttype = self.get_token()
         if ttype is TokenType.TOKEN:
             self.unget_token()
-            self.parse_items_list()
+            self.parse_title_list()
         elif ttype in SubscriptionParser.statement_token_types:
             self.unget_token()
             self.parse_statement_list()
@@ -64,32 +81,32 @@ class SubscriptionParser:
 
     def parse_statement(self):
         token, ttype = self.get_token()
-        if ttype is TokenType.ITEMS:
-            self.parse_items_list()
-        elif ttype is TokenType.SITES:
-            self.parse_sites_list()
+        if ttype is TokenType.TITLE:
+            self.parse_title_list()
+        elif ttype is TokenType.BODY:
+            self.parse_body_list()
         elif ttype is TokenType.REDDITORS:
             self.parse_redditors_list()
         elif ttype is TokenType.SUBREDDITS:
             self.parse_subreddits_list()
-        elif ttype is TokenType.IGNORE_ITEMS:
-            self.parse_ignore_items_list()
-        elif ttype is TokenType.IGNORE_SITES:
-            self.parse_ignore_sites_list()
+        elif ttype is TokenType.IGNORE_TITLE:
+            self.parse_ignore_title_list()
+        elif ttype is TokenType.IGNORE_BODY:
+            self.parse_ignore_body_list()
         elif ttype is TokenType.IGNORE_REDDITORS:
             self.parse_ignore_redditors_list()
         elif ttype is TokenType.EMAIL:
             self.parse_email()
         elif ttype is TokenType.NSFW:
-            self.parse_hide_nsfw()
+            self.parse_nsfw()
         else:
             raise SubscriptionParserException('Error - parse_statement_list - Expected ' + str(SubscriptionParser.statement_tokens))
 
-    def parse_items_list(self):
-        self.items += self.parse_list([])
+    def parse_title_list(self):
+        self.title += self.parse_list([])
 
-    def parse_sites_list(self):
-        self.sites += self.parse_list([])
+    def parse_body_list(self):
+        self.body += self.parse_list([])
 
     def parse_redditors_list(self):
         self.redditors += self.parse_list([])
@@ -98,16 +115,16 @@ class SubscriptionParser:
         self.subreddits += self.parse_list([])
 
     def parse_email(self):
-        self.settings += ['email', True]
+        self.flags += ['email', True]
 
-    def parse_hide_nsfw(self):
-        self.settings += ['hide-nsfw', True]
+    def parse_nsfw(self):
+        self.flags += ['nsfw', True]
 
-    def parse_ignore_items_list(self):
-        self.ignore_items += self.parse_list([])
+    def parse_ignore_title_list(self):
+        self.ignore_title += self.parse_list([])
 
-    def parse_ignore_sites_list(self):
-        self.ignore_sites += self.parse_list([])
+    def parse_ignore_body_list(self):
+        self.ignore_body += self.parse_list([])
 
     def parse_ignore_redditors_list(self):
         self.ignore_redditors += self.parse_list([])

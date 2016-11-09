@@ -8,6 +8,7 @@ class RedditHandler:
 
     def __init__(self):
         self.reddit = self.connect()
+        self.NUM_POSTS = 20
 
     def connect(self):
         try:
@@ -38,10 +39,20 @@ class RedditHandler:
         except:
             raise RedditHelperException(RedditHelperException.SEND_MESSAGE_EXCEPTION)
 
+    def get_submissions(self, subreddit):
+        submissions = []
+        posts = 200 if (subreddit == 'all') else self.NUM_POSTS
+        try:
+            submissions = self.reddit.get_subreddit(subreddit).get_new(limit=posts)
+        except:
+            raise RedditHelperException(RedditHelperException.GET_SUBMISSIONS_EXCEPTION)
+        return submissions
+
 
 class RedditHelperException(Exception):
     SEND_MESSAGE_EXCEPTION = 'Error sending message'
     RESET_EXCEPTION = 'Error resetting connection to Reddit'
+    GET_SUBMISSIONS_EXCEPTION = 'Error getting submissions'
 
     def __init__(self, error_args):
         Exception.__init__(self, "Reddit Exception: {0}".format(error_args))

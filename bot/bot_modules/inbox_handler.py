@@ -40,14 +40,14 @@ class InboxHandler:
     def handle_get_subscriptions_message(database, message):
         print('Get subs message')
         subscriptions = database.get_subscriptions_by_username(message.author)
-        formatted_message = inbox.compose_subscriptions_message(message.author, subscriptions)
+        formatted_message = inbox.compose_all_subscriptions_message(message.author, subscriptions)
         message.reply(formatted_message)
         message.mark_as_read()
 
     @staticmethod
     def handle_subscription_message(database, message):
         print('Sub message')
-        new_sub = Subscription(inbox.format_subject(message.subject))
+        new_sub = Subscription(inbox.format_subject(message.subject), message.author, message.message_id)
         if not new_sub.valid:
             message.reply(inbox.compose_invalid_subscription_message(message.username, message.subject))
             message.mark_as_read()
@@ -64,18 +64,20 @@ class InboxHandler:
                 return
         all_subs = database.get_subscriptions_by_username(message.author)
         database.insert_subscription(message.author, message.message_id, message.subject, times.get_current_timestamp())
-        message.reply(inbox.compose_subscriptions_message(message.author, new_sub, all_subs))
+        message.reply(inbox.compose_new_subscription_message(message.author, new_sub, all_subs))
         message.mark_as_read()
 
+    # TODO Check if subscription exists first, and handle if sub isn't valid
     @staticmethod
     def handle_unsubscribe_message(database, message):
-        print('Unsub message')
-        sub = Subscription(message.body)
+        print('Unsub message') # (self, sub, username, message_id):
+        sub = Subscription(inbox.format_subject(message.subject), message.author, message.message_id)
         if sub.valid:
             database.remove_subscription(message.author, inbox.format_subject(message.subject))
             message.reply(inbox.compose_unsubscribe_message(message.author, message.subject))
             message.mark_as_read()
 
+    # TODO Handle if there are 0 subs for user
     @staticmethod
     def handle_unsubscribe_all_message(database, message):
         print('Unsub all message')
@@ -120,6 +122,7 @@ class InboxHandler:
         reddit.send_message(accountinfo.developerusername2, 'REJECT MESSAGE - ' + message.author, inbox.compose_reject_message(message.author, message.subject, message.body))
         message.mark_as_read()
 
+    # TODO Add the ability to EDIT existing subscriptions
     @staticmethod
     def read_inbox(database, reddit):
         print('Reading inbox...')
@@ -159,8 +162,9 @@ class InboxHandler:
             except DBHandlerException as ex:
                 if ex.errorArgs == DBHandlerException.INTEGRITY_ERROR:
                     message.mark_as_read()
-                    reddit.send_message(accountinfo.developerusername, 'Integrity Error',
-                                        'SUBJECT: ' + str(message.subject) +
+                    reddit.send_message(accountinfo.developerusername,
+                                        'Integrity Error',
+                                        'SUBJECT: ' + str(inbox.format_subject(message.subject)) +
                                         'BODY:\n' + str(message.body))
                     continue
             except:

@@ -10,6 +10,11 @@ class CommandHandler:
     PAUSE = 2
     KILL = 3
 
+    run = ['run', 'start', 'resume']
+    pause = ['stop', 'pause']
+    kill = ['kill']
+    test = ['test']
+
     @staticmethod
     def get_dev_messages(reddit):
         dev_messages = []
@@ -27,23 +32,23 @@ class CommandHandler:
             messages = CommandHandler.get_dev_messages(reddit)
             for message in messages:
                 subject, body = inbox.format_subject(message.subject.lower()), message.body.lower()
-                if subject in ['run', 'start', 'resume']:
+                if subject in CommandHandler.run or body in CommandHandler.run:
                     Logger.log(Color.GREEN, '--------- Bot resumed by developer ---------')
                     message.reply('Thanks, I was getting bored!')
                     commands.append(CommandHandler.RUN)
                     message.mark_as_read()
-                elif subject in ['stop', 'pause']:
+                elif subject in CommandHandler.pause or body in CommandHandler.pause:
                     Logger.log(Color.YELLOW, '--------- Bot paused by developer ---------')
                     message.reply('Standing by for further instructions.')
                     commands.append(CommandHandler.PAUSE)
                     message.mark_as_read()
-                elif subject in ['kill']:
+                elif subject in CommandHandler.kill or body in CommandHandler.kill:
                     Logger.log(Color.RED, '--------- Bot killed by developer ---------')
                     message.reply('Bot has been killed')
                     commands.append(CommandHandler.KILL)
-                elif subject in ['test']:
+                elif subject in CommandHandler.test or body in CommandHandler.test:
                     Logger.log(Color.GREEN, '--------- Bot is being tested ---------')
-                    message.reply('')
+                    message.reply('Bot is being tested')
                     message.mark_as_read()
                     commands.append(CommandHandler.TEST)
         except:

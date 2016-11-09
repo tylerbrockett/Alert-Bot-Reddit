@@ -36,7 +36,15 @@ def compose_subscribe_message(username, item, subscriptions):
     return result
 
 
-def compose_subscriptions_message(username, new_sub, all_subscriptions):
+def compose_all_subscriptions_message(username, all_subscriptions):
+    result = compose_greeting(username) + \
+             format_subscriptions(all_subscriptions) + \
+             compose_salutation()
+    return result
+
+
+# TODO If subscription doesn't specify subreddit, reply saying default has been set to /r/buildapcsales
+def compose_new_subscription_message(username, new_sub, all_subscriptions):
     result = compose_greeting(username) + \
              format_subscriptions(all_subscriptions) + \
              compose_salutation()
@@ -124,7 +132,7 @@ def compose_reject_message(username, subject, body):
     return result
 
 
-def compose_match_message(username, item, title, permalink, url):
+def compose_match_message(subscription, submission):
     result = compose_greeting(username) + \
              "We have found a match for your subscription to '" + item + "'! " + \
              "Below you will find the details:\n\t \n\t \n" + \

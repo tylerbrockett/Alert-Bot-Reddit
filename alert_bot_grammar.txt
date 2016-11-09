@@ -3,7 +3,87 @@
     GRAMMAR
 ---------------------------
 
-program -> subscription
+actions -> action
+
+action -> subscribe_action
+action -> unsubscribe_action
+action -> unsubscribe_all_action
+action -> edit_action
+
+subscribe_action -> SUBSCRIBE subscription
+unsubscribe_action -> UNSUBSCRIBE subscription
+unsubscribe_action -> UNSUBSCRIBE subscription_number
+unsubscribe_all_action -> UNSUBSCRIBE ALL
+edit_action -> EDIT # subscription_number subscription_change_list
+
+subscription_change_list -> subscription_change
+subscription_change_list -> subscription_change subscription_change_list
+
+subscription_change -> ADD list TO field
+subscription_change -> REMOVE list FROM field
+subscription_change -> -NSFW boolean | -EMAIL boolean
+
+
+
+
+subscription_number -> 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | subscription_number subscription_number
+
+
+
+
+# SIMPLE GRAMMAR
+
+subscription -> statement_list
+subscription -> list statement_list
+subscription -> list
+
+statement_list -> statement
+statement_list -> statement statement_list
+
+statement -> title_statement
+statement -> ignore_title_statement
+statement -> body_statement
+statement -> ignore_body_statement
+statement -> redditors_statement
+statement -> ignore_redditors_statement
+statement -> subreddits_statement
+statement -> flags
+
+flags -> flag
+flags -> flags flag
+
+flag -> email_flag
+flag -> nsfw_flag
+
+title_statement -> -TITLE list
+ignore_title_statement -> -IGNORE-TITLE list
+
+body_statement -> -BODY list
+ignore_body_statement -> -IGNORE-BODY list
+
+redditors_statement -> -REDDITORS list
+ignore_redditors_statement -> -IGNORE-REDDITORS list
+
+subreddits_statement -> -SUBREDDITS list
+
+email_flag -> -EMAIL
+nsfw_flag -> -NSFW
+
+
+ignore_redditor_statement -> -IGNORE-REDDITORS list
+
+list -> element
+list -> element COMMA list
+
+element -> TOKEN
+element -> TOKEN element
+
+
+
+
+
+# FULL GRAMMAR
+
 
 subscription -> statement_list
 subscription -> list statement_list

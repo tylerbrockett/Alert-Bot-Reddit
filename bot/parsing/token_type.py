@@ -1,14 +1,19 @@
 
 class TokenType:
-    SITES = 1
-    ITEMS = 2
+    BODY = 1
+    IGNORE_BODY = 5
+
+    TITLE = 2
+    IGNORE_TITLE = 6
+
     REDDITORS = 3
-    SUBREDDITS = 4
-    IGNORE_SITES = 5
-    IGNORE_ITEMS = 6
     IGNORE_REDDITORS = 7
+
+    SUBREDDITS = 4
+
     EMAIL = 8
     NSFW = 9
+
     COMMA = 10
 
     ERROR = 50

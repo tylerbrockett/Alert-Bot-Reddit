@@ -1,16 +1,16 @@
 
 DATABASE_LOCATION = '/database/subscriptions.db'
 
+
 # ======================================================================================================
 #           DATABASE SUBSCRIPTIONS TABLE
 # ======================================================================================================
 
 TABLE_SUBSCRIPTIONS = 'subscriptions'
 
-ROW_ID = 'row_id'
 USERNAME = 'username'
 MESSAGE_ID = 'message_id'
-ITEM = 'item'
+SUB = 'sub'
 TIMESTAMP = 'timestamp'
 
 COL_SUB_USERNAME = 0
@@ -23,9 +23,9 @@ CREATE_TABLE_SUBSCRIPTIONS = \
     "CREATE TABLE IF NOT EXISTS " + TABLE_SUBSCRIPTIONS + "(" + \
     USERNAME + " TEXT NOT NULL, " + \
     MESSAGE_ID + " TEXT NOT NULL, " + \
-    ITEM + " TEXT NOT NULL, " + \
+    SUB + " TEXT NOT NULL, " + \
     TIMESTAMP + " REAL NOT NULL, " + \
-    "PRIMARY KEY(" + USERNAME + ", " + ITEM + "));"
+    "PRIMARY KEY(" + USERNAME + ", " + SUB + "));"
 
 INSERT_ROW_SUBSCRIPTIONS = "INSERT INTO " + \
                            TABLE_SUBSCRIPTIONS + \
@@ -33,7 +33,7 @@ INSERT_ROW_SUBSCRIPTIONS = "INSERT INTO " + \
 
 REMOVE_ROW_SUBSCRIPTIONS = "DELETE FROM " + TABLE_SUBSCRIPTIONS + \
     " WHERE " + USERNAME + " = (?) " + \
-    " AND " + ITEM + " = (?)"
+    " AND " + SUB + " = (?)"
 
 REMOVE_ALL_SUBSCRIPTIONS_BY_USERNAME = "DELETE FROM " + TABLE_SUBSCRIPTIONS + \
     " WHERE " + USERNAME + " = (?)"
@@ -41,9 +41,44 @@ REMOVE_ALL_SUBSCRIPTIONS_BY_USERNAME = "DELETE FROM " + TABLE_SUBSCRIPTIONS + \
 GET_SUBSCRIPTIONS_BY_USERNAME = "SELECT * " + \
                                 "FROM " + TABLE_SUBSCRIPTIONS + " " + \
                                 "WHERE username = ? " + \
-                                "ORDER BY " + ITEM + " ASC"
+                                "ORDER BY " + SUB + " ASC"
 
 GET_ALL_SUBSCRIPTIONS = 'SELECT * FROM ' + TABLE_SUBSCRIPTIONS
+
+# ======================================================================================================
+#           DATABASE MESSAGES TABLE
+# ======================================================================================================
+
+TABLE_MESSAGES = 'messages'
+
+SUB_ID = 'sub_id'
+MESSAGE_ID = 'message_id'
+
+COL_MESSAGE_SUB_ID = 0
+COL_MESSAGE_USERNAME = 1
+COL_MESSAGE_ID = 2
+COL_MESSAGE_TIMESTAMP = 3
+
+CREATE_TABLE_MESSAGES = \
+    "CREATE TABLE IF NOT EXISTS " + TABLE_MESSAGES + "(" + \
+    "FOREIGN KEY(" + SUB_ID + ") REFERENCES " + TABLE_SUBSCRIPTIONS + "(rowid) NOT NULL ON DELETE CASCADE, " + \
+    USERNAME + " TEXT NOT NULL, " + \
+    MESSAGE_ID + " TEXT NOT NULL, " + \
+    TIMESTAMP + " REAL NOT NULL, " + \
+    "PRIMARY KEY(" + SUB_ID + ", " + MESSAGE_ID + "));"
+
+INSERT_ROW_MESSAGES = "INSERT INTO " + TABLE_MESSAGES + " VALUES (?,?,?)"
+
+REMOVE_ROW_MESSAGES = "DELETE FROM " + TABLE_MESSAGES + \
+    " WHERE " + SUB_ID + " = (?) " + \
+    " AND " + MESSAGE_ID + " = (?)"
+
+GET_MESSAGES_BY_USERNAME = "SELECT * " + \
+                           "FROM " + TABLE_MESSAGES + " " + \
+                           "WHERE username = (?) " + \
+                           "ORDER BY " + SUB + " ASC"
+
+GET_ALL_MESSAGES = 'SELECT * FROM ' + TABLE_SUBSCRIPTIONS
 
 # ======================================================================================================
 #           DATABASE USERS TABLE
@@ -68,23 +103,23 @@ COL_MATCHES_ITEM = 1
 COL_MATCHES_LINK = 2
 COL_MATCHES_TIMESTAMP = 3
 
-LINK = 'link'
+PERMALINK = 'permalink'
 
 CREATE_TABLE_MATCHES = \
     "CREATE TABLE IF NOT EXISTS " + TABLE_MATCHES + "(" + \
     USERNAME + " TEXT NOT NULL, " + \
-    ITEM + " TEXT NOT NULL, " + \
-    LINK + " TEXT NOT NULL, " + \
+    SUB + " TEXT NOT NULL, " + \
+    SUB + " TEXT NOT NULL, " + \
     TIMESTAMP + " REAL NOT NULL, " + \
-    "PRIMARY KEY(" + USERNAME + ", " + ITEM + ", " + LINK + "));"
+    "PRIMARY KEY(" + USERNAME + ", " + SUB + ", " + PERMALINK + "));"
 
 CREATE_TABLE_ALL_MATCHES = \
     "CREATE TABLE IF NOT EXISTS " + TABLE_ALL_MATCHES + "(" + \
     USERNAME + " TEXT NOT NULL, " + \
-    ITEM + " TEXT NOT NULL, " + \
-    LINK + " TEXT NOT NULL, " + \
+    SUB + " TEXT NOT NULL, " + \
+    PERMALINK + " TEXT NOT NULL, " + \
     TIMESTAMP + " REAL NOT NULL, " + \
-    "PRIMARY KEY(" + USERNAME + ", " + ITEM + ", " + LINK + "));"
+    "PRIMARY KEY(" + USERNAME + ", " + SUB + ", " + PERMALINK + "));"
 
 INSERT_ROW_MATCHES = "INSERT INTO " + \
                          TABLE_MATCHES + \
@@ -98,11 +133,13 @@ REMOVE_ALL_MATCHES_BY_USERNAME = "DELETE FROM " + TABLE_MATCHES + \
     " WHERE " + USERNAME + " = ? "
 
 REMOVE_MATCHES_BY_USERNAME_AND_SUBJECT = "DELETE FROM " + TABLE_MATCHES + \
-    " WHERE " + USERNAME + " = (?) " + " AND " + ITEM + " = (?)"
+    " WHERE " + USERNAME + " = (?) " + " AND " + SUB + " = (?)"
 
 PURGE_OLD_MATCHES = 'DELETE FROM ' + TABLE_MATCHES + \
     ' WHERE ' + TIMESTAMP + ' <= (?)'
 
+GET_MATCH = 'SELECT * FROM MATCHES ' + \
+    'WHERE ' + USERNAME + ' = (?) AND ' + SUB + ' = (?) AND ' + PERMALINK + ' = (?)'
 
 # ======================================================================================================
 #           DATABASE ALERTS TABLE
@@ -138,9 +175,9 @@ DROP_TABLE_ALERTS = "DROP TABLE " + TABLE_ALERTS
 
 COUNT_USERS = "SELECT DISTINCT " + USERNAME + " FROM " + TABLE_SUBSCRIPTIONS
 COUNT_SUBSCRIPTIONS = "SELECT * FROM " + TABLE_SUBSCRIPTIONS
-COUNT_UNIQUE_SUBSCRIPTIONS = "SELECT DISTINCT " + ITEM + " FROM " + TABLE_SUBSCRIPTIONS
+COUNT_UNIQUE_SUBSCRIPTIONS = "SELECT DISTINCT " + SUB + " FROM " + TABLE_SUBSCRIPTIONS
 GET_ALL_MATCHES = 'SELECT * ' + ' FROM ' + TABLE_ALL_MATCHES
 GET_ALL_USERS = 'SELECT DISTINCT * FROM ' + TABLE_ALL_USERS
 GET_ACTIVE_USERS = 'SELECT DISTINCT ' + USERNAME + ' FROM ' + TABLE_SUBSCRIPTIONS
-GET_UNIQUE_SUBSCRIPTIONS = 'SELECT DISTINCT ' + ITEM + ' FROM ' + TABLE_SUBSCRIPTIONS
-SELECT_DISTINCT_ITEMS = "SELECT DISTINCT " + ITEM + " FROM " + TABLE_SUBSCRIPTIONS
+GET_UNIQUE_SUBSCRIPTIONS = 'SELECT DISTINCT ' + SUB + ' FROM ' + TABLE_SUBSCRIPTIONS
+SELECT_DISTINCT_ITEMS = "SELECT DISTINCT " + SUB + " FROM " + TABLE_SUBSCRIPTIONS

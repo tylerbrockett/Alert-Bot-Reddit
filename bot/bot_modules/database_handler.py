@@ -14,9 +14,11 @@ class DatabaseHandler:
     def connect(self):
         try:
             connection = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + database.DATABASE_LOCATION)
+            # connection.execute('PRAGMA foreign_keys = ON;') #TODO CHECK IF NEEDED!
             cursor = self.connection.cursor()
             cursor.execute(database.CREATE_TABLE_SUBSCRIPTIONS)
             cursor.execute(database.CREATE_TABLE_MATCHES)
+            cursor.execute(database.CREATE_TABLE_MESSAGES)
             cursor.execute(database.CREATE_TABLE_ALL_MATCHES)
             cursor.execute(database.CREATE_TABLE_ALL_USERS)
             cursor.execute(database.CREATE_TABLE_ALERTS)
@@ -52,15 +54,14 @@ class DatabaseHandler:
             if sub.valid:
                 subs.append((username, message_id, sub))
             else:
-                raise DBHandlerException('ERROR - get_subscriptions')
+                raise DBHandlerException('ERROR - get_subscriptions - Subscription not valid')
         return subs
 
     def insert_match(self, username, item, permalink):
         try:
-            self.connection.cursor().execute(database.INSERT_ROW_MATCHES,
-                                             (username, item, permalink, times.get_current_timestamp()))
-            self.connection.cursor().execute(database.INSERT_ROW_ALL_MATCHES,
-                                             (username, item, permalink, times.get_current_timestamp()))
+            match = (username, item, permalink, times.get_current_timestamp())
+            self.connection.cursor().execute(database.INSERT_ROW_MATCHES, match)
+            self.connection.cursor().execute(database.INSERT_ROW_ALL_MATCHES, match)
             self.connection.commit()  # TODO Move this to where method is called.
         except:
             raise DBHandlerException('Error - insert_match')
@@ -68,7 +69,7 @@ class DatabaseHandler:
     def purge_old_matches(self):
         print('purging')
         current_time = times.get_current_timestamp()
-        quarter_of_year = 31556926 / 43
+        quarter_of_year = 31557600 / 4
         marked_old_time = current_time - quarter_of_year
         try:
             self.connection.cursor().execute(database.PURGE_OLD_MATCHES, (marked_old_time,))
@@ -94,7 +95,8 @@ class DatabaseHandler:
     def insert_subscription(self, username, message_id, sub, timestamp):
         print('Insert subscription')
         try:
-            self.connection.cursor().execute(database.INSERT_ROW_SUBSCRIPTIONS, (username, message_id, sub, timestamp))
+            sub = (username, message_id, sub, timestamp,)
+            self.connection.cursor().execute(database.INSERT_ROW_SUBSCRIPTIONS, sub)
             self.connection.commit()
         except:
             raise DBHandlerException('ERROR - insert_subscription')
@@ -102,10 +104,20 @@ class DatabaseHandler:
     # TODO - Check if subscription exists first
     def remove_subscription(self, username, sub):
         try:
-            self.connection.cursor().execute(database.REMOVE_ROW_SUBSCRIPTIONS, (username, sub,))
+            self.connection.cursor().execute(database.REMOVE_ROW_SUBSCRIPTIONS, (username, sub))
             self.connection.commit()
         except:
             raise DBHandlerException('ERROR - remove_subscription')
+
+    def remove_subscription_by_number(self, username, sub_num):
+        try:
+            subs = self.get_subscriptions_by_user(username)
+            if (sub_num - 1) >= len(subs) or sub_num <= 0:
+                raise DBHandlerException('ERROR - Invalid subscription #. Requested Subscription: ' + str(sub_num) + '  Number of subscriptions: ' + str(len(subs)))
+            sub = subs[sub_num - 1]
+            self.remove_subscription(username, sub[2]) # (username, message_id, sub)
+        except:
+            raise DBHandlerException('Error - remove_subscription_by_number')
 
     # TODO - Check if subscription exists first
     def remove_all_subscriptions(self, username):
@@ -168,6 +180,13 @@ class DatabaseHandler:
         except:
             raise DBHandlerException('ERROR - count_total_matches')
         return matches
+
+    def check_if_match_exists(self, username, item, permalink):
+        try:
+            return len(self.connection.cursor().execute(database.GET_MATCH, (username, item, permalink)).fetchall()) >= 1
+        except:
+            print('ERROR - Couldn\'t figure out if match existed')
+            return True
 
 
 class DBHandlerException(Exception):
