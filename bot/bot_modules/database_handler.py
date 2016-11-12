@@ -14,11 +14,10 @@ class DatabaseHandler:
     def connect(self):
         try:
             connection = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + database.DATABASE_LOCATION)
-            # connection.execute('PRAGMA foreign_keys = ON;') #TODO CHECK IF NEEDED!
+            connection.execute('PRAGMA foreign_keys = ON;') #TODO CHECK IF NEEDED!
             cursor = self.connection.cursor()
             cursor.execute(database.CREATE_TABLE_SUBSCRIPTIONS)
             cursor.execute(database.CREATE_TABLE_MATCHES)
-            cursor.execute(database.CREATE_TABLE_MESSAGES)
             cursor.execute(database.CREATE_TABLE_ALL_MATCHES)
             cursor.execute(database.CREATE_TABLE_ALL_USERS)
             cursor.execute(database.CREATE_TABLE_ALERTS)
@@ -42,6 +41,18 @@ class DatabaseHandler:
     def commit(self):
         self.connection.commit()
 
+    # ==============================================================================
+    #           SUBSCRIPTIONS
+    # ==============================================================================
+    def insert_subscription(self, username, message_id, sub, timestamp):
+        print('Insert subscription')
+        try:
+            sub = (username, message_id, sub, timestamp,)
+            self.connection.cursor().execute(database.INSERT_ROW_SUBSCRIPTIONS, sub)
+            self.connection.commit()
+        except:
+            raise DBHandlerException('ERROR - insert_subscription')
+
     def get_subscriptions(self):
         print('Getting subscriptions')
         subs = []
@@ -57,26 +68,6 @@ class DatabaseHandler:
                 raise DBHandlerException('ERROR - get_subscriptions - Subscription not valid')
         return subs
 
-    def insert_match(self, username, item, permalink):
-        try:
-            match = (username, item, permalink, times.get_current_timestamp())
-            self.connection.cursor().execute(database.INSERT_ROW_MATCHES, match)
-            self.connection.cursor().execute(database.INSERT_ROW_ALL_MATCHES, match)
-            self.connection.commit()  # TODO Move this to where method is called.
-        except:
-            raise DBHandlerException('Error - insert_match')
-
-    def purge_old_matches(self):
-        print('purging')
-        current_time = times.get_current_timestamp()
-        quarter_of_year = 31557600 / 4
-        marked_old_time = current_time - quarter_of_year
-        try:
-            self.connection.cursor().execute(database.PURGE_OLD_MATCHES, (marked_old_time,))
-            self.connection.commit()
-        except:
-            raise DBHandlerException('ERROR - purge_old_matches')
-
     def get_subscriptions_by_user(self, username):
         print('Get Subs By Username')
         subs = []
@@ -91,15 +82,6 @@ class DatabaseHandler:
             else:
                 raise DBHandlerException('ERROR - get_subscriptions - subscription not valid')
         return subs
-
-    def insert_subscription(self, username, message_id, sub, timestamp):
-        print('Insert subscription')
-        try:
-            sub = (username, message_id, sub, timestamp,)
-            self.connection.cursor().execute(database.INSERT_ROW_SUBSCRIPTIONS, sub)
-            self.connection.commit()
-        except:
-            raise DBHandlerException('ERROR - insert_subscription')
 
     # TODO - Check if subscription exists first
     def remove_subscription(self, username, sub):
@@ -127,22 +109,6 @@ class DatabaseHandler:
         except:
             raise DBHandlerException('ERROR - remove_all_subscriptions')
 
-    def count_all_users(self):
-        users = 0
-        try:
-            users = len(self.connection.cursor().execute(database.GET_ALL_USERS).fetchall())
-        except:
-            raise DBHandlerException('ERROR - count_all_users')
-        return users
-
-    def count_current_users(self):
-        users = 0
-        try:
-            users = len(self.connection.cursor().execute(database.GET_ACTIVE_USERS).fetchall())
-        except:
-            raise DBHandlerException('ERROR - count_active_users')
-        return users
-
     def count_all_subscriptions(self):
         subs = 0
         try:
@@ -159,19 +125,18 @@ class DatabaseHandler:
             raise DBHandlerException('ERROR - count_unique_subscriptions')
         return subs
 
-    def count_subreddits(self):
-        dict = {}
+    # ==============================================================================
+    #           MATCHES
+    # ==============================================================================
+
+    def insert_match(self, username, item, permalink):
         try:
-            subscriptions = self.get_subscriptions()
-            for sub in subscriptions:
-                for subreddit in sub.subreddits:
-                    if subreddit in dict:
-                        dict[subreddit] += 1
-                    else:
-                        dict[subreddit] = 1
+            match = (username, item, permalink, times.get_current_timestamp())
+            self.connection.cursor().execute(database.INSERT_ROW_MATCHES, match)
+            self.connection.cursor().execute(database.INSERT_ROW_ALL_MATCHES, match)
+            self.connection.commit()  # TODO Move this to where method is called.
         except:
-            raise DBHandlerException('ERROR - count_subreddits')
-        return sorted(dict.items(), key=lambda x: x[1])
+            raise DBHandlerException('Error - insert_match')
 
     def count_total_matches(self):
         matches = 0
@@ -187,6 +152,55 @@ class DatabaseHandler:
         except:
             print('ERROR - Couldn\'t figure out if match existed')
             return True
+
+    def purge_old_matches(self):
+        print('purging')
+        current_time = times.get_current_timestamp()
+        quarter_of_year = 31557600 / 4
+        marked_old_time = current_time - quarter_of_year
+        try:
+            self.connection.cursor().execute(database.PURGE_OLD_MATCHES, (marked_old_time,))
+            self.commit()
+        except:
+            raise DBHandlerException('ERROR - purge_old_matches')
+
+    # ==============================================================================
+    #           USERS
+    # ==============================================================================
+
+    def count_all_users(self):
+        users = 0
+        try:
+            users = len(self.connection.cursor().execute(database.GET_ALL_USERS).fetchall())
+        except:
+            raise DBHandlerException('ERROR - count_all_users')
+        return users
+
+    def count_current_users(self):
+        users = 0
+        try:
+            users = len(self.connection.cursor().execute(database.GET_ACTIVE_USERS).fetchall())
+        except:
+            raise DBHandlerException('ERROR - count_active_users')
+        return users
+
+    # ==============================================================================
+    #           SUBREDDITS
+    # ==============================================================================
+
+    def count_subreddits(self):
+        dict = {}
+        try:
+            subscriptions = self.get_subscriptions()
+            for sub in subscriptions:
+                for subreddit in sub.subreddits:
+                    if subreddit in dict:
+                        dict[subreddit] += 1
+                    else:
+                        dict[subreddit] = 1
+        except:
+            raise DBHandlerException('ERROR - count_subreddits')
+        return sorted(dict.items(), key=lambda x: x[1])
 
 
 class DBHandlerException(Exception):

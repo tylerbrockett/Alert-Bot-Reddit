@@ -48,6 +48,12 @@ class RedditHandler:
             raise RedditHelperException(RedditHelperException.GET_SUBMISSIONS_EXCEPTION)
         return submissions
 
+    def get_original_message(self, received_message):
+        message = received_message
+        while message.parent_id is not None:
+            message = self.reddit.get_message(message.parent_id)
+        return message
+
 
 class RedditHelperException(Exception):
     SEND_MESSAGE_EXCEPTION = 'Error sending message'

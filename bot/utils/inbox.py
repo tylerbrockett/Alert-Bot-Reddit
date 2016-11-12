@@ -62,13 +62,11 @@ def compose_invalid_subscription_message(username, sub):
 
 def compose_duplicate_subscription_message(username, existing, new):
     result = compose_greeting(username) + \
-             'We think you alread have an existing subscription matching the criteria specified. Below ' + \
+             'We think you already have an existing subscription matching the criteria specified. Below ' + \
              'both subscriptions are listed. If you believe there has been a mistake, please PM me at ' + \
              '/u/' + accountinfo.developerusername + ' and let me know.\n\n' + \
-             '###Existing\n' + \
-             existing.to_string() + '\n\n' + \
-             '###New\n' + \
-             new.to_string() + '\n' + \
+             existing.to_string('Existing Subscription') + '\n\n' + \
+             new.to_string('New Subscription') + '\n' + \
              compose_salutation()
     return result
 

@@ -58,8 +58,8 @@ class InboxHandler:
                 Logger.log(Color.RED, 'Subscription already exists')
                 message.reply(inbox.compose_duplicate_subscription_message(
                     message.author,
-                    existing_sub.to_string(),
-                    new_sub.to_string()))
+                    existing_sub.to_string('Existing Subscription'),
+                    new_sub.to_string('New Subscription')))
                 message.mark_as_read()
                 return
         all_subs = database.get_subscriptions_by_username(message.author)

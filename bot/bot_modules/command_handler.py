@@ -32,21 +32,21 @@ class CommandHandler:
             messages = CommandHandler.get_dev_messages(reddit)
             for message in messages:
                 subject, body = inbox.format_subject(message.subject.lower()), message.body.lower()
-                if subject in CommandHandler.run or body in CommandHandler.run:
+                if body in CommandHandler.run:
                     Logger.log(Color.GREEN, '--------- Bot resumed by developer ---------')
                     message.reply('Thanks, I was getting bored!')
                     commands.append(CommandHandler.RUN)
                     message.mark_as_read()
-                elif subject in CommandHandler.pause or body in CommandHandler.pause:
+                elif body in CommandHandler.pause:
                     Logger.log(Color.YELLOW, '--------- Bot paused by developer ---------')
                     message.reply('Standing by for further instructions.')
                     commands.append(CommandHandler.PAUSE)
                     message.mark_as_read()
-                elif subject in CommandHandler.kill or body in CommandHandler.kill:
+                elif body in CommandHandler.kill:
                     Logger.log(Color.RED, '--------- Bot killed by developer ---------')
                     message.reply('Bot has been killed')
                     commands.append(CommandHandler.KILL)
-                elif subject in CommandHandler.test or body in CommandHandler.test:
+                elif body in CommandHandler.test:
                     Logger.log(Color.GREEN, '--------- Bot is being tested ---------')
                     message.reply('Bot is being tested')
                     message.mark_as_read()

@@ -1,0 +1,4 @@
+
+1. If you subscribe to all posts within /r/buildapcsales without specifying the subreddit ("subscribe ", since the
+    subreddit defaults to /r/buildapcsales), the bot will throw an error. The user must specify the subreddit in this
+    case ("subscribe -subreddit buildapcsales"). Makes sense to keep it this way...

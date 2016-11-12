@@ -103,16 +103,21 @@ class SubscriptionParser:
             raise SubscriptionParserException('Error - parse_statement_list - Expected ' + str(SubscriptionParser.statement_tokens))
 
     def parse_title_list(self):
-        self.title += self.parse_list([])
+        title_list = self.parse_list([])
+        if len(list) == 1 and list[0].lower() == 'all':
+            title_list = []
+        self.title += title_list
 
     def parse_body_list(self):
         self.body += self.parse_list([])
 
     def parse_redditors_list(self):
-        self.redditors += self.parse_list([])
+        redditors = self.parse_list([])
+        self.redditors += [r.lower().replace('/u/', '') for r in redditors]
 
     def parse_subreddits_list(self):
-        self.subreddits += self.parse_list([])
+        subreddits = self.parse_list([])
+        self.subreddits += [s.lower().replace('/r/', '') for s in subreddits]
 
     def parse_email(self):
         self.flags += ['email', True]
@@ -127,7 +132,8 @@ class SubscriptionParser:
         self.ignore_body += self.parse_list([])
 
     def parse_ignore_redditors_list(self):
-        self.ignore_redditors += self.parse_list([])
+        redditors = self.parse_list([])
+        self.ignore_redditors += [r.lower().replace('/u/', '') for r in redditors]
 
     def parse_list(self, ret):
         token, ttype = self.get_token()

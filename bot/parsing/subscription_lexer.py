@@ -13,12 +13,12 @@ class SubscriptionLexer:
         '',
         # TITLE
         '-title',
-        '-site',
-        '-sites',
-        # BODY
-        '-url',
         '-item',
         '-items',
+        # BODY
+        '-url',
+        '-site',
+        '-sites',
         '-body',
         # SUBREDDIT
         '-subreddit',
@@ -34,9 +34,7 @@ class SubscriptionLexer:
         '-ignore-item',
         '-ignore-items',
         '-ignore-title',
-        # IGNORE SUBREDDITS
-        '-ignore-subreddit',
-        '-ignore-subreddits',
+        # FLAGS
         '-nsfw',
         '-email',
         ','

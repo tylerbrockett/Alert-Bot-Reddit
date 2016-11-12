@@ -46,41 +46,6 @@ GET_SUBSCRIPTIONS_BY_USERNAME = "SELECT * " + \
 GET_ALL_SUBSCRIPTIONS = 'SELECT * FROM ' + TABLE_SUBSCRIPTIONS
 
 # ======================================================================================================
-#           DATABASE MESSAGES TABLE
-# ======================================================================================================
-
-TABLE_MESSAGES = 'messages'
-
-SUB_ID = 'sub_id'
-MESSAGE_ID = 'message_id'
-
-COL_MESSAGE_SUB_ID = 0
-COL_MESSAGE_USERNAME = 1
-COL_MESSAGE_ID = 2
-COL_MESSAGE_TIMESTAMP = 3
-
-CREATE_TABLE_MESSAGES = \
-    "CREATE TABLE IF NOT EXISTS " + TABLE_MESSAGES + "(" + \
-    "FOREIGN KEY(" + SUB_ID + ") REFERENCES " + TABLE_SUBSCRIPTIONS + "(rowid) NOT NULL ON DELETE CASCADE, " + \
-    USERNAME + " TEXT NOT NULL, " + \
-    MESSAGE_ID + " TEXT NOT NULL, " + \
-    TIMESTAMP + " REAL NOT NULL, " + \
-    "PRIMARY KEY(" + SUB_ID + ", " + MESSAGE_ID + "));"
-
-INSERT_ROW_MESSAGES = "INSERT INTO " + TABLE_MESSAGES + " VALUES (?,?,?)"
-
-REMOVE_ROW_MESSAGES = "DELETE FROM " + TABLE_MESSAGES + \
-    " WHERE " + SUB_ID + " = (?) " + \
-    " AND " + MESSAGE_ID + " = (?)"
-
-GET_MESSAGES_BY_USERNAME = "SELECT * " + \
-                           "FROM " + TABLE_MESSAGES + " " + \
-                           "WHERE username = (?) " + \
-                           "ORDER BY " + SUB + " ASC"
-
-GET_ALL_MESSAGES = 'SELECT * FROM ' + TABLE_SUBSCRIPTIONS
-
-# ======================================================================================================
 #           DATABASE USERS TABLE
 # ======================================================================================================
 
@@ -88,8 +53,10 @@ TABLE_ALL_USERS = 'all_users'
 
 CREATE_TABLE_ALL_USERS = \
     'CREATE TABLE IF NOT EXISTS ' + TABLE_ALL_USERS + '(' + \
-    USERNAME + ' TEXT NOT NULL ,' + \
+    USERNAME + ' TEXT NOT NULL,' + \
     'PRIMARY KEY(' + USERNAME + '));'
+
+INSERT_ROW_ALL_USERS = 'INSERT OR IGNORE INTO ' + TABLE_ALL_USERS + ' VALUES(?)'
 
 # ======================================================================================================
 #           DATABASE MATCHES TABLES
@@ -109,7 +76,7 @@ CREATE_TABLE_MATCHES = \
     "CREATE TABLE IF NOT EXISTS " + TABLE_MATCHES + "(" + \
     USERNAME + " TEXT NOT NULL, " + \
     SUB + " TEXT NOT NULL, " + \
-    SUB + " TEXT NOT NULL, " + \
+    PERMALINK + " TEXT NOT NULL, " + \
     TIMESTAMP + " REAL NOT NULL, " + \
     "PRIMARY KEY(" + USERNAME + ", " + SUB + ", " + PERMALINK + "));"
 
