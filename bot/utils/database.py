@@ -41,9 +41,12 @@ REMOVE_ALL_SUBSCRIPTIONS_BY_USERNAME = "DELETE FROM " + TABLE_SUBSCRIPTIONS + \
 GET_SUBSCRIPTIONS_BY_USERNAME = "SELECT * " + \
                                 "FROM " + TABLE_SUBSCRIPTIONS + " " + \
                                 "WHERE username = ? " + \
-                                "ORDER BY " + SUB + " ASC"
+                                "ORDER BY " + TIMESTAMP + " ASC"
 
-GET_ALL_SUBSCRIPTIONS = 'SELECT * FROM ' + TABLE_SUBSCRIPTIONS
+GET_SUBSCRIPTION = 'SELECT * FROM ' + TABLE_SUBSCRIPTIONS + ' ' + \
+    'WHERE ' + USERNAME + ' = (?) AND ' + SUB + ' = (?)'
+
+GET_ALL_SUBSCRIPTIONS = 'SELECT * FROM ' + TABLE_SUBSCRIPTIONS + " ORDER BY " + TIMESTAMP + " ASC"
 
 # ======================================================================================================
 #           DATABASE USERS TABLE
@@ -105,7 +108,7 @@ REMOVE_MATCHES_BY_USERNAME_AND_SUBJECT = "DELETE FROM " + TABLE_MATCHES + \
 PURGE_OLD_MATCHES = 'DELETE FROM ' + TABLE_MATCHES + \
     ' WHERE ' + TIMESTAMP + ' <= (?)'
 
-GET_MATCH = 'SELECT * FROM MATCHES ' + \
+GET_MATCH = 'SELECT * FROM ' + TABLE_MATCHES + ' ' + \
     'WHERE ' + USERNAME + ' = (?) AND ' + SUB + ' = (?) AND ' + PERMALINK + ' = (?)'
 
 # ======================================================================================================

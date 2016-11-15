@@ -32,25 +32,26 @@ class CommandHandler:
             messages = CommandHandler.get_dev_messages(reddit)
             for message in messages:
                 subject, body = inbox.format_subject(message.subject.lower()), message.body.lower()
-                if body in CommandHandler.run:
+                if body in CommandHandler.run or subject in CommandHandler.run:
                     Logger.log(Color.GREEN, '--------- Bot resumed by developer ---------')
-                    message.reply('Thanks, I was getting bored!')
+                    message.reply('Bot will be resumed')
                     commands.append(CommandHandler.RUN)
                     message.mark_as_read()
-                elif body in CommandHandler.pause:
+                elif body in CommandHandler.pause or subject in CommandHandler.pause:
                     Logger.log(Color.YELLOW, '--------- Bot paused by developer ---------')
-                    message.reply('Standing by for further instructions.')
+                    message.reply('Bot will be paused')
                     commands.append(CommandHandler.PAUSE)
                     message.mark_as_read()
-                elif body in CommandHandler.kill:
+                elif body in CommandHandler.kill or subject in CommandHandler.kill:
                     Logger.log(Color.RED, '--------- Bot killed by developer ---------')
-                    message.reply('Bot has been killed')
+                    message.reply('Bot will be killed')
                     commands.append(CommandHandler.KILL)
-                elif body in CommandHandler.test:
+                    message.mark_as_read()
+                elif body in CommandHandler.test or subject in CommandHandler.test:
                     Logger.log(Color.GREEN, '--------- Bot is being tested ---------')
                     message.reply('Bot is being tested')
-                    message.mark_as_read()
                     commands.append(CommandHandler.TEST)
+                    message.mark_as_read()
         except:
             raise CommandHandlerException('Error occurred reading commands')
         return commands

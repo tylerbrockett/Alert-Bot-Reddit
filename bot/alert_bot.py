@@ -10,25 +10,25 @@ Version:            v0.1
 """
 
 from bot_modules.command_handler import CommandHandler
+from bot_modules.command_handler import CommandHandlerException
 from bot_modules.database_handler import DatabaseHandler
+from bot_modules.database_handler import DatabaseHandlerException
 from bot_modules.inbox_handler import InboxHandler
 from bot_modules.match_handler import MatchHandler
 from bot_modules.reddit_handler import RedditHandler
 from bot_modules.sleep_handler import SleepHandler
 from bot_modules.subscription_handler import SubscriptionHandler
-from private import accountinfo
 import traceback
 from utils import times
 from utils.color import Color
 from utils.logger import Logger
+from bot_modules.crash_handler import handle_crash
 
 
 class AlertBot:
     def __init__(self):
         self.start_time = times.get_current_timestamp()
         self.run = True
-        self.sleep_seconds = 45
-        self.num_posts = 20
         self.database = DatabaseHandler()
         self.reddit = RedditHandler()
 
@@ -41,15 +41,19 @@ class AlertBot:
                     InboxHandler.read_inbox(self.database, self.reddit)
                     subscriptions = self.database.get_subscriptions()
                     matches = SubscriptionHandler.find_matches(subscriptions, self.reddit, self.database)
-                    MatchHandler.handle_matches(self.reddit, self.database, matches)
+                    MatchHandler.send_messages(self.reddit, self.database, matches)
                     self.database.purge_old_matches()
                     Logger.log(Color.YELLOW, times.get_time_passed(self.start_time))
             except KeyboardInterrupt:
                 Logger.log(Color.RED, 'Keyboard Interrupt - Bot killed')
                 exit()
+            except CommandHandlerException as ex:
+                handle_crash(traceback.format_exc(), self.reddit, self.database, True)
+            except DatabaseHandlerException as ex:
+                handle_crash(traceback.format_exc(), self.reddit, self.database, True)
             except:
-                self.handle_crash(traceback.format_exc())
-            SleepHandler.sleep(self.sleep_seconds)
+                handle_crash(traceback.format_exc(), self.reddit, self.database, True)
+            SleepHandler.sleep(20)
 
     def check_for_commands(self):
         Logger.log('Checking for commands')
@@ -60,14 +64,3 @@ class AlertBot:
             self.run = True
         if CommandHandler.KILL in commands:
             exit()
-
-    def handle_crash(self, stacktrace):
-        reset = False
-        while not reset:
-            try:
-                self.reddit.reset()
-                self.database.reset()
-                self.reddit.send_message(accountinfo.developerusername, "Exception Handled", stacktrace)
-                reset = True
-            except:
-                SleepHandler.sleep(15)

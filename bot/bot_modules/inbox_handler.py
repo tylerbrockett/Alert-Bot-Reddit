@@ -1,19 +1,21 @@
 from utils import inbox, times
 from bot_modules.sleep_handler import SleepHandler
-from bot_modules.database_handler import DBHandlerException
+from bot_modules.database_handler import DatabaseHandlerException
 from utils.logger import Logger
 from utils.color import Color
 from private import accountinfo
 from utils.subscription import Subscription
+from parsing.message_parser import MessageParser
+from parsing.message_parser import MessageParserException
 
 
 class InboxHandler:
 
     @staticmethod
-    def handle_reddit_message(reddit, message):
+    def handle_message_from_reddit(reddit, message):
         print('Message from reddit')
-        reddit.send_message(accountinfo.developerusername, 'FORWARD: ' + message.subject, message.body)
-        reddit.send_message(accountinfo.developerusername2, 'FORWARD: ' + message.subject, message.body)
+        reddit.send_message(accountinfo.developerusername, 'FWD: ' + message.subject, message.body)
+        reddit.send_message(accountinfo.developerusername2, 'FWD: ' + message.subject, message.body)
         message.mark_as_read()
 
     @staticmethod
@@ -128,9 +130,9 @@ class InboxHandler:
         print('Reading inbox...')
         unread = []
         try:
-            unread = reddit.get_unread()
+            unread = reddit.get_unread(limit=None)
         except:
-            raise InboxHelperException(InboxHelperException.READ_MESSAGES_EXCEPTION)
+            raise InboxHandlerException(InboxHandlerException.READ_MESSAGES_EXCEPTION)
 
         for message in unread:
             username = str(message.author).lower()
@@ -138,29 +140,33 @@ class InboxHandler:
             body     = message.body.lower()
             try:
                 if username == 'reddit':
-                    InboxHandler.handle_reddit_message(reddit, message)
-                elif subject in ['statistics', 'stats'] or body in ['statistics', 'stats']:
-                    InboxHandler.handle_statistics_message(database, message)
-                elif subject in ['subscriptions', 'subs'] or body in ['subscriptions, subs']:
-                    InboxHandler.handle_get_subscriptions_message(database, message)
+                    InboxHandler.handle_message_from_reddit(reddit, message)
                 elif subject == 'username mention':
                     InboxHandler.handle_username_mention_message(reddit, message)
                 elif subject == 'post reply':
                     InboxHandler.handle_post_reply_message(reddit, message)
-                elif ['unsubscribe', 'all'] in body or ['unsubscribe', 'all'] in subject:
-                    InboxHandler.handle_unsubscribe_all_message(database, message)
-                elif body in ['unsubscribe', 'unsub'] and subject.replace(' ', '') != '':
-                    InboxHandler.handle_unsubscribe_message(database, message)
-                elif body in ['subscribe', 'sub'] and len(inbox.format_subject(subject).replace(' ', '')) > 0:
-                    InboxHandler.handle_subscription_message(database, message)
-                elif subject in ['information', 'info', 'help'] or body in ['information', 'info', 'help']:
-                    InboxHandler.handle_help_message(database, message)
-                elif subject == 'feedback':
-                    InboxHandler.handle_feedback_message(reddit, message)
+                else:
+                    m = MessageParser(body)
+                    action = m.action
+
+                    if action == MessageParser.ACTION_STATISTICS and m.valid:
+                        InboxHandler.handle_statistics_message(database, message)
+                    elif action == MessageParser.ACTION_GET_SUBSCRIPTIONS and m.valid:
+                        InboxHandler.handle_get_subscriptions_message(database, message)
+                    elif action == MessageParser.ACTION_UNSUBSCRIBE_ALL and m.valid:
+                        InboxHandler.handle_unsubscribe_all_message(database, message)
+                    elif action == MessageParser.ACTION_UNSUBSCRIBE and m.valid:
+                        InboxHandler.handle_unsubscribe_message(database, message)
+                    elif action == MessageParser.ACTION_SUBSCRIBE and m.valid:
+                        InboxHandler.handle_subscription_message(database, message)
+                    elif action == MessageParser.ACTION_HELP and m.valid:
+                        InboxHandler.handle_help_message(database, message)
+                    elif action == MessageParser.ACTION_FEEDBACK and m.valid:
+                        InboxHandler.handle_feedback_message(reddit, message)
                 else:
                     InboxHandler.handle_reject_message(reddit, message)
-            except DBHandlerException as ex:
-                if ex.errorArgs == DBHandlerException.INTEGRITY_ERROR:
+            except DatabaseHandlerException as ex:
+                if ex.errorArgs == DatabaseHandlerException.INTEGRITY_ERROR:
                     message.mark_as_read()
                     reddit.send_message(accountinfo.developerusername,
                                         'Integrity Error',
@@ -174,7 +180,7 @@ class InboxHandler:
         Logger.log(Color.CYAN, str(len(unread)) + ' unread messages handled')
 
 
-class InboxHelperException(Exception):
+class InboxHandlerException(Exception):
     READ_MESSAGES_EXCEPTION = 'Error reading messages'
 
     def __init__(self, error_args, traceback=None):

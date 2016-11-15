@@ -4,6 +4,7 @@ from utils import inbox
 import praw
 from bot_modules.reddit_handler import RedditHandler
 from bot_modules.database_handler import DatabaseHandler
+import json
 
 if __name__ == '__main__':
     '''
@@ -24,7 +25,7 @@ if __name__ == '__main__':
     print('FORMAT: ' + s)
     print(inbox.format_subject(s))
     '''
-
+    '''
     r = praw.Reddit(user_agent=accountinfo.user_agent)
     r.login(accountinfo.old_username, accountinfo.password, disable_warning=True)
 
@@ -38,3 +39,12 @@ if __name__ == '__main__':
         print('Message ID:   ' + str(message.id))
         print('Message Body: ' + message.body)
     print('\n\n\nFinal Count: ' + str(i))
+
+    test = ['yes', 'no', 'maybe', ['yes', 'no', 'maybe']]
+    s = '{"test":' + json.dumps(test) + '}'
+    j = json.loads(s)
+    print(json.dumps(j))
+    '''
+    test = "-item 6700k, i5 6500k -item bluetooth -body bodytext! -nsfw -email -nsfw -email -subreddits /r/buildapcsales, r/hardwareswap -redditors u/tylerbrockett -ignore-title yaaaay, yooo -ignore-body yay -ignore-title test -ignore-redditors /u/tylerbrockett "
+    sub = SubscriptionParser(test)
+    print(sub.to_json())
