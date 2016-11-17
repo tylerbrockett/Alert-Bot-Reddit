@@ -3,7 +3,6 @@ from private import accountinfo
 
 
 def format_subject(s):
-    print(s[:3].lower())
     while len(s) >= 3 and s[:3].lower() == 're:':
         s = s[3:]
     while len(s) > 0 and s[0] == ' ':
@@ -102,6 +101,22 @@ def compose_unsubscribe_all_message(username):
     result = compose_greeting(username) + \
              "Sorry to see you go. Thanks for trying me though! I hope you'll be back soon!" + \
              compose_salutation()
+    return result
+
+
+# TODO
+def compose_unsubscribe_from_num_message(username, subscription, subscriptions):
+    result = compose_greeting(username) + \
+        "You have unsubscribed from the following item. Below are your new set of subscriptions." + \
+        compose_salutation()
+    return result
+
+
+def compose_edit_message(username):
+    result = compose_greeting(username) + \
+        "Unfortunately, the bot has only partially implemented this feature, so it is not up and running quite " + \
+        "yet. Please try again at a later date. Sorry for the inconvenience! " + \
+        compose_salutation()
     return result
 
 

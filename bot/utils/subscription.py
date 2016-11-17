@@ -1,55 +1,66 @@
-from parsing.subscription_parser import SubscriptionParser
-from parsing.subscription_parser import SubscriptionParserException
+from dict_compare import dict_compare
+import traceback
+import json
 
 
 class Subscription:
 
-    def __init__(self, original_string, username, message_id):
-        self.original_string = original_string
+    TITLE = 'title'
+    BODY = 'body'
+    IGNORE_TITLE = 'ignore_title'
+    IGNORE_BODY = 'ignore_body'
+    REDDITORS = 'redditors'
+    IGNORE_REDDITORS = 'ignore_redditors'
+    SUBREDDITS = 'subreddits'
+    NSFW = 'nsfw'
+    EMAIL = 'email'
+    VALID = 'valid'
+    SCHEMA_VERSION = 'schema_version'
+
+    STATUS_VALID = 'valid'
+    STATUS_INVALID = 'invalid'
+    STATUS_TOO_GENERIC = 'too_generic'
+
+    CURRENT_SCHEMA_VERSION = 1
+
+    def __init__(self, subscription, username, message_id):
         self.username = username
         self.message_id = message_id
-        self.title = []
-        self.ignore_title = []
-        self.body = []
-        self.ignore_body = []
-        self.redditors = []
-        self.ignore_redditors = []
-        self.subreddits = []
-        self.flags = []
-        self.valid = False
-        self.parse()
-        self.sort()
-
-    def parse(self):
+        self.status = Subscription.STATUS_INVALID
+        self.data = {}
         try:
-            parser = SubscriptionParser(self.original_string)
-            self.title = list(set(parser.title))
-            self.ignore_title = list(set(parser.ignore_title))
-            self.body = list(set(parser.body))
-            self.ignore_body = list(set(parser.ignore_body))
-            self.redditors = list(set(parser.redditors))
-            self.ignore_redditors = list(set(parser.ignore_redditors))
-            self.subreddits = list(set(parser.subreddits))
-            self.flags = list(set(parser.flags))
-            self.valid = True
-        except SubscriptionParserException:
-            self.valid = False
+            if type(subscription) == dict:
+                self.data = subscription
+            elif type(subscription) == str:
+                self.data = json.loads(subscription)
+            self.sort()
+            self.status = Subscription.STATUS_VALID
+        except:
+            print(traceback.format_exc())
+            self.valid = Subscription.STATUS_INVALID
+        self.check_too_generic()
+
+    def check_too_generic(self):
+        if not self.data[Subscription.TITLE] and 'all' in self.data[Subscription.SUBREDDITS]:
+            self.status = Subscription.STATUS_TOO_GENERIC
 
     def sort(self):
-        self.title.sort()
-        self.ignore_title.sort()
-        self.body.sort()
-        self.ignore_body.sort()
-        self.redditors.sort()
-        self.ignore_redditors.sort()
-        self.subreddits.sort()
-        self.flags.sort()
+        for i in range(0, len(self.data[Subscription.TITLE])):
+            self.data[Subscription.TITLE][i].sort()
+        self.data[Subscription.TITLE].sort()
+        self.data[Subscription.BODY].sort()
+        self.data[Subscription.REDDITORS].sort()
+        self.data[Subscription.IGNORE_TITLE].sort()
+        self.data[Subscription.IGNORE_BODY].sort()
+        self.data[Subscription.IGNORE_REDDITORS].sort()
+        self.data[Subscription.SUBREDDITS].sort()
 
-    def format_settings(self):
-        ret = ''
-        for setting in self.flags:
-            ret += (str(setting[0]) + '|' + str(setting[1])) + '\n'
-        return ret
+    def check_schema_version(self):
+        schema_version = self.data[Subscription.SCHEMA_VERSION]
+        if schema_version != Subscription.CURRENT_SCHEMA_VERSION:
+            self.data[Subscription.SCHEMA_VERSION] = Subscription.CURRENT_SCHEMA_VERSION
+            return True
+        return False
 
     @staticmethod
     def format_list(lis):
@@ -60,46 +71,47 @@ class Subscription:
     def format_terms(self):
         ret = ''
         i = 1
-        for term_set in self.title:
-            ret += 'Item ' + str(i) + '|' + Subscription.format_list(term_set)
+        for term_set in self.data[Subscription.TITLE]:
+            ret += 'Item ' + str(i) + '|' + Subscription.format_list(term_set) + '\n'
             i += 1
         return ret
 
-    def to_string(self, title):
+    def to_string(self):
+        return json.dumps(self.data, 2)
+
+    def to_table(self, title):
         ret = \
             '###' + title + '\n' + \
             'Detail|Value\n' + \
             '--:|:--:' + '\n' + \
             self.format_terms() + \
-            'Ignore Title Terms|' + Subscription.format_list(self.ignore_title) + '\n' + \
-            'Body Terms|' + Subscription.format_list(self.body) + '\n' + \
-            'Ignore Body Terms|' + Subscription.format_list(self.ignore_body) + '\n' + \
-            'Whitelist Redditors|' + Subscription.format_list(self.redditors) + '\n' + \
-            'Ignore Redditors|' + Subscription.format_list(self.ignore_redditors) + '\n' + \
-            'Subreddits|' + Subscription.format_list(self.subreddits) + '\n' + \
-            'Flags|' + Subscription.format_list(self.flags)
+            'Body Terms|' + Subscription.format_list(self.data[Subscription.BODY]) + '\n' + \
+            'Subreddits|' + Subscription.format_list(self.data[Subscription.SUBREDDITS]) + '\n' + \
+            'Ignore Title Terms|' + Subscription.format_list(self.data[Subscription.IGNORE_TITLE]) + '\n' + \
+            'Ignore Body Terms|' + Subscription.format_list(self.data[Subscription.IGNORE_BODY]) + '\n' + \
+            'Whitelist Redditors|' + Subscription.format_list(self.data[Subscription.REDDITORS]) + '\n' + \
+            'Ignore Redditors|' + Subscription.format_list(self.data[Subscription.IGNORE_REDDITORS]) + '\n' + \
+            'NSFW|' + str(self.data[Subscription.NSFW]) + '\n' + \
+            'Email|' + str(self.data[Subscription.EMAIL])
+
         return ret
 
-    # TODO I think this method is incorrect
     @staticmethod
     def compare_lists(list1, list2):
         for val in list1:
-            if val in list2:
-                return True
-        return False
+            if val not in list2:
+                return False
+        for val in list2:
+            if val not in list1:
+                return False
+        if len(list1) != len(list2):
+            return False
+        return True
 
     def compare_to(self, sub):
-        compare_title = Subscription.compare_lists(self.title, sub.title)
-        compare_ig_title = Subscription.compare_lists(self.ignore_title, sub.ignore_title)
-        compare_body = Subscription.compare_lists(self.body, sub.body)
-        compare_ig_body = Subscription.compare_lists(self.ignore_body, sub.ignore_body)
-        compare_redditors = Subscription.compare_lists(self.redditors, sub.redditors)
-        compare_ig_redditors = Subscription.compare_lists(self.ignore_redditors, sub.ignore_redditors)
-        compare_flags = Subscription.compare_lists(self.flags, sub.flags)
-        return (compare_title and
-                compare_ig_title and
-                compare_body and
-                compare_ig_body and
-                compare_redditors and
-                compare_ig_redditors and
-                compare_flags)
+        self.sort()
+        sub.sort()
+        added, removed, modified, same = dict_compare(self.data, sub.data)
+        if len(added) != 0 or len(removed) != 0 or len(modified) != 0:
+            return False
+        return True

@@ -1,5 +1,5 @@
 from subscription_lexer import SubscriptionLexer
-from subscription_lexer import SubscriptionLexerException
+from utils.subscription import Subscription
 from token_type import TokenType
 import json
 
@@ -28,15 +28,6 @@ class SubscriptionParser:
         '-email'
     ]
 
-    TITLE = 'title'
-    BODY = 'body'
-    IGNORE_TITLE = 'ignore_title'
-    IGNORE_BODY = 'ignore_body'
-    REDDITORS = 'redditors'
-    IGNORE_REDDITORS = 'ignore_redditors'
-    SUBREDDITS = 'subreddits'
-    FLAGS = 'flags'
-
     def unget_token(self):
         self.index -= 1
 
@@ -49,33 +40,36 @@ class SubscriptionParser:
     def __init__(self, sub):
         self.index = -1
         self.data = {
-            SubscriptionParser.TITLE: [],
-            SubscriptionParser.BODY: [],
-            SubscriptionParser.IGNORE_TITLE: [],
-            SubscriptionParser.IGNORE_BODY: [],
-            SubscriptionParser.REDDITORS: [],
-            SubscriptionParser.IGNORE_REDDITORS: [],
-            SubscriptionParser.SUBREDDITS: [],
-            SubscriptionParser.FLAGS: []
+            Subscription.TITLE: [],
+            Subscription.BODY: [],
+            Subscription.IGNORE_TITLE: [],
+            Subscription.IGNORE_BODY: [],
+            Subscription.REDDITORS: [],
+            Subscription.IGNORE_REDDITORS: [],
+            Subscription.SUBREDDITS: [],
+            Subscription.NSFW: False,
+            Subscription.EMAIL: False,
+            Subscription.SCHEMA_VERSION: Subscription.CURRENT_SCHEMA_VERSION
         }
         try:
             self.tokens = SubscriptionLexer(sub).tokenize()
+            self.parse_subscription()
+            self.final_checks()
+            self.data[Subscription.VALID] = True
         except:
-            raise SubscriptionLexerException("Error - subscription __init __ - Lexing Subscription")
-        self.parse_subscription()
-        self.final_checks()
+            raise SubscriptionParserException('SubscriptionParser __init__ - Malformed Subscription')
+
+    def get_data(self):
+        return self.data
 
     def to_json(self):
-        return json.dumps(self.data, 2)
+        return json.dumps(self.data, indent=2)
 
     def final_checks(self):
-        for term_list in self.data[SubscriptionParser.TITLE]:
-            for term in term_list:
-                if term == 'all' or term == '*':
-                    self.data[SubscriptionParser.TITLE] = []
-        if len(self.data[SubscriptionParser.SUBREDDITS]) == 0:
-            # default to /r/buildapcsales if no subreddits are specified
-            self.data[SubscriptionParser.SUBREDDITS] = ['buildapcsales']
+        for term_list in self.data[Subscription.TITLE]:
+            if len(term_list) == 1 and term_list[0] == '*':
+                self.data[Subscription.TITLE] = []
+                return
 
     def parse_subscription(self):
         token, ttype = self.get_token()
@@ -127,62 +121,67 @@ class SubscriptionParser:
             raise SubscriptionParserException('Error - parse_statement_list - Expected ' + str(SubscriptionParser.statement_tokens))
 
     def parse_title_list(self):
-        title_list = sorted(set(self.parse_list([])))
-        self.data[SubscriptionParser.TITLE].append(title_list)
+        new_list = sorted(set(self.parse_list([])))
+        if new_list not in self.data[Subscription.TITLE]:
+            self.data[Subscription.TITLE].append(new_list)
+            self.data[Subscription.TITLE].sort()
 
     def parse_body_list(self):
-        body_list = self.data[SubscriptionParser.BODY]
-        body_list += self.parse_list([])
-        body_list = sorted(set(body_list))
-        self.data[SubscriptionParser.BODY] = body_list
+        body_list = sorted(set(self.parse_list([])))
+        for item in body_list:
+            if item not in self.data[Subscription.BODY]:
+                self.data[Subscription.BODY].append(item)
+                self.data[Subscription.BODY].sort()
 
     def parse_redditors_list(self):
-        redditor_list = self.data[SubscriptionParser.REDDITORS]
-        redditor_list += self.parse_list([])
+        redditor_list = self.parse_list([])
         redditor_list = [r.lower().replace('/u/', '') for r in redditor_list]
         redditor_list = [r.lower().replace('u/', '') for r in redditor_list]
         redditor_list = sorted(set(redditor_list))
-        self.data[SubscriptionParser.REDDITORS] = redditor_list
+        for redditor in redditor_list:
+            if redditor not in self.data[Subscription.REDDITORS]:
+                self.data[Subscription.REDDITORS].append(redditor)
+                self.data[Subscription.REDDITORS].sort()
 
     def parse_subreddits_list(self):
-        subreddit_list = self.data[SubscriptionParser.SUBREDDITS]
-        subreddit_list += self.parse_list([])
+        subreddit_list = self.parse_list([])
         subreddit_list = [s.lower().replace('/r/', '') for s in subreddit_list]
         subreddit_list = [s.lower().replace('r/', '') for s in subreddit_list]
         subreddit_list = sorted(set(subreddit_list))
-        self.data[SubscriptionParser.SUBREDDITS] = subreddit_list
+        for subreddit in subreddit_list:
+            if subreddit not in self.data[Subscription.SUBREDDITS]:
+                self.data[Subscription.SUBREDDITS].append(subreddit)
+                self.data[Subscription.SUBREDDITS].sort()
 
     def parse_email(self):
-        existing_flags = self.data[SubscriptionParser.FLAGS]
-        existing_flags += ['email']
-        existing_flags = sorted(set(existing_flags))
-        self.data[SubscriptionParser.FLAGS] = existing_flags
+        self.data[Subscription.EMAIL] = True
 
     def parse_nsfw(self):
-        existing_flags = self.data[SubscriptionParser.FLAGS]
-        existing_flags += ['nsfw']
-        existing_flags = sorted(set(existing_flags))
-        self.data[SubscriptionParser.FLAGS] = existing_flags
+        self.data[Subscription.NSFW] = True
 
     def parse_ignore_title_list(self):
-        ignore_list = self.data[SubscriptionParser.IGNORE_TITLE]
-        ignore_list += self.parse_list([])
-        ignore_list = sorted(set(ignore_list))
-        self.data[SubscriptionParser.IGNORE_TITLE] = ignore_list
+        ignore_list = sorted(set(self.parse_list([])))
+        for item in ignore_list:
+            if item not in self.data[Subscription.IGNORE_TITLE]:
+                self.data[Subscription.IGNORE_TITLE].append(item)
+                self.data[Subscription.IGNORE_TITLE].sort()
 
     def parse_ignore_body_list(self):
-        ignore_list = self.data[SubscriptionParser.IGNORE_BODY]
-        ignore_list += self.parse_list([])
-        ignore_list = sorted(set(ignore_list))
-        self.data[SubscriptionParser.IGNORE_BODY] = ignore_list
+        ignore_list = sorted(set(self.parse_list([])))
+        for item in ignore_list:
+            if item not in self.data[Subscription.IGNORE_BODY]:
+                self.data[Subscription.IGNORE_BODY].append(item)
+                self.data[Subscription.IGNORE_BODY].sort()
 
     def parse_ignore_redditors_list(self):
-        redditor_list = self.data[SubscriptionParser.IGNORE_REDDITORS]
-        redditor_list += self.parse_list([])
-        redditor_list = [r.lower().replace('/u/', '') for r in redditor_list]
-        redditor_list = [r.lower().replace('u/', '') for r in redditor_list]
-        redditor_list = sorted(set(redditor_list))
-        self.data[SubscriptionParser.IGNORE_REDDITORS] = redditor_list
+        ignore_list = self.parse_list([])
+        ignore_list = [r.lower().replace('/u/', '') for r in ignore_list]
+        ignore_list = [r.lower().replace('u/', '') for r in ignore_list]
+        ignore_list = sorted(set(ignore_list))
+        for item in ignore_list:
+            if item not in self.data[Subscription.IGNORE_REDDITORS]:
+                self.data[Subscription.IGNORE_REDDITORS].append(item)
+                self.data[Subscription.IGNORE_REDDITORS].sort()
 
     def parse_list(self, ret):
         token, ttype = self.get_token()

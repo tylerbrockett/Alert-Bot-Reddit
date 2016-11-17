@@ -1,3 +1,5 @@
+from parsing.edit_lexer import EditLexer
+from parsing.token_type import TokenType
 
 
 class EditParser:
@@ -21,7 +23,7 @@ class EditParser:
     def get_token(self):
         self.index += 1
         if self.index >= len(self.tokens) or self.index < 0:
-            raise SubscriptionParserException('Error - Index out of bounds [' + str(self.index) + ']')
+            raise EditParserException('Error - Index out of bounds [' + str(self.index) + ']')
         return self.tokens[self.index]
 
 

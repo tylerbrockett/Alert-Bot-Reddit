@@ -61,7 +61,7 @@ class InboxHandler:
                 message.reply(inbox.compose_duplicate_subscription_message(
                     message.author,
                     existing_sub.to_string('Existing Subscription'),
-                    new_sub.to_string('New Subscription')))
+                    new_sub.to_table('New Subscription')))
                 message.mark_as_read()
                 return
         all_subs = database.get_subscriptions_by_username(message.author)
@@ -78,6 +78,17 @@ class InboxHandler:
             database.remove_subscription(message.author, inbox.format_subject(message.subject))
             message.reply(inbox.compose_unsubscribe_message(message.author, message.subject))
             message.mark_as_read()
+
+    # TODO
+    @staticmethod
+    def handle_unsubscribe_from_num_message(database, message):
+        print("Unsub from num")
+
+
+    @staticmethod
+    def handle_edit_message(database, message):
+        print('Edit message')
+        message.reply(inbox.)
 
     # TODO Handle if there are 0 subs for user
     @staticmethod
@@ -132,7 +143,7 @@ class InboxHandler:
         try:
             unread = reddit.get_unread(limit=None)
         except:
-            raise InboxHandlerException(InboxHandlerException.READ_MESSAGES_EXCEPTION)
+            unread = []
 
         for message in unread:
             username = str(message.author).lower()
@@ -147,24 +158,31 @@ class InboxHandler:
                     InboxHandler.handle_post_reply_message(reddit, message)
                 else:
                     m = MessageParser(body)
-                    action = m.action
+                    valid = m.data[MessageParser.KEY_VALID]
+                    action = m.data[MessageParser.KEY_ACTION]
+                    payload = m.get_payload()
 
-                    if action == MessageParser.ACTION_STATISTICS and m.valid:
+                    if action == MessageParser.ACTION_STATISTICS and valid:
                         InboxHandler.handle_statistics_message(database, message)
-                    elif action == MessageParser.ACTION_GET_SUBSCRIPTIONS and m.valid:
+                    elif action == MessageParser.ACTION_GET_SUBSCRIPTIONS and valid:
                         InboxHandler.handle_get_subscriptions_message(database, message)
-                    elif action == MessageParser.ACTION_UNSUBSCRIBE_ALL and m.valid:
+                    elif action == MessageParser.ACTION_UNSUBSCRIBE_ALL and valid:
                         InboxHandler.handle_unsubscribe_all_message(database, message)
-                    elif action == MessageParser.ACTION_UNSUBSCRIBE and m.valid:
+                    elif action == MessageParser.ACTION_UNSUBSCRIBE and valid:
                         InboxHandler.handle_unsubscribe_message(database, message)
-                    elif action == MessageParser.ACTION_SUBSCRIBE and m.valid:
-                        InboxHandler.handle_subscription_message(database, message)
-                    elif action == MessageParser.ACTION_HELP and m.valid:
+                    elif action == MessageParser.ACTION_UNSUBSCRIBE_FROM_NUM and valid:
+                        InboxHandler.handle_unsubscribe_from_num_message(database, message, payload)
+                    elif action == MessageParser.ACTION_SUBSCRIBE and valid:
+                        InboxHandler.handle_subscription_message(database, message, payload)
+                    elif action == MessageParser.ACTION_EDIT and valid:
+                        InboxHandler.handle_edit_message(database, message, payload)
+                    elif action == MessageParser.ACTION_HELP and valid:
                         InboxHandler.handle_help_message(database, message)
-                    elif action == MessageParser.ACTION_FEEDBACK and m.valid:
+                    elif action == MessageParser.ACTION_FEEDBACK and valid:
                         InboxHandler.handle_feedback_message(reddit, message)
-                else:
-                    InboxHandler.handle_reject_message(reddit, message)
+                    else:
+                        InboxHandler.handle_reject_message(reddit, message)
+
             except DatabaseHandlerException as ex:
                 if ex.errorArgs == DatabaseHandlerException.INTEGRITY_ERROR:
                     message.mark_as_read()
@@ -174,7 +192,7 @@ class InboxHandler:
                                         'BODY:\n' + str(message.body))
                     continue
             except:
-                raise InboxHelperException('Error handling inbox message')
+                raise InboxHandlerException('Error handling inbox message')
 
             SleepHandler.sleep(2)
         Logger.log(Color.CYAN, str(len(unread)) + ' unread messages handled')

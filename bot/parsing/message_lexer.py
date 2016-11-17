@@ -82,7 +82,7 @@ class MessageLexer:
         while self.is_num(c):
             self.token += c
             c = self.get_char()
-        if c not in self.whitespace and c != TokenType.EOF:
+        if c not in self.whitespace and c != TokenType.EOF and c != '':
             raise MessageLexerException('Error - whitespace or EOF expected after number')
         self.unget_char()
         return TokenType.NUM
@@ -110,7 +110,7 @@ class MessageLexer:
         return isinstance(char, str)
 
     def is_num(self, char):
-        return isinstance(char, (int, long, float, complex))
+        return char.isdigit()
 
     def is_alpha_num(self, char):
         if self.is_alpha(char) or self.is_num(char):
