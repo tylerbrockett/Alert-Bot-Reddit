@@ -6,7 +6,7 @@ from utils.color import Color
 from private import accountinfo
 from utils.subscription import Subscription
 from parsing.message_parser import MessageParser
-from parsing.message_parser import MessageParserException
+from parsing.message_lexer import MessageLexer
 
 
 class InboxHandler:
@@ -21,20 +21,14 @@ class InboxHandler:
     @staticmethod
     def handle_statistics_message(database, message):
         print('Stats message')
-        current_users = database.count_current_users()
-        all_users = database.count_all_users()
-        unique_subs = database.count_unique_subscriptions()
-        all_subs = database.count_all_subscriptions()
-        unique_subreddits = database.count_unique_subreddits()
-        all_matches = database.count_total_matches()
         formatted_message = inbox.compose_statistics(
             message.author,
-            all_users,
-            current_users,
-            unique_subs,
-            all_subs,
-            unique_subreddits,
-            all_matches)
+            database.count_current_users(),
+            database.count_all_users(),
+            database.count_unique_subscriptions(),
+            database.count_all_subscriptions(),
+            database.count_unique_subreddits(),
+            database.count_total_matches())
         message.reply(formatted_message)
         message.mark_as_read()
 
@@ -47,11 +41,11 @@ class InboxHandler:
         message.mark_as_read()
 
     @staticmethod
-    def handle_subscription_message(database, message):
+    def handle_subscription_message(database, message, payload):
         print('Sub message')
-        new_sub = Subscription(inbox.format_subject(message.subject), message.author, message.message_id)
+        new_sub = Subscription(payload, message.author, message.message_id)
         if not new_sub.valid:
-            message.reply(inbox.compose_invalid_subscription_message(message.username, message.subject))
+            message.reply(inbox.compose_reject_message(message.author, message.subject, message.body))
             message.mark_as_read()
             return
         subscriptions = database.get_subscriptions_by_username(message.author)
@@ -60,41 +54,52 @@ class InboxHandler:
                 Logger.log(Color.RED, 'Subscription already exists')
                 message.reply(inbox.compose_duplicate_subscription_message(
                     message.author,
-                    existing_sub.to_string('Existing Subscription'),
+                    existing_sub.to_table('Existing Subscription'),
                     new_sub.to_table('New Subscription')))
                 message.mark_as_read()
                 return
         all_subs = database.get_subscriptions_by_username(message.author)
-        database.insert_subscription(message.author, message.message_id, message.subject, times.get_current_timestamp())
-        message.reply(inbox.compose_new_subscription_message(message.author, new_sub, all_subs))
+        database.insert_subscription(message.author, message.message_id, new_sub.to_string(), times.get_current_timestamp())
+        subreddit_not_specified = len(new_sub.data[Subscription.SUBREDDITS]) == 0
+        message.reply(inbox.compose_subscribe_message(message.author, new_sub, all_subs, subreddit_not_specified))
+        database.commit()
         message.mark_as_read()
 
-    # TODO Check if subscription exists first, and handle if sub isn't valid
     @staticmethod
-    def handle_unsubscribe_message(database, message):
-        print('Unsub message') # (self, sub, username, message_id):
-        sub = Subscription(inbox.format_subject(message.subject), message.author, message.message_id)
-        if sub.valid:
-            database.remove_subscription(message.author, inbox.format_subject(message.subject))
-            message.reply(inbox.compose_unsubscribe_message(message.author, message.subject))
-            message.mark_as_read()
+    def handle_unsubscribe_message(reddit, database, message):
+        print('Unsub message')
+        message_id = reddit.get_original_message(message).id
+        sub = database.get_subscription_by_message_id(message_id)
+        subs = database.get_subscriptions_by_user(message.author)
+        if sub:
+            database.remove_subscription_by_message_id(message.author, message_id)
+            message.reply(inbox.compose_unsubscribe_message(message.author, sub, subs))
+        else:
+            message.reply(inbox.compose_unsubscribe_invalid_sub_message(message.author, subs))
+        message.mark_as_read()
 
-    # TODO
     @staticmethod
-    def handle_unsubscribe_from_num_message(database, message):
+    def handle_unsubscribe_from_num_message(database, message, payload):
         print("Unsub from num")
-
+        removed = database.remove_subscription_by_number(payload)
+        subs = database.get_subscriptions_by_user(message.author)
+        if removed:
+            message.reply(inbox.compose_unsubscribe_from_num_message(message.author, removed, subs))
+        else:
+            message.reply(inbox.compose_unsubscribe_invalid_sub_message(message.author, subs))
+        message.mark_as_read()
 
     @staticmethod
-    def handle_edit_message(database, message):
+    def handle_edit_message(database, message, payload):
         print('Edit message')
-        message.reply(inbox.)
+        message.reply(inbox.compose_edit_message(message.author))
+        message.mark_as_read()
 
     # TODO Handle if there are 0 subs for user
     @staticmethod
     def handle_unsubscribe_all_message(database, message):
         print('Unsub all message')
-        database.remove_all_subscriptions(message.author)
+        had_subscriptions = database.remove_all_subscriptions(message.author)
         message.reply(inbox.compose_unsubscribe_all_message(message.author))
         message.mark_as_read()
 
@@ -147,7 +152,7 @@ class InboxHandler:
 
         for message in unread:
             username = str(message.author).lower()
-            subject  = inbox.format_subject(message.subject.lower())
+            subject  = inbox.format_subject(str(message.subject).lower())
             body     = message.body.lower()
             try:
                 if username == 'reddit':
@@ -156,29 +161,33 @@ class InboxHandler:
                     InboxHandler.handle_username_mention_message(reddit, message)
                 elif subject == 'post reply':
                     InboxHandler.handle_post_reply_message(reddit, message)
+                elif subject in MessageLexer.feedback_keywords:
+                    InboxHandler.handle_feedback_message(reddit, message)
+                elif subject in MessageLexer.help_keywords:
+                    InboxHandler.handle_help_message(database, message)
                 else:
                     m = MessageParser(body)
                     valid = m.data[MessageParser.KEY_VALID]
                     action = m.data[MessageParser.KEY_ACTION]
                     payload = m.get_payload()
 
-                    if action == MessageParser.ACTION_STATISTICS and valid:
+                    if valid and action == MessageParser.ACTION_STATISTICS:
                         InboxHandler.handle_statistics_message(database, message)
-                    elif action == MessageParser.ACTION_GET_SUBSCRIPTIONS and valid:
+                    elif valid and action == MessageParser.ACTION_GET_SUBSCRIPTIONS:
                         InboxHandler.handle_get_subscriptions_message(database, message)
-                    elif action == MessageParser.ACTION_UNSUBSCRIBE_ALL and valid:
+                    elif valid and action == MessageParser.ACTION_UNSUBSCRIBE_ALL:
                         InboxHandler.handle_unsubscribe_all_message(database, message)
-                    elif action == MessageParser.ACTION_UNSUBSCRIBE and valid:
-                        InboxHandler.handle_unsubscribe_message(database, message)
-                    elif action == MessageParser.ACTION_UNSUBSCRIBE_FROM_NUM and valid:
+                    elif valid and action == MessageParser.ACTION_UNSUBSCRIBE:
+                        InboxHandler.handle_unsubscribe_message(reddit, database, message)
+                    elif valid and action == MessageParser.ACTION_UNSUBSCRIBE_FROM_NUM:
                         InboxHandler.handle_unsubscribe_from_num_message(database, message, payload)
-                    elif action == MessageParser.ACTION_SUBSCRIBE and valid:
+                    elif valid and action == MessageParser.ACTION_SUBSCRIBE:
                         InboxHandler.handle_subscription_message(database, message, payload)
-                    elif action == MessageParser.ACTION_EDIT and valid:
+                    elif valid and action == MessageParser.ACTION_EDIT:
                         InboxHandler.handle_edit_message(database, message, payload)
-                    elif action == MessageParser.ACTION_HELP and valid:
+                    elif valid and action == MessageParser.ACTION_HELP:
                         InboxHandler.handle_help_message(database, message)
-                    elif action == MessageParser.ACTION_FEEDBACK and valid:
+                    elif valid and action == MessageParser.ACTION_FEEDBACK:
                         InboxHandler.handle_feedback_message(reddit, message)
                     else:
                         InboxHandler.handle_reject_message(reddit, message)
@@ -191,6 +200,8 @@ class InboxHandler:
                                         'SUBJECT: ' + str(inbox.format_subject(message.subject)) +
                                         'BODY:\n' + str(message.body))
                     continue
+                else:
+                    raise
             except:
                 raise InboxHandlerException('Error handling inbox message')
 

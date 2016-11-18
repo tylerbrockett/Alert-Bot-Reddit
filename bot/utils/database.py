@@ -46,6 +46,10 @@ GET_SUBSCRIPTIONS_BY_USERNAME = "SELECT * " + \
 GET_SUBSCRIPTION = 'SELECT * FROM ' + TABLE_SUBSCRIPTIONS + ' ' + \
     'WHERE ' + USERNAME + ' = (?) AND ' + SUB + ' = (?)'
 
+GET_SUBSCRIPTION_BY_MESSAGE_ID = 'SELECT * FROM ' + TABLE_SUBSCRIPTIONS + ' ' + \
+    'WHERE ' + USERNAME + ' = (?) AND ' + MESSAGE_ID + ' = (?)'
+
+
 GET_ALL_SUBSCRIPTIONS = 'SELECT * FROM ' + TABLE_SUBSCRIPTIONS + " ORDER BY " + TIMESTAMP + " ASC"
 
 # ======================================================================================================
@@ -102,7 +106,7 @@ INSERT_ROW_ALL_MATCHES = "INSERT INTO " + \
 REMOVE_ALL_MATCHES_BY_USERNAME = "DELETE FROM " + TABLE_MATCHES + \
     " WHERE " + USERNAME + " = ? "
 
-REMOVE_MATCHES_BY_USERNAME_AND_SUBJECT = "DELETE FROM " + TABLE_MATCHES + \
+REMOVE_MATCHES_BY_USERNAME_AND_SUBSCRIPTION = "DELETE FROM " + TABLE_MATCHES + \
     " WHERE " + USERNAME + " = (?) " + " AND " + SUB + " = (?)"
 
 PURGE_OLD_MATCHES = 'DELETE FROM ' + TABLE_MATCHES + \
@@ -110,6 +114,9 @@ PURGE_OLD_MATCHES = 'DELETE FROM ' + TABLE_MATCHES + \
 
 GET_MATCH = 'SELECT * FROM ' + TABLE_MATCHES + ' ' + \
     'WHERE ' + USERNAME + ' = (?) AND ' + SUB + ' = (?) AND ' + PERMALINK + ' = (?)'
+
+GET_MATCHES_BY_USERNAME_AND_SUBSCRIPTION = 'SELECT * FROM ' + TABLE_MATCHES + ' ' + \
+    'WHERE ' + USERNAME + ' = (?) AND ' + SUB + ' = (?)'
 
 # ======================================================================================================
 #           DATABASE ALERTS TABLE

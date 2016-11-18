@@ -20,6 +20,16 @@ if __name__ == '__main__':
         "unsubscribe -item i5 6500k, 6700k -item 6700k, i5 6500k -item  bluetooth -body bodytext! -subreddit hardwareswap -nsfw -email -nsfw -email -subreddits /r/buildapcsales, r/hardwareswap -redditors u/tylerbrockett -ignore-title yaaaay, yooo -ignore-body yay -ignore-title test -ignore-redditors /u/tylerbrockett "
     )
 
+    m = Message(
+        'help',
+        "feedback: Hey, "
+    )
+
+    # sub = SubscriptionParser('6800k')
+    # sub1 = Subscription(sub.data, 'username', 'id')
+    #
+    # print(sub1.to_string())
+
     message = MessageParser(m)
     print(message.get_data())
     print(message.data[MessageParser.KEY_VALID])

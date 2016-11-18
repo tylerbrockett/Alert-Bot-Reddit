@@ -1,15 +1,18 @@
 from private import accountinfo
 from bot_modules.sleep_handler import SleepHandler
+from utils.logger import Logger
+from utils.color import Color
 
 
 def handle_crash(stacktrace, reddit, database, message_dev):
     reset = False
     while not reset:
+        SleepHandler.sleep(30)
         try:
             reddit.reset()
             database.reset()
             if message_dev:
-                reddit.send_message(accountinfo.developerusername, "Exception Handled", stacktrace)
+                reddit.send_message(accountinfo.bot_errors, accountinfo.username + " - Exception Handled", stacktrace)
             reset = True
         except:
-            SleepHandler.sleep(30)
+            Logger.log(Color.RED, 'Failed to restart bot. Trying again in 30 seconds.')

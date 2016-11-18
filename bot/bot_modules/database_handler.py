@@ -52,7 +52,7 @@ class DatabaseHandler:
         try:
             sub = (username, message_id, sub_data, timestamp,)
             self.connection.cursor().execute(database.INSERT_ROW_SUBSCRIPTIONS, sub)
-            self.commit()
+            # Commit is handled after the message is sent
         except:
             raise DatabaseHandlerException('ERROR - insert_subscription')
 
@@ -76,26 +76,43 @@ class DatabaseHandler:
         subs = []
         result = self.connection.cursor().execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, (username,)).fetchall()
         for temp in result:
-            item = temp[database.COL_SUB_ITEM]
+            sub = temp[database.COL_SUB_ITEM]
             username = temp[database.COL_SUB_USERNAME]
             message_id = temp[database.COL_SUB_MESSAGE_ID]
-            sub = Subscription(item, username, message_id)
-            if sub.valid:
-                subs.append((username, message_id, sub))
+            subscription = Subscription(sub, username, message_id)
+            if subscription.valid:
+                subs.append((username, message_id, subscription))
             else:
+                self.remove_subscription(username, sub)  # TODO Should this really be here?
                 raise DatabaseHandlerException('ERROR - get_subscriptions - subscription not valid')
         return subs
 
-    def check_if_subscription_exists(self, username, item):
+    def check_if_subscription_exists_by_sub(self, username, sub):
         try:
-            return len(self.connection.cursor().execute(database.GET_MATCH, (username, item,)).fetchall()) >= 1
+            sub = self.connection.cursor().execute(database.GET_SUBSCRIPTION, (username, sub,)).fetchall()
+            if len(sub) == 1:
+                return sub[0]
+            else:
+                return None
         except:
-            print('ERROR - Couldn\'t figure out if match existed')
-            return True
+            raise DatabaseHandlerException('Error - check_if_subscription_exists_by_sub')
+
+    def get_subscription_by_message_id(self, username, message_id):
+        try:
+            result = self.connection.cursor().execute(database.GET_SUBSCRIPTION_BY_MESSAGE_ID, (username, message_id,)).fetchall()
+            if len(result) == 1:
+                item = result[0][database.COL_SUB_ITEM]
+                username = result[0][database.COL_SUB_USERNAME]
+                message_id = result[0][database.COL_SUB_MESSAGE_ID]
+                sub = Subscription(item, username, message_id)
+                return sub
+            return None
+        except:
+            raise DatabaseHandlerException('Error - get_subscription_by_message_id')
 
     def remove_subscription(self, username, sub):
         try:
-            if not self.check_if_subscription_exists(username, sub):
+            if not self.check_if_subscription_exists_by_sub(username, sub):
                 self.connection.cursor().execute(database.REMOVE_ROW_SUBSCRIPTIONS, (username, sub))
                 self.commit()
                 return True
@@ -107,13 +124,13 @@ class DatabaseHandler:
     def remove_subscription_by_number(self, username, sub_num):
         try:
             subs = self.get_subscriptions_by_user(username)
-            if (sub_num - 1) >= len(subs) or sub_num <= 0:
-                return False
+            if sub_num > len(subs) or sub_num <= 0:
+                return None
             sub = subs[sub_num - 1]
-            self.remove_subscription(username, sub[2]) # (username, message_id, sub)
-            return True
+            self.remove_subscription(username, sub[database.COL_SUB_ITEM])
+            return sub
         except:
-            raise DatabaseHandlerException('Error - remove_subscription_by_number')
+            return None
 
     def get_num_subscriptions_by_user(self, username):
         return len(self.get_subscriptions_by_user(username))

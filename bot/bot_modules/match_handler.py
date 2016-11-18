@@ -8,8 +8,9 @@ class MatchHandler:
         print('Handling matches...')
         for subscription, submission in matches:
             try:
+                subs = database.get_subscriptions_by_user(subscription.username)
                 message = reddit.get_message(subscription.message_id)
-                message.reply(inbox.compose_match_message(subscription, submission))
+                message.reply(inbox.compose_match_message(subscription, submission, subs))
                 database.insert_match(subscription.username, message.subject, submission.permalink)
                 database.commit()
                 output.match(subscription, submission)

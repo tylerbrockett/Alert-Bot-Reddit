@@ -27,6 +27,7 @@ class MessageParser:
 
     def unget_token(self):
         self.index -= 1
+        return self.tokens[self.index]
 
     def get_token(self):
         self.index += 1
@@ -61,9 +62,13 @@ class MessageParser:
 
     def parse_message(self):
         token, ttype, index = self.get_token()
-
         if ttype == TokenType.STATISTICS:
             self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_STATISTICS
+            token, ttype, index = self.get_token()
+            if ttype != TokenType.EOF:
+                raise MessageParserException(MessageParserException.MALFORMED_REQUEST)
+        elif ttype == TokenType.HELP:
+            self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_HELP
             token, ttype, index = self.get_token()
             if ttype != TokenType.EOF:
                 raise MessageParserException(MessageParserException.MALFORMED_REQUEST)
@@ -73,6 +78,7 @@ class MessageParser:
             if ttype != TokenType.EOF:
                 raise MessageParserException(MessageParserException.MALFORMED_REQUEST)
         elif ttype == TokenType.UNSUBSCRIBE:
+            self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_UNSUBSCRIBE
             token, ttype, index = self.get_token()
             if ttype == TokenType.ALL:
                 self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_UNSUBSCRIBE_ALL
@@ -91,15 +97,17 @@ class MessageParser:
                 self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_UNSUBSCRIBE
         elif ttype == TokenType.SUBSCRIBE:
             self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_SUBSCRIBE
-            token, ttype, new_index = self.get_token()
+            token, ttype, index = self.get_token()
             if ttype == TokenType.EOF:
                 subscription = SubscriptionParser(format_subject(self.message.subject))
                 self.data[MessageParser.KEY_PAYLOAD] = subscription.get_data()
             else:
-                self.unget_token()
+                token, ttype, index = self.unget_token()
                 subscription = SubscriptionParser(self.message.body[index:])
                 self.data[MessageParser.KEY_PAYLOAD] = subscription.get_data()
-
+        elif ttype == TokenType.FEEDBACK:
+            self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_FEEDBACK
+            self.data[MessageParser.KEY_PAYLOAD] = self.message
         elif ttype == TokenType.EDIT:
             # edits = EditParser(self.message[index:])
             self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_EDIT

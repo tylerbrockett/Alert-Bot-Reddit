@@ -20,6 +20,15 @@ class MessageLexer:
         'feedback', 'suggestion', 'suggestions', 'advice'
     ]
 
+    statistics_keywords = ['statistics', 'stats']
+    subscriptions_keywords = ['subscriptions', 'subs']
+    unsubscribe_keywords = ['unsubscribe', 'unsub']
+    all_keywords = ['all']
+    subscribe_keywords = ['subscribe', 'sub']
+    edit_keywords = ['edit', 'change']
+    help_keywords = ['help', 'info', 'information']
+    feedback_keywords = ['feedback', 'suggestion', 'suggestions', 'advice']
+
     def __init__(self, message):
         self.message = message
 
@@ -31,21 +40,21 @@ class MessageLexer:
             self.unget_char()
 
     def is_keyword(self, token):
-        if token.lower() in ['statistics', 'stats']:
+        if token.lower() in MessageLexer.statistics_keywords:
             return TokenType.STATISTICS
-        if token.lower() in ['subscriptions', 'subs']:
+        if token.lower() in MessageLexer.subscriptions_keywords:
             return TokenType.SUBSCRIPTIONS
-        elif token.lower() in ['unsubscribe', 'unsub']:
+        elif token.lower() in MessageLexer.unsubscribe_keywords:
             return TokenType.UNSUBSCRIBE
-        elif token.lower() in ['all']:
+        elif token.lower() in MessageLexer.all_keywords:
             return TokenType.ALL
-        elif token.lower() in ['subscribe', 'sub']:
+        elif token.lower() in MessageLexer.subscribe_keywords:
             return TokenType.SUBSCRIBE
-        elif token.lower() in ['edit', 'change']:
+        elif token.lower() in MessageLexer.edit_keywords:
             return TokenType.EDIT
-        elif token.lower() in ['help', 'info', 'information']:
+        elif token.lower() in MessageLexer.help_keywords:
             return TokenType.HELP
-        elif token.lower() in ['feedback', 'suggestion', 'suggestions', 'advice']:
+        elif token.lower() in MessageLexer.feedback_keywords:
             return TokenType.FEEDBACK
         return self.FALSE
 
@@ -82,8 +91,9 @@ class MessageLexer:
         while self.is_num(c):
             self.token += c
             c = self.get_char()
-        if c not in self.whitespace and c != TokenType.EOF and c != '':
-            raise MessageLexerException('Error - whitespace or EOF expected after number')
+        if c not in self.whitespace and not self.EOF:
+            self.scan_token()
+            return
         self.unget_char()
         return TokenType.NUM
 

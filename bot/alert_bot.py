@@ -44,6 +44,7 @@ class AlertBot:
                     MatchHandler.send_messages(self.reddit, self.database, matches)
                     self.database.purge_old_matches()
                     Logger.log(Color.YELLOW, times.get_time_passed(self.start_time))
+                SleepHandler.sleep(20)
             except KeyboardInterrupt:
                 Logger.log(Color.RED, 'Keyboard Interrupt - Bot killed')
                 exit()
@@ -53,7 +54,6 @@ class AlertBot:
                 handle_crash(traceback.format_exc(), self.reddit, self.database, True)
             except:
                 handle_crash(traceback.format_exc(), self.reddit, self.database, True)
-            SleepHandler.sleep(20)
 
     def check_for_commands(self):
         Logger.log('Checking for commands')

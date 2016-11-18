@@ -36,7 +36,7 @@ class Subscription:
             self.sort()
             self.status = Subscription.STATUS_VALID
         except:
-            print(traceback.format_exc())
+            self.data = {}
             self.valid = Subscription.STATUS_INVALID
         self.check_too_generic()
 
