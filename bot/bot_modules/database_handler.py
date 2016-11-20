@@ -73,7 +73,6 @@ class DatabaseHandler:
             username = sub[database.COL_SUB_USERNAME]
             message_id = sub[database.COL_SUB_MESSAGE_ID]
             subscription = Subscription(item, username, message_id)
-            print('READ SUB: ' + subscription.to_string())
             if subscription.status == Subscription.STATUS_VALID:
                 subs.append(subscription)
             else:
@@ -133,12 +132,9 @@ class DatabaseHandler:
     def remove_subscription_by_number(self, username, sub_num):
         try:
             subs = self.get_subscriptions_by_user(username)
-            print('# SUBS: ' + str(len(subs)))
             if sub_num > len(subs) or sub_num <= 0:
-                print('RETURN NONE::: SUB NUM: ' + str(sub_num) + '   LEN(subs): ' + str(len(subs)))
                 return None
             sub = subs[sub_num - 1]
-            print('Removing Sub: ' + sub.to_string())
             self.remove_subscription(sub)
             return sub
         except:
@@ -214,7 +210,6 @@ class DatabaseHandler:
             self.connection.cursor().execute(database.PURGE_OLD_MATCHES, [marked_old_time])
             self.commit()
         except:
-            print('TRACEBACK:   ' + traceback.format_exc())
             raise DatabaseHandlerException('ERROR - purge_old_matches')
 
     # ==============================================================================

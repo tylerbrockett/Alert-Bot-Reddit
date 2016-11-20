@@ -164,11 +164,10 @@ def compose_invalid_subreddit_message(username, invalid_subreddits, message):
 
 
 def compose_match_message(sub, submission, subs):
-    print("SELFTEXT:   \n" + str(vars(submission)))
     result = compose_greeting(sub.username) + \
         "**Post Title:**\t \n" + \
         "[" + submission.title + "](" + submission.permalink + ")\t \n\t \n" + \
-        (("**Body Text:**\t \n" + submission.preview) if submission.is_self
+        (("**Body Text:**\t \n" + submission.selftext[:500] + (submission.selftext[500:] and '...')) if submission.is_self
          else ("**Post Content Link:**\t \n[Content Link](" + submission.url + ")")) + \
         "\t \n\t \n" + \
         sub.to_table('Matched Subscription') + "\t \n\t \n" + \
