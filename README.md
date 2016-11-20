@@ -14,9 +14,11 @@ Send a private message to /u/Alert_Bot with the body of the message specifying w
 Essentially there is the subscribe action, and a list of parameters. Parameter List:
 
 #####Parameter Values:
+***NOTES:*** All parameters can be combined to form one specific, constrained subscription. Also note that most parameters support a comma separated list of words or phrases as well, each of which need to show up in order to constitute a match. The nice thing about this is that the order of the words does ***NOT*** matter. 
+
 * ***-title***
     * Function:
-        * Specifies words or phrases to watch out for in the title of the post. Multiple '-title' parameters can be specified, the user will be notified of the post even if only ***ONE*** of the '-title' parameters match. Each '-title' parameter also supports a comma-separated list of words or phrases, each of which need to show up to constitute a match, however order does ***NOT*** matter.
+        * Specifies words or phrases to watch out for in the title of the post. Multiple '-title' parameters can be specified, the user will be notified of the post even if only ***ONE*** of the '-title' parameters match.
     * Examples:
         * subscribe -title cats
             * Watches for posts containing the word 'cats' in its title
@@ -32,19 +34,27 @@ Essentially there is the subscribe action, and a list of parameters. Parameter L
         * -items
 * ***-body***
     * Function:
-        * Specifies words or phrases to watch out for in the body of the post. This could be used for selftext ***OR*** links, the '-body' parameter will figure out which post type it is. This parameter is especially useful for filtering URLs from posts, such as if you only want to be notified of posts that link to *'amazon.com'* for example.
+        * Specifies words or phrases to watch out for in the body of the post. This could be used for selftext ***OR*** links, the '-body' parameter will figure out which post type it is. Multiple '-body' parameters can be specified, the user will be notified of the post even if only ***ONE*** of the '-body' parameters match. This parameter is especially useful for filtering URLs from posts, such as if you only want to be notified of posts that link to *'amazon.com'* for example.
     * Examples:
         * subscribe -body cats
-            * Watches for posts containing the word 'cats' in its body
+            * Watches for posts containing the word 'cats' in the selftext or link.
+        * subscribe -body cats -body dogs
+            * Watches for posts containing the word 'cats' ***OR*** 'dogs' in the selftext or link.
         * subscribe -body cats, dogs
-            * Watches for posts containing the words 'cats' ***AND*** 'dogs' in its body, but order doesn't matter.
+            * Watches for posts containing the words 'cats' ***AND*** 'dogs' in its selftext or link, but order doesn't matter.
         * subscribe -body funny cats
-            * Watches for posts containing the phrase 'funny cats' in its body.
+            * Watches for posts containing the phrase 'funny cats' in its selftext or link.
     * Aliases:
         * -body
         * -site
         * -sites
         * -url
+        * -content
+        * -selftext
+        * -link
+* ***-subreddit***
+    * Function:
+        * Specifies which subreddits to look in to match against the other parameters. Multiple subreddits can be specified, separated by a comma, and the bot will look in all of them. Although you can technically subscribe to /r/all, I wouldn't recommend it, because some posts will inevitably slip through the cracks. Also, it could hog the bots resources sending out messages to all the posts, so I may remove the ability to do this later depending on how it goes. ***NOTE:*** If no subreddit is specified here, /r/buildapcsales will be used by default, because that what the subreddit that gave this bot life to begin with.
 
 #### Unsubscribe
 To unsubscribe, either reply to the original message confirming your subscription to that item with the body as "Unsubscribe", or create a new message with the item to unsubscribe from as the subject and "Unsubscribe" as the body.

@@ -19,6 +19,9 @@ class SubscriptionLexer:
         '-site',
         '-sites',
         '-body',
+        '-content',
+        '-selftext',
+        '-link',
         # SUBREDDIT
         '-subreddit',
         '-subreddits',
@@ -50,7 +53,7 @@ class SubscriptionLexer:
             self.unget_char()
 
     def is_keyword(self, token):
-        if token.lower() in ['-body', '-site', '-sites', '-url']:
+        if token.lower() in ['-body', '-site', '-sites', '-url', '-content', '-selftext', '-link']:
             return TokenType.BODY
         elif token.lower() in ['-title', '-item', '-items']:
             return TokenType.TITLE
