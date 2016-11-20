@@ -32,7 +32,7 @@ class AlertBot:
         self.database = DatabaseHandler()
         self.reddit = RedditHandler()
 
-    def run(self):
+    def start(self):
         Logger.log(Color.GREEN, 'Starting bot...')
         while True:
             try:
@@ -64,3 +64,7 @@ class AlertBot:
             self.run = True
         if CommandHandler.KILL in commands:
             exit()
+
+if __name__ == '__main__':
+    bot = AlertBot()
+    bot.start()

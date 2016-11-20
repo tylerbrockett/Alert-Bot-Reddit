@@ -1,5 +1,5 @@
 from utils.color import Color
-
+import traceback
 
 class Logger:
     RESET = '\033[39m'
@@ -15,10 +15,10 @@ class Logger:
                 col = Color.random()
                 Logger.print_color(string, col)
             elif col in Color.colors:
-                Logger.log(string, col)
+                Logger.print_color(string, col)
             else:
                 print(string)
         # Handle terminals that don't support ANSI color codes I think?
         # I Don't remember if they throw an error or not.
         except:
-            print str(string)
+            print(str(string))

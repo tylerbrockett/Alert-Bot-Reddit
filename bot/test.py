@@ -7,6 +7,7 @@ from bot_modules.database_handler import DatabaseHandler
 from parsing.message_parser import MessageParser
 from utils.subscription import Subscription
 import json
+from bot_modules.subscription_handler import SubscriptionHandler
 
 
 class Message:
@@ -14,26 +15,32 @@ class Message:
         self.subject = subject
         self.body = body
 
+
+class Submission:
+    def __init__(self, title, selftext, author, over_18):
+        self.title = title
+        self.selftext = selftext
+        self.author = author
+        self.over_18 = over_18
+
+
 if __name__ == '__main__':
+    submission = Submission(
+        'i5',
+        'bodytext! this is blah cool!',
+        'tylerbrockett',
+        True
+    )
     m = Message(
         'Message1',
-        "unsubscribe -item i5 6500k, 6700k -item 6700k, i5 6500k -item  bluetooth -body bodytext! -subreddit hardwareswap -nsfw -email -nsfw -email -subreddits /r/buildapcsales, r/hardwareswap -redditors u/tylerbrockett -ignore-title yaaaay, yooo -ignore-body yay -ignore-title test -ignore-redditors /u/tylerbrockett "
+        'Subscribe -item i5,6500 -subreddit buildapcsales'
     )
-
-    m = Message(
-        'help',
-        "feedback: Hey, "
-    )
-
-    # sub = SubscriptionParser('6800k')
-    # sub1 = Subscription(sub.data, 'username', 'id')
-    #
-    # print(sub1.to_string())
-
     message = MessageParser(m)
-    print(message.get_data())
-    print(message.data[MessageParser.KEY_VALID])
-    '''
     payload = message.get_payload()
     sub = Subscription(payload, 'tylerbrockett', '1')
-    '''
+
+    print(json.dumps(payload), 2)
+
+    print('VALID: ' + str(message.data[MessageParser.KEY_VALID]))
+    # is_match, mismatched_keys = SubscriptionHandler.is_match(sub, submission)
+    # print('MATCH -- ' + str(is_match) + '\n\nMismatched Keys: ' + str(mismatched_keys))

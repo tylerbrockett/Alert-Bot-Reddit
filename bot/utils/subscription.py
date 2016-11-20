@@ -31,11 +31,12 @@ class Subscription:
         try:
             if type(subscription) == dict:
                 self.data = subscription
-            elif type(subscription) == str:
+            else:
                 self.data = json.loads(subscription)
             self.sort()
-            self.status = Subscription.STATUS_VALID
+            self.status = Subscription.STATUS_VALID if self.data[Subscription.VALID] else Subscription.STATUS_INVALID
         except:
+            print(traceback.format_exc())
             self.data = {}
             self.valid = Subscription.STATUS_INVALID
         self.check_too_generic()
@@ -66,7 +67,7 @@ class Subscription:
     def format_list(lis):
         if len(lis) is 0:
             return 'N/A'
-        return str(lis).replace('[', '').replace(']', '')
+        return str(lis)[1:-1]
 
     def format_terms(self):
         ret = ''
@@ -79,9 +80,16 @@ class Subscription:
     def to_string(self):
         return json.dumps(self.data, 2)
 
+    def check_against_existing(self, existing_subs):
+        duplicate_subs = []
+        for existing_sub in existing_subs:
+            if self.compare_to(existing_sub):
+                duplicate_subs.append(existing_sub)
+        return duplicate_subs
+
     def to_table(self, title):
         ret = \
-            '###' + title + '\n' + \
+            '####' + title + '\n' + \
             'Detail|Value\n' + \
             '--:|:--:' + '\n' + \
             self.format_terms() + \

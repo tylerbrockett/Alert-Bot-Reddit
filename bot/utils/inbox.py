@@ -11,7 +11,7 @@ def format_subject(s):
 
 
 def format_subscription_list(subs, title):
-    result = '##' + title
+    result = '##' + title + '\n'
     i = 0
     if len(subs) == 0:
         result += 'No Subscriptions'
@@ -37,12 +37,12 @@ def compose_subscribe_message(username, new_sub, subs, subreddit_not_specified):
     result = compose_greeting(username) + \
              "Thanks for your subscription. " + \
              "You will continue to receive updates to part sales that match your new subscription. " + \
-             "To unsubscribe, send me a message with the body 'unsubscribe {subscription#}.\t \nAlternatively, " + \
+             "To unsubscribe, send me a message with the body 'unsubscribe {subscription#}'.\t \nAlternatively, " + \
              "you can reply to this message or any replies from the bot in regards to this subscription and reply " + \
              "with 'unsubscribe' as the body.\t \n" + \
              new_sub.to_table('New Subscription') + "\t \n\t \n" + \
              format_subscription_list(subs, 'Your Subscriptions') + \
-             "\t \n**Note:** If no subreddit is specified, /r/buildapcsales will be used by default" if subreddit_not_specified else "" + \
+             ("\t \n**Note:** If no subreddit is specified, /r/buildapcsales will be used by default" if subreddit_not_specified else "") + \
              compose_salutation()
     return result
 
@@ -83,10 +83,11 @@ def compose_unsubscribe_invalid_sub_message(username, subs):
     return result
 
 
-def compose_unsubscribe_message(username, sub, subs):
+def compose_unsubscribe_message(username, removed_subs, subs):
     result = compose_greeting(username) + \
              "You have unsubscribed from the following item. Thanks for using the bot!\n\n" + \
-             sub.to_table('Unsubscribed From') + \
+             removed_subs[0].to_table('Unsubscribed From') + \
+             '\n' + \
              format_subscription_list(subs, 'Your Subscriptions') + \
              compose_salutation()
     return result
@@ -139,15 +140,44 @@ def compose_reject_message(username, subject, body):
     return result
 
 
+def format_subreddit_list(subreddits, title):
+    i = 0
+    result = '###' + title + '\n' + \
+             '#|Subreddit' + '\n' + \
+             '--:|:--:' + '\n'
+    for subreddit in subreddits:
+        i += 1
+        result += str(i) + '|' + str(subreddit) + '\n'
+    return result
+
+
+def compose_invalid_subreddit_message(username, invalid_subreddits):
+    result = compose_greeting(username) + \
+        'Unfortunately, it appears that the following subreddit(s) you tried to subscribe to were invalid. If you ' + \
+        'believe this is a mistake please message /u/' + accountinfo.developerusername + '. Sorry for the ' + \
+        'inconvenience!\t \n' + \
+        format_subreddit_list(invalid_subreddits, 'Invalid Subreddits') + \
+        compose_salutation()
+    return result
+
+
 def compose_match_message(sub, submission, subs):
     is_self = submission.is_self
     result = compose_greeting(sub.username) + \
         "**Post Title:**\t \n" + \
         "[" + submission.title + "](" + submission.permalink + ")" + "\t \n\t \n" + \
-        "**Body Text:**\t \n" + submission.selftext if is_self else "**[Content Link](" + submission.selftext + ")**" + \
+        ("**Body Text:**\t \n" + submission.selftext if is_self else "**[Content Link](" + submission.selftext + ")**") + \
         "\t \n\t \n" + \
         sub.to_table('Matched Subscription') + "\t \n\t \n" + \
         format_subscription_list(subs, 'Your Subscriptions') + \
+        compose_salutation()
+    return result
+
+
+def compose_too_generic_message(username):
+    result = compose_greeting(username) + \
+        "Unfortunately, your subscription request is too generic. Allowing such a subscription would probably hog " + \
+        "the bot's resources. Try constraining the subscription a bit. Sorry, and thanks for your understanding." + \
         compose_salutation()
     return result
 

@@ -10,7 +10,6 @@ class SubscriptionLexer:
     token = ''
     token_type = TokenType.NO_TOKEN
     reserved_tokens = [
-        '',
         # TITLE
         '-title',
         '-item',
@@ -89,7 +88,7 @@ class SubscriptionLexer:
     def scan_token(self):
         self.token_type = TokenType.NO_TOKEN
         c = self.get_char()
-        while c is not ' ' and c is not '' and c not in self.reserved_tokens:
+        while c != ' ' and c != '' and c not in self.reserved_tokens:
             self.token += c
             c = self.get_char()
         if not self.EOF:

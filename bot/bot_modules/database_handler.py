@@ -5,6 +5,9 @@ import traceback
 from utils import times
 from utils import database
 from utils.subscription import Subscription
+from os import path
+from definitions import DB_LOCATION
+from utils import files
 
 
 class DatabaseHandler:
@@ -13,9 +16,12 @@ class DatabaseHandler:
 
     def connect(self):
         try:
-            connection = sqlite3.connect(os.path.dirname(os.path.abspath(__file__)) + database.DATABASE_LOCATION)
+            print('PATH: ' + DB_LOCATION)
+            if not path.isfile(DB_LOCATION):
+                files.create_file(DB_LOCATION)
+            connection = sqlite3.connect(DB_LOCATION)
             connection.execute('PRAGMA foreign_keys = ON;')
-            cursor = self.connection.cursor()
+            cursor = connection.cursor()
             cursor.execute(database.CREATE_TABLE_SUBSCRIPTIONS)
             cursor.execute(database.CREATE_TABLE_MATCHES)
             cursor.execute(database.CREATE_TABLE_ALL_MATCHES)
@@ -50,8 +56,9 @@ class DatabaseHandler:
     def insert_subscription(self, username, message_id, sub_data, timestamp):
         print('Insert subscription')
         try:
-            sub = (username, message_id, sub_data, timestamp,)
+            sub = [username, message_id, sub_data, timestamp]
             self.connection.cursor().execute(database.INSERT_ROW_SUBSCRIPTIONS, sub)
+            self.connection.cursor().execute(database.INSERT_ROW_ALL_USERS, [username])
             # Commit is handled after the message is sent
         except:
             raise DatabaseHandlerException('ERROR - insert_subscription')
@@ -61,65 +68,64 @@ class DatabaseHandler:
         subs = []
         results = self.connection.cursor().execute(database.GET_ALL_SUBSCRIPTIONS).fetchall()
         for sub in results:
-            item = sub[database.COL_SUB_ITEM]
-            username = sub[database.COL_SUB_USERNAME]
-            message_id = sub[database.COL_SUB_MESSAGE_ID]
+            item = str(sub[database.COL_SUB_ITEM])
+            username = str(sub[database.COL_SUB_USERNAME])
+            message_id = str(sub[database.COL_SUB_MESSAGE_ID])
             subscription = Subscription(item, username, message_id)
-            if subscription.valid:
-                subs.append((username, message_id, sub))
+            if subscription.status == Subscription.STATUS_VALID:
+                subs.append(subscription)
             else:
+                print("INVALID SUB:   " + subscription.to_string())
+                self.remove_subscription(subscription)  # TODO Should this really be here?
                 raise DatabaseHandlerException('ERROR - get_subscriptions - Subscription not valid')
         return subs
 
     def get_subscriptions_by_user(self, username):
         print('Get Subs By Username')
         subs = []
-        result = self.connection.cursor().execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, (username,)).fetchall()
-        for temp in result:
-            sub = temp[database.COL_SUB_ITEM]
-            username = temp[database.COL_SUB_USERNAME]
-            message_id = temp[database.COL_SUB_MESSAGE_ID]
-            subscription = Subscription(sub, username, message_id)
-            if subscription.valid:
-                subs.append((username, message_id, subscription))
+        result = self.connection.cursor().execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, [username]).fetchall()
+        for sub in result:
+            item = str(sub[database.COL_SUB_ITEM])
+            username = str(sub[database.COL_SUB_USERNAME])
+            message_id = str(sub[database.COL_SUB_MESSAGE_ID])
+            subscription = Subscription(item, username, message_id)
+            if subscription.status == Subscription.STATUS_VALID:
+                subs.append(subscription)
             else:
-                self.remove_subscription(username, sub)  # TODO Should this really be here?
+                print("INVALID SUB:   " + subscription.to_string())
+                self.remove_subscription(subscription)  # TODO Should this really be here?
                 raise DatabaseHandlerException('ERROR - get_subscriptions - subscription not valid')
         return subs
 
-    def check_if_subscription_exists_by_sub(self, username, sub):
+    def get_subscriptions_by_message_id(self, username, message_id):
         try:
-            sub = self.connection.cursor().execute(database.GET_SUBSCRIPTION, (username, sub,)).fetchall()
-            if len(sub) == 1:
-                return sub[0]
-            else:
-                return None
+            result = self.connection.cursor().execute(database.GET_SUBSCRIPTION_BY_MESSAGE_ID, [username, message_id]).fetchall()
+            subs = []
+            for sub in result:
+                item = str(sub[database.COL_SUB_ITEM])
+                username = str(sub[database.COL_SUB_USERNAME])
+                message_id = str(sub[database.COL_SUB_MESSAGE_ID])
+                subscription = Subscription(item, username, message_id)
+                subs.append(subscription)
+            return subs
         except:
-            raise DatabaseHandlerException('Error - check_if_subscription_exists_by_sub')
+            print(traceback.format_exc())
+            raise DatabaseHandlerException('Error - get_subscription_by_message_id')
 
-    def get_subscription_by_message_id(self, username, message_id):
+    def remove_subscriptions_by_message_id(self, username, message_id):
         try:
-            result = self.connection.cursor().execute(database.GET_SUBSCRIPTION_BY_MESSAGE_ID, (username, message_id,)).fetchall()
-            if len(result) == 1:
-                item = result[0][database.COL_SUB_ITEM]
-                username = result[0][database.COL_SUB_USERNAME]
-                message_id = result[0][database.COL_SUB_MESSAGE_ID]
-                sub = Subscription(item, username, message_id)
-                return sub
-            return None
+            subs = self.get_subscriptions_by_message_id(username, message_id)
+            self.connection.cursor().execute(database.REMOVE_SUBSCRIPTION_BY_MESSAGE_ID, [username, message_id])
+            self.commit()
+            return subs
         except:
             raise DatabaseHandlerException('Error - get_subscription_by_message_id')
 
-    def remove_subscription(self, username, sub):
+    def remove_subscription(self, subscription):
         try:
-            if not self.check_if_subscription_exists_by_sub(username, sub):
-                self.connection.cursor().execute(database.REMOVE_ROW_SUBSCRIPTIONS, (username, sub))
-                self.commit()
-                return True
-            else:
-                return False
+            return self.remove_subscriptions_by_message_id(subscription.username, subscription.message_id)
         except:
-            raise DatabaseHandlerException('ERROR - remove_subscription')
+            return []
 
     def remove_subscription_by_number(self, username, sub_num):
         try:
@@ -127,7 +133,7 @@ class DatabaseHandler:
             if sub_num > len(subs) or sub_num <= 0:
                 return None
             sub = subs[sub_num - 1]
-            self.remove_subscription(username, sub[database.COL_SUB_ITEM])
+            self.remove_subscription(sub)
             return sub
         except:
             return None
@@ -138,7 +144,7 @@ class DatabaseHandler:
     def remove_all_subscriptions(self, username):
         try:
             if self.get_num_subscriptions_by_user(username) >= 1:
-                self.connection.cursor().execute(database.REMOVE_ALL_SUBSCRIPTIONS_BY_USERNAME, (username,))
+                self.connection.cursor().execute(database.REMOVE_ALL_SUBSCRIPTIONS_BY_USERNAME, [username])
                 self.commit()
                 return True
             else:
@@ -170,7 +176,7 @@ class DatabaseHandler:
 
     def insert_match(self, username, item, permalink):
         try:
-            match = (username, item, permalink, times.get_current_timestamp())
+            match = [username, item, permalink, times.get_current_timestamp()]
             self.connection.cursor().execute(database.INSERT_ROW_MATCHES, match)
             self.connection.cursor().execute(database.INSERT_ROW_ALL_MATCHES, match)
             # NOTE: Commit is called after message is sent
@@ -188,7 +194,7 @@ class DatabaseHandler:
 
     def check_if_match_exists(self, username, item, permalink):
         try:
-            return len(self.connection.cursor().execute(database.GET_MATCH, (username, item, permalink)).fetchall()) >= 1
+            return len(self.connection.cursor().execute(database.GET_MATCH, [username, item, permalink]).fetchall()) >= 1
         except:
             print('ERROR - Couldn\'t figure out if match existed')
             return True
@@ -199,7 +205,7 @@ class DatabaseHandler:
         quarter_of_year = 31557600 / 4
         marked_old_time = current_time - quarter_of_year
         try:
-            self.connection.cursor().execute(database.PURGE_OLD_MATCHES, (marked_old_time,))
+            self.connection.cursor().execute(database.PURGE_OLD_MATCHES, [marked_old_time])
             self.commit()
         except:
             raise DatabaseHandlerException('ERROR - purge_old_matches')
@@ -213,7 +219,8 @@ class DatabaseHandler:
         try:
             users = len(self.connection.cursor().execute(database.GET_ALL_USERS).fetchall())
         except:
-            raise DatabaseHandlerException('ERROR - count_all_users')
+            user = -1
+            print('Error counting all users')
         return users
 
     def count_current_users(self):
@@ -221,19 +228,23 @@ class DatabaseHandler:
         try:
             users = len(self.connection.cursor().execute(database.GET_ACTIVE_USERS).fetchall())
         except:
-            raise DatabaseHandlerException('ERROR - count_active_users')
+            users = -1
+            print('Error counting current users')
         return users
 
     # ==============================================================================
     #           SUBREDDITS
     # ==============================================================================
 
-    def count_subreddits(self):
+    # TAG_DEFAULT_SUBREDDIT
+    def get_unique_subreddits(self):
         dict = {}
         try:
             subscriptions = self.get_subscriptions()
             for sub in subscriptions:
-                for subreddit in sub.subreddits:
+                if len(sub.data[Subscription.SUBREDDITS]) == 0 and 'buildapcsales' not in dict.keys():
+                    dict['buildapcsales'] = 1
+                for subreddit in sub.data[Subscription.SUBREDDITS]:
                     if subreddit in dict:
                         dict[subreddit] += 1
                     else:

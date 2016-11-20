@@ -45,7 +45,7 @@ class MessageParser:
             MessageParser.KEY_VALID: False
         }
         try:
-            self.tokens = MessageLexer(message.body).tokenize()
+            self.tokens = MessageLexer(str(message.body)).tokenize()
             self.parse_message()
             self.data[MessageParser.KEY_VALID] = True
         except:

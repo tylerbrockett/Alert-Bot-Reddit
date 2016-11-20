@@ -76,7 +76,7 @@ class MessageLexer:
     def scan_token(self):
         self.token_type = TokenType.NO_TOKEN
         c = self.get_char()
-        while c not in self.whitespace and c is not '' and c not in self.reserved_tokens:
+        while c not in self.whitespace and c != '' and c not in self.reserved_tokens:
             self.token += c
             c = self.get_char()
         if not self.EOF:

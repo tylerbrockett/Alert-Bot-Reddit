@@ -35,3 +35,4 @@ Possible Features to Add
     -fuzzines 80
 4. Add -min-upvotes and/or -delay so that crappy submissions don't get sent out
 5. Parse subscription text into A JSON object before putting it into the database. Use the subscription class as a sort of JSON wrapper
+6. Add -sort option.

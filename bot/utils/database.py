@@ -1,5 +1,5 @@
 
-DATABASE_LOCATION = '/database/subscriptions.db'
+DB_FILE_NAME = 'subscriptions.db'
 
 
 # ======================================================================================================
@@ -38,9 +38,12 @@ REMOVE_ROW_SUBSCRIPTIONS = "DELETE FROM " + TABLE_SUBSCRIPTIONS + \
 REMOVE_ALL_SUBSCRIPTIONS_BY_USERNAME = "DELETE FROM " + TABLE_SUBSCRIPTIONS + \
     " WHERE " + USERNAME + " = (?)"
 
+REMOVE_SUBSCRIPTION_BY_MESSAGE_ID = "DELETE FROM " + TABLE_SUBSCRIPTIONS + \
+    " WHERE " + USERNAME + " = (?) AND " + MESSAGE_ID + " = (?)"
+
 GET_SUBSCRIPTIONS_BY_USERNAME = "SELECT * " + \
                                 "FROM " + TABLE_SUBSCRIPTIONS + " " + \
-                                "WHERE username = ? " + \
+                                "WHERE " + USERNAME + " = ? " + \
                                 "ORDER BY " + TIMESTAMP + " ASC"
 
 GET_SUBSCRIPTION = 'SELECT * FROM ' + TABLE_SUBSCRIPTIONS + ' ' + \

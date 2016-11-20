@@ -48,12 +48,20 @@ class RedditHandler:
             raise RedditHelperException(RedditHelperException.GET_SUBMISSIONS_EXCEPTION)
         return submissions
 
-    def get_original_message(self, received_message):
+    def get_original_message(self, received_message, database):
         message = received_message
-        while message.parent_id is not None:
+        while message.parent_id and len(database.get_subscriptions_by_message_id(str(message.author), message.id)) == 0:
             message = self.reddit.get_message(message.parent_id)
         return message
 
+    def check_invalid_subreddits(self, subreddits):
+        invalid = []
+        for subreddit in subreddits:
+            try:
+                self.reddit.get_subreddit(subreddit).get_new(limit=1)
+            except:
+                invalid.append(subreddit)
+        return invalid
 
 class RedditHelperException(Exception):
     SEND_MESSAGE_EXCEPTION = 'Error sending message'

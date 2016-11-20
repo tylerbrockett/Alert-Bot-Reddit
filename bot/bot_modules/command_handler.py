@@ -18,7 +18,7 @@ class CommandHandler:
     @staticmethod
     def get_dev_messages(reddit):
         dev_messages = []
-        unread_messages = reddit.get_unread(limit=None)
+        unread_messages = reddit.get_unread()
         for message in unread_messages:
             username = str(message.author).lower()
             if username == accountinfo.developerusername:
