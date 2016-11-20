@@ -27,22 +27,22 @@ def compose_greeting(username):
 
 def compose_salutation():
     result = SIGNATURE + "\n\t \n\t \n" + \
-             "[code](https://github.com/tylerbrockett/reddit-bot-buildapcsales)" + \
-             " | /u/" + accountinfo.developerusername + \
-             " | /r/buildapcsales\n"
+             "/r/Alert_Bot | " + \
+             "/u/" + accountinfo.developerusername + " | " + \
+             "[Bot Code](https://github.com/tylerbrockett/Alert-Bot-Reddit)\n"
     return result
 
 
 def compose_subscribe_message(username, new_sub, subs, subreddit_not_specified):
     result = compose_greeting(username) + \
              "Thanks for your subscription. " + \
-             "You will continue to receive updates to part sales that match your new subscription. " + \
+             "You will continue to receive updates for posts that match your new subscription. " + \
              "To unsubscribe, send me a message with the body 'unsubscribe {subscription#}'.\t \nAlternatively, " + \
              "you can reply to this message or any replies from the bot in regards to this subscription and reply " + \
              "with 'unsubscribe' as the body.\t \n" + \
+             ("\t \n**Note:** If no subreddit is specified, /r/buildapcsales will be used by default\t \n" if subreddit_not_specified else "") + \
              new_sub.to_table('New Subscription') + "\t \n\t \n" + \
              format_subscription_list(subs, 'Your Subscriptions') + \
-             ("\t \n**Note:** If no subreddit is specified, /r/buildapcsales will be used by default" if subreddit_not_specified else "") + \
              compose_salutation()
     return result
 
@@ -54,13 +54,13 @@ def compose_all_subscriptions_message(username, all_subscriptions):
     return result
 
 
-def compose_duplicate_subscription_message(username, existing, new):
+def compose_duplicate_subscription_message(username, existing_sub, new_sub):
     result = compose_greeting(username) + \
              'We think you already have an existing subscription matching the criteria specified. Below ' + \
              'both subscriptions are listed. If you believe there has been a mistake, please PM me at ' + \
              '/u/' + accountinfo.developerusername + ' and let me know.\n\n' + \
-             existing.to_string('Existing Subscription') + '\n\n' + \
-             new.to_string('New Subscription') + '\n' + \
+             existing_sub.to_table('Existing Subscription') + '\n\n' + \
+             new_sub.to_table('New Subscription') + '\n' + \
              compose_salutation()
     return result
 
@@ -143,30 +143,33 @@ def compose_reject_message(username, subject, body):
 def format_subreddit_list(subreddits, title):
     i = 0
     result = '###' + title + '\n' + \
-             '#|Subreddit' + '\n' + \
-             '--:|:--:' + '\n'
+             '\#|Subreddit' + '\n' + \
+             ':--|:--' + '\n'
     for subreddit in subreddits:
         i += 1
         result += str(i) + '|' + str(subreddit) + '\n'
     return result
 
 
-def compose_invalid_subreddit_message(username, invalid_subreddits):
+def compose_invalid_subreddit_message(username, invalid_subreddits, message):
     result = compose_greeting(username) + \
         'Unfortunately, it appears that the following subreddit(s) you tried to subscribe to were invalid. If you ' + \
         'believe this is a mistake please message /u/' + accountinfo.developerusername + '. Sorry for the ' + \
-        'inconvenience!\t \n' + \
+        'inconvenience!\t \n\t \n' + \
+        '**Subject:**\t' + message.subject + '\t \n' + \
+        '**Body:**\t\t' + message.body + '\t \n' + \
         format_subreddit_list(invalid_subreddits, 'Invalid Subreddits') + \
         compose_salutation()
     return result
 
 
 def compose_match_message(sub, submission, subs):
-    is_self = submission.is_self
+    print("SELFTEXT:   \n" + str(vars(submission)))
     result = compose_greeting(sub.username) + \
         "**Post Title:**\t \n" + \
-        "[" + submission.title + "](" + submission.permalink + ")" + "\t \n\t \n" + \
-        ("**Body Text:**\t \n" + submission.selftext if is_self else "**[Content Link](" + submission.selftext + ")**") + \
+        "[" + submission.title + "](" + submission.permalink + ")\t \n\t \n" + \
+        (("**Body Text:**\t \n" + submission.preview) if submission.is_self
+         else ("**Post Content Link:**\t \n[Content Link](" + submission.url + ")")) + \
         "\t \n\t \n" + \
         sub.to_table('Matched Subscription') + "\t \n\t \n" + \
         format_subscription_list(subs, 'Your Subscriptions') + \

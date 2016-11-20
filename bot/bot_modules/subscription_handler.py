@@ -22,7 +22,10 @@ class SubscriptionHandler:
             elif key == Subscription.BODY:
                 body_match = True
                 for item in subscription.data[key]:
-                    if item.lower() not in submission.selftext.lower():
+                    print("VARS: \n\n" + str(vars(submission)))
+                    body_content = submission.selftext.lower() if submission.is_self else submission.url.lower()
+                    print('BODY CONTENT:  ' + body_content)
+                    if item.lower() not in body_content:
                         body_match = False
                         mismatched_keys.append(key)
                 result = result and body_match
@@ -66,9 +69,11 @@ class SubscriptionHandler:
         subreddits = {}
         matches = []
         for subscription in subscriptions:
-            print(subscription.to_string())
             subreds = subscription.data[Subscription.SUBREDDITS]
             for subreddit in subreds:
+                if reddit.check_invalid_subreddits([subreddit]):
+                    print('INVALID SUBREDDIT - ' + subreddit)
+                    continue
                 if subreddit not in subreddits:
                     submissions = reddit.get_submissions(subreddit)
                     subreddits[subreddit] = submissions
@@ -77,7 +82,7 @@ class SubscriptionHandler:
                     is_match, mismatched_keys = SubscriptionHandler.is_match(subscription, submission)
                     if is_match:
                         already_exists = database.check_if_match_exists(subscription.username,
-                                                                        subscription.original_string,
+                                                                        subscription.to_string(),
                                                                         submission.permalink)
                         if not already_exists:
                             matches.append((subscription, submission))

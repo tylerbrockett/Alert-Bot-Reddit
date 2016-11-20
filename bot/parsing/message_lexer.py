@@ -17,7 +17,7 @@ class MessageLexer:
         'subscribe', 'sub',
         'edit', 'change',
         'help', 'info', 'information',
-        'feedback', 'suggestion', 'suggestions', 'advice'
+        'feedback', 'suggestion', 'suggestions', 'advice', 'feature', 'features', 'request', 'requests'
     ]
 
     statistics_keywords = ['statistics', 'stats']
@@ -27,7 +27,7 @@ class MessageLexer:
     subscribe_keywords = ['subscribe', 'sub']
     edit_keywords = ['edit', 'change']
     help_keywords = ['help', 'info', 'information']
-    feedback_keywords = ['feedback', 'suggestion', 'suggestions', 'advice']
+    feedback_keywords = ['feedback', 'suggestion', 'suggestions', 'advice', 'feature', 'features', 'request', 'requests']
 
     def __init__(self, message):
         self.message = message

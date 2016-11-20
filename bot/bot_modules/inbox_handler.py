@@ -37,7 +37,7 @@ class InboxHandler:
     @staticmethod
     def handle_get_subscriptions_message(database, message):
         print('Get subs message')
-        subscriptions = database.get_subscriptions_by_username(str(message.author))
+        subscriptions = database.get_subscriptions_by_user(str(message.author))
         formatted_message = inbox.compose_all_subscriptions_message(str(message.author), subscriptions)
         message.reply(formatted_message)
         message.mark_as_read()
@@ -60,14 +60,16 @@ class InboxHandler:
             Logger.log(Color.RED, 'Subscription already exists')
             message.reply(inbox.compose_duplicate_subscription_message(
                 str(message.author),
-                duplicate_subs[0].to_table('Existing Subscription'),
-                new_sub.to_table('New Subscription')))
+                duplicate_subs[0],
+                new_sub))
             message.mark_as_read()
             return
         invalid_subreddits = reddit.check_invalid_subreddits(new_sub.data[Subscription.SUBREDDITS])
         if invalid_subreddits:
             Logger.log(Color.RED, 'Subreddit(s) invalid: ' + str(invalid_subreddits))
-            message.reply(inbox.compose_invalid_subreddit_message(str(message.author), invalid_subreddits))
+            message.reply(inbox.compose_invalid_subreddit_message(str(message.author), invalid_subreddits, message))
+            message.mark_as_read()
+            return
         database.insert_subscription(str(message.author), str(message.id), new_sub.to_string(), times.get_current_timestamp())
         existing_subs.append(new_sub)
         subreddit_not_specified = len(new_sub.data[Subscription.SUBREDDITS]) == 0
@@ -90,7 +92,7 @@ class InboxHandler:
     @staticmethod
     def handle_unsubscribe_from_num_message(database, message, payload):
         print("Unsub from num")
-        removed = database.remove_subscription_by_number(payload)
+        removed = database.remove_subscription_by_number(str(message.author), int(payload))
         subs = database.get_subscriptions_by_user(str(message.author))
         if removed:
             message.reply(inbox.compose_unsubscribe_from_num_message(str(message.author), removed, subs))
@@ -115,7 +117,7 @@ class InboxHandler:
     @staticmethod
     def handle_help_message(database, message):
         print('Help message')
-        subs = database.get_subscriptions_by_username(str(message.author))
+        subs = database.get_subscriptions_by_user(str(message.author))
         message.reply(inbox.compose_help_message(str(message.author), subs))
         message.mark_as_read()
 

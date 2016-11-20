@@ -41,6 +41,36 @@ class Subscription:
             self.valid = Subscription.STATUS_INVALID
         self.check_too_generic()
 
+    def format(self, key):
+        result = ''
+        data = self.data[key]
+        if key == Subscription.TITLE:
+            if data:
+                i = 1
+                for term_set in data:
+                    result += 'Item ' + str(i) + '|' + ', '.join(term_set) + '\n'
+                    i += 1
+            else:
+                result = 'Items|* (All)' + '\n'
+        elif key == Subscription.SUBREDDITS:
+            if data:
+                result = ", ".join(['/r/' + str(r) for r in data])
+            else:
+                result = '/r/buildapcsales'
+        elif data and (key == Subscription.REDDITORS or key == Subscription.IGNORE_REDDITORS):
+            result = ", ".join(['/u/' + str(u) for u in data])
+        elif key == Subscription.NSFW or key == Subscription.EMAIL:
+            if data:
+                result = str(data)
+            else:
+                result = str(False)
+        else:
+            if not data:
+                result = 'N/A'
+            else:
+                result = ", ".join([str(element) for element in data])
+        return result
+
     def check_too_generic(self):
         if not self.data[Subscription.TITLE] and 'all' in self.data[Subscription.SUBREDDITS]:
             self.status = Subscription.STATUS_TOO_GENERIC
@@ -63,20 +93,6 @@ class Subscription:
             return True
         return False
 
-    @staticmethod
-    def format_list(lis):
-        if len(lis) is 0:
-            return 'N/A'
-        return str(lis)[1:-1]
-
-    def format_terms(self):
-        ret = ''
-        i = 1
-        for term_set in self.data[Subscription.TITLE]:
-            ret += 'Item ' + str(i) + '|' + Subscription.format_list(term_set) + '\n'
-            i += 1
-        return ret
-
     def to_string(self):
         return json.dumps(self.data, 2)
 
@@ -91,17 +107,16 @@ class Subscription:
         ret = \
             '####' + title + '\n' + \
             'Detail|Value\n' + \
-            '--:|:--:' + '\n' + \
-            self.format_terms() + \
-            'Body Terms|' + Subscription.format_list(self.data[Subscription.BODY]) + '\n' + \
-            'Subreddits|' + Subscription.format_list(self.data[Subscription.SUBREDDITS]) + '\n' + \
-            'Ignore Title Terms|' + Subscription.format_list(self.data[Subscription.IGNORE_TITLE]) + '\n' + \
-            'Ignore Body Terms|' + Subscription.format_list(self.data[Subscription.IGNORE_BODY]) + '\n' + \
-            'Whitelist Redditors|' + Subscription.format_list(self.data[Subscription.REDDITORS]) + '\n' + \
-            'Ignore Redditors|' + Subscription.format_list(self.data[Subscription.IGNORE_REDDITORS]) + '\n' + \
-            'NSFW|' + str(self.data[Subscription.NSFW]) + '\n' + \
-            'Email|' + str(self.data[Subscription.EMAIL])
-
+            ':--|:--' + '\n' + \
+            self.format(Subscription.TITLE) + \
+            'Body Terms|' + self.format(Subscription.BODY) + '\n' + \
+            'Subreddits|' + self.format(Subscription.SUBREDDITS) + '\n' + \
+            'Ignore Title Terms|' + self.format(Subscription.IGNORE_TITLE) + '\n' + \
+            'Ignore Body Terms|' + self.format(Subscription.IGNORE_BODY) + '\n' + \
+            'Redditors|' + self.format(Subscription.REDDITORS) + '\n' + \
+            'Ignore Redditors|' + self.format(Subscription.IGNORE_REDDITORS) + '\n' + \
+            'Allow NSFW|' + self.format(Subscription.NSFW) + '\n' + \
+            'Email|' + self.format(Subscription.EMAIL) + '\n'
         return ret
 
     @staticmethod

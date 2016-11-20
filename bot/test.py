@@ -25,22 +25,6 @@ class Submission:
 
 
 if __name__ == '__main__':
-    submission = Submission(
-        'i5',
-        'bodytext! this is blah cool!',
-        'tylerbrockett',
-        True
-    )
-    m = Message(
-        'Message1',
-        'Subscribe -item i5,6500 -subreddit buildapcsales'
-    )
-    message = MessageParser(m)
-    payload = message.get_payload()
-    sub = Subscription(payload, 'tylerbrockett', '1')
-
-    print(json.dumps(payload), 2)
-
-    print('VALID: ' + str(message.data[MessageParser.KEY_VALID]))
-    # is_match, mismatched_keys = SubscriptionHandler.is_match(sub, submission)
-    # print('MATCH -- ' + str(is_match) + '\n\nMismatched Keys: ' + str(mismatched_keys))
+    reddit = RedditHandler()
+    invalid = reddit.check_invalid_subreddits(['sdfsdfsdfsdfsdfdsdfadas'])
+    print(','.join(invalid))

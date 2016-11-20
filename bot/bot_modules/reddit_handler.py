@@ -33,6 +33,9 @@ class RedditHandler:
         unread = self.reddit.get_unread(limit=None)
         return unread
 
+    def get_message(self, message_id):
+        return self.reddit.get_message(message_id)
+
     def send_message(self, redditor, subject, body):
         try:
             self.reddit.send_message(redditor, subject, body)
@@ -58,10 +61,11 @@ class RedditHandler:
         invalid = []
         for subreddit in subreddits:
             try:
-                self.reddit.get_subreddit(subreddit).get_new(limit=1)
+                self.reddit.get_subreddit(subreddit, fetch=True).get_new(limit=1)
             except:
                 invalid.append(subreddit)
         return invalid
+
 
 class RedditHelperException(Exception):
     SEND_MESSAGE_EXCEPTION = 'Error sending message'

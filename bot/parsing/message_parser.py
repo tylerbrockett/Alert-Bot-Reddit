@@ -107,7 +107,7 @@ class MessageParser:
                 self.data[MessageParser.KEY_PAYLOAD] = subscription.get_data()
         elif ttype == TokenType.FEEDBACK:
             self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_FEEDBACK
-            self.data[MessageParser.KEY_PAYLOAD] = self.message
+            self.data[MessageParser.KEY_PAYLOAD] = str(self.message.body)
         elif ttype == TokenType.EDIT:
             # edits = EditParser(self.message[index:])
             self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_EDIT

@@ -20,6 +20,7 @@ class DatabaseHandler:
             if not path.isfile(DB_LOCATION):
                 files.create_file(DB_LOCATION)
             connection = sqlite3.connect(DB_LOCATION)
+            connection.text_factory = str
             connection.execute('PRAGMA foreign_keys = ON;')
             cursor = connection.cursor()
             cursor.execute(database.CREATE_TABLE_SUBSCRIPTIONS)
@@ -43,7 +44,7 @@ class DatabaseHandler:
     def reset(self):
         try:
             self.disconnect()
-            self.connect()
+            self.connection = self.connect()
         except:
             DatabaseHandlerException('Error resetting connection to database\n\n' + traceback.format_exc())
 
@@ -68,10 +69,11 @@ class DatabaseHandler:
         subs = []
         results = self.connection.cursor().execute(database.GET_ALL_SUBSCRIPTIONS).fetchall()
         for sub in results:
-            item = str(sub[database.COL_SUB_ITEM])
-            username = str(sub[database.COL_SUB_USERNAME])
-            message_id = str(sub[database.COL_SUB_MESSAGE_ID])
+            item = sub[database.COL_SUB_ITEM]
+            username = sub[database.COL_SUB_USERNAME]
+            message_id = sub[database.COL_SUB_MESSAGE_ID]
             subscription = Subscription(item, username, message_id)
+            print('READ SUB: ' + subscription.to_string())
             if subscription.status == Subscription.STATUS_VALID:
                 subs.append(subscription)
             else:
@@ -85,9 +87,9 @@ class DatabaseHandler:
         subs = []
         result = self.connection.cursor().execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, [username]).fetchall()
         for sub in result:
-            item = str(sub[database.COL_SUB_ITEM])
-            username = str(sub[database.COL_SUB_USERNAME])
-            message_id = str(sub[database.COL_SUB_MESSAGE_ID])
+            item = sub[database.COL_SUB_ITEM]
+            username = sub[database.COL_SUB_USERNAME]
+            message_id = sub[database.COL_SUB_MESSAGE_ID]
             subscription = Subscription(item, username, message_id)
             if subscription.status == Subscription.STATUS_VALID:
                 subs.append(subscription)
@@ -102,10 +104,11 @@ class DatabaseHandler:
             result = self.connection.cursor().execute(database.GET_SUBSCRIPTION_BY_MESSAGE_ID, [username, message_id]).fetchall()
             subs = []
             for sub in result:
-                item = str(sub[database.COL_SUB_ITEM])
-                username = str(sub[database.COL_SUB_USERNAME])
-                message_id = str(sub[database.COL_SUB_MESSAGE_ID])
+                item = sub[database.COL_SUB_ITEM]
+                username = sub[database.COL_SUB_USERNAME]
+                message_id = sub[database.COL_SUB_MESSAGE_ID]
                 subscription = Subscription(item, username, message_id)
+                print('BY MESSAGE ID: ' + subscription.to_string())
                 subs.append(subscription)
             return subs
         except:
@@ -130,9 +133,12 @@ class DatabaseHandler:
     def remove_subscription_by_number(self, username, sub_num):
         try:
             subs = self.get_subscriptions_by_user(username)
+            print('# SUBS: ' + str(len(subs)))
             if sub_num > len(subs) or sub_num <= 0:
+                print('RETURN NONE::: SUB NUM: ' + str(sub_num) + '   LEN(subs): ' + str(len(subs)))
                 return None
             sub = subs[sub_num - 1]
+            print('Removing Sub: ' + sub.to_string())
             self.remove_subscription(sub)
             return sub
         except:
@@ -208,6 +214,7 @@ class DatabaseHandler:
             self.connection.cursor().execute(database.PURGE_OLD_MATCHES, [marked_old_time])
             self.commit()
         except:
+            print('TRACEBACK:   ' + traceback.format_exc())
             raise DatabaseHandlerException('ERROR - purge_old_matches')
 
     # ==============================================================================

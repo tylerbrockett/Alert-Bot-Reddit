@@ -171,12 +171,12 @@ def match(subscription, submission):
         Color.MAGENTA,
         "-------------------------------\n" +
         "        SUBMISSION MATCH\n" +
-        "username:   " + username + "\n" +
-        "message id: " + message_id + "\n" +
-        "item:       " + item + "\n" +
-        "title:      " + title + "\n" +
-        "reddit url: " + permalink + "\n" +
-        "sale link:  " + url + "\n" +
+        "username:   " + subscription.username + "\n" +
+        "message id: " + subscription.message_id + "\n" +
+        "item:       " + subscription.to_string() + "\n" +
+        "title:      " + submission.title + "\n" +
+        "Body:       " + submission.selftext + "\n" +
+        "reddit url: " + submission.permalink + "\n" +
         '-------------------------------\n\n')
 
 
