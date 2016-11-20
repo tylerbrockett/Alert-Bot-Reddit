@@ -52,6 +52,14 @@ class Subscription:
                     i += 1
             else:
                 result = 'Items|* (All)' + '\n'
+        elif key == Subscription.BODY:
+            if data:
+                i = 1
+                for term_set in data:
+                    result += 'Body Item ' + str(i) + '|' + ', '.join(term_set) + '\n'
+                    i += 1
+            else:
+                result = 'Body|Not specified' + '\n'
         elif key == Subscription.SUBREDDITS:
             if data:
                 result = ", ".join(['/r/' + str(r) for r in data])
@@ -66,7 +74,7 @@ class Subscription:
                 result = str(False)
         else:
             if not data:
-                result = 'N/A'
+                result = 'Not specified'
             else:
                 result = ", ".join([str(element) for element in data])
         return result
@@ -79,6 +87,8 @@ class Subscription:
         for i in range(0, len(self.data[Subscription.TITLE])):
             self.data[Subscription.TITLE][i].sort()
         self.data[Subscription.TITLE].sort()
+        for i in range(0, len(self.data[Subscription.BODY])):
+            self.data[Subscription.BODY][i].sort()
         self.data[Subscription.BODY].sort()
         self.data[Subscription.REDDITORS].sort()
         self.data[Subscription.IGNORE_TITLE].sort()
@@ -109,7 +119,7 @@ class Subscription:
             'Detail|Value\n' + \
             ':--|:--' + '\n' + \
             self.format(Subscription.TITLE) + \
-            'Body Terms|' + self.format(Subscription.BODY) + '\n' + \
+            self.format(Subscription.BODY) + \
             'Subreddits|' + self.format(Subscription.SUBREDDITS) + '\n' + \
             'Ignore Title Terms|' + self.format(Subscription.IGNORE_TITLE) + '\n' + \
             'Ignore Body Terms|' + self.format(Subscription.IGNORE_BODY) + '\n' + \

@@ -23,7 +23,7 @@ reddit = None
 subject = "Alert_Bot (formerly sales__bot for buildapcsales) - message from developer"
 signature = "\n\t \n\t \n-tylerbrockett"
 
-select_users = []
+select_users = ['XdrummerXboy']
 
 
 def compose_alert(username):

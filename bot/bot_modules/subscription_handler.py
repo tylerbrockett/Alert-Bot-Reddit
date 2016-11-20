@@ -19,13 +19,17 @@ class SubscriptionHandler:
                 if not title_match:
                     mismatched_keys.append(key)
                 result = result and title_match
-            elif key == Subscription.BODY:
-                body_match = True
-                for item in subscription.data[key]:
-                    body_content = submission.selftext.lower() if submission.is_self else submission.url.lower()
-                    if item.lower() not in body_content:
-                        body_match = False
-                        mismatched_keys.append(key)
+            if key == Subscription.BODY:
+                body_match = False  # Empty body_list is automatically 'True' because it has no effect on result
+                for body_list in subscription.data[key]:
+                    body_list_match = True
+                    for item in body_list:
+                        body_content = submission.selftext.lower() if submission.is_self else submission.url.lower()
+                        if item.lower() not in body_content:
+                            body_list_match = False
+                    body_match = body_match or body_list_match
+                if not body_match:
+                    mismatched_keys.append(key)
                 result = result and body_match
             elif key == Subscription.REDDITORS:
                 redditor_match = True

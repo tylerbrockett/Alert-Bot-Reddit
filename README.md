@@ -1,15 +1,50 @@
-# reddit-bot-buildapcsales
+# Alert Bot
 
-This is just a side project for me. I had been introduced to the Python programming language in an Artificial Intelligence class, and loved the syntax so much that I decided to explore it some more. I happened upon someone writing about how Reddit bots were primarily done using Python and the PRAW (Python Reddit API Wrapper) library, and thought I'd give it a try.
+This bot allows users to subscribe to certain posts based on the title, body, link, post author, etc. The bot will notify the user when it finds posts that matches what the user specifies.
+This bot is excellent to keep track of subreddits that post links to sales or freebies!
+[Formerly known as /u/sales__bot for /r/buildapcsales.](https://www.reddit.com/r/buildapcsales/comments/3u2tg5/buildapcsales_bot/)
 
-[This is a link to the Reddit post describing the bot. Essentially the same information found here](https://www.reddit.com/r/buildapcsales/comments/3u2tg5/buildapcsales_bot/)
 
 ## How It Works
 
 ***NOTE:*** For each of these fields (subject and body) capitalization does *not* matter, it will yield the exact same results.
 
-#### To subscribe 
-Send a private message to /u/sales__bot (notice ***two*** underscores) with the subject line as the item you want to receive notifications for, and the body of the message as "Subscribe". What the bot does is scans the first 100 most recent /r/buildapcsales submissions for either a title or body of a submission that matches the item you subscribed to. ***Currently, it must be an exact match to the term you gave me.*** I will work on using some sort of search in the future, but for now this will suffice. Because of this, try to keep your terms generic, e.g. use "850 evo" instead of "Samsung 850 EVO-Series 250GB 2.5" Solid State Drive". For now, feel free to have multiple subscriptions for the same item, just so I can cover the bases. By this, I mean it is okay to subscribe to "caviar black 3tb" ***and*** "caviar black series 3tb" (notice the word "series" in the middle). Do **not** subscribe to two separate things like "i7-6700k" and "6700k", since everything found for the second term covers that of the first. If all the subscriptions become unmanageable, I will change this rule. Also, if/when the search feature is implemented, in theory the multiple subscriptions for the same item won't be necessary.
+#### To subscribe
+Send a private message to /u/Alert_Bot with the body of the message specifying what you want the bot to look out for. Detailed grammar is found at the bottom of this page.
+Essentially there is the subscribe action, and a list of parameters. Parameter List:
+
+#####Parameter Values:
+* ***-title***
+    * Function:
+        * Specifies words or phrases to watch out for in the title of the post. Multiple '-title' parameters can be specified, the user will be notified of the post even if only ***ONE*** of the '-title' parameters match. Each '-title' parameter also supports a comma-separated list of words or phrases, each of which need to show up to constitute a match, however order does ***NOT*** matter.
+    * Examples:
+        * subscribe -title cats
+            * Watches for posts containing the word 'cats' in its title
+        * subscribe -title cats -title dogs
+            * Watches for posts containing the word 'cats' ***OR*** 'dogs' in its title.
+        * subscribe -title cats, dogs
+            * Watches for posts containing the words 'cats' ***AND*** 'dogs' in its title, but order doesn't matter.
+        * subscribe -title funny cats
+            * Watches for posts containing the phrase 'funny cats' in its title.
+    * Aliases:
+        * -title
+        * -item
+        * -items
+* ***-body***
+    * Function:
+        * Specifies words or phrases to watch out for in the body of the post. This could be used for selftext ***OR*** links, the '-body' parameter will figure out which post type it is. This parameter is especially useful for filtering URLs from posts, such as if you only want to be notified of posts that link to *'amazon.com'* for example.
+    * Examples:
+        * subscribe -body cats
+            * Watches for posts containing the word 'cats' in its body
+        * subscribe -body cats, dogs
+            * Watches for posts containing the words 'cats' ***AND*** 'dogs' in its body, but order doesn't matter.
+        * subscribe -body funny cats
+            * Watches for posts containing the phrase 'funny cats' in its body.
+    * Aliases:
+        * -body
+        * -site
+        * -sites
+        * -url
 
 #### Unsubscribe
 To unsubscribe, either reply to the original message confirming your subscription to that item with the body as "Unsubscribe", or create a new message with the item to unsubscribe from as the subject and "Unsubscribe" as the body.

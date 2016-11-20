@@ -121,17 +121,16 @@ class SubscriptionParser:
             raise SubscriptionParserException('Error - parse_statement_list - Expected ' + str(SubscriptionParser.statement_tokens))
 
     def parse_title_list(self):
-        new_list = sorted(set(self.parse_list([])))
-        if new_list not in self.data[Subscription.TITLE]:
-            self.data[Subscription.TITLE].append(new_list)
+        title_list = sorted(set(self.parse_list([])))
+        if title_list not in self.data[Subscription.TITLE]:
+            self.data[Subscription.TITLE].append(title_list)
             self.data[Subscription.TITLE].sort()
 
     def parse_body_list(self):
         body_list = sorted(set(self.parse_list([])))
-        for item in body_list:
-            if item not in self.data[Subscription.BODY]:
-                self.data[Subscription.BODY].append(item)
-                self.data[Subscription.BODY].sort()
+        if body_list not in self.data[Subscription.BODY]:
+            self.data[Subscription.BODY].append(body_list)
+            self.data[Subscription.BODY].sort()
 
     def parse_redditors_list(self):
         redditor_list = self.parse_list([])

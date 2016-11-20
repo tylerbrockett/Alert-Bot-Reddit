@@ -176,9 +176,9 @@ class DatabaseHandler:
     #           MATCHES
     # ==============================================================================
 
-    def insert_match(self, username, item, permalink):
+    def insert_match(self, username, json, permalink):
         try:
-            match = [username, item, permalink, times.get_current_timestamp()]
+            match = [username, json, permalink, times.get_current_timestamp()]
             self.connection.cursor().execute(database.INSERT_ROW_MATCHES, match)
             self.connection.cursor().execute(database.INSERT_ROW_ALL_MATCHES, match)
             # NOTE: Commit is called after message is sent
