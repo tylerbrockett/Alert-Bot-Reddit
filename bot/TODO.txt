@@ -1,0 +1,38 @@
+Definite Features to Add
+-----------------------------------------------------------------------------------------------
+2. Add ability to use command (subscribe, unsubscribe, etc) inline in the body and
+    potentially leave subject/body subs too. Maybe parse the sub and do a toString()
+    with sorting and use that as the sub column in the database. Then separate each
+    command type into its own file/handler
+3. Add functionality to edit the subscription. Example:
+    - edit #1 add test1, test2 to item, remove test3, test4
+4. Add email functionality
+5. Create MESSAGE table in database to handle messages sent to user about subscription. This would
+    allow users to reply to a message with a blank subject with "unsubscribe" and the bot would know
+    which subscription to unsubscribe from. Fields:
+    - Subscription ID
+    - Message ID
+6. Add URL to message if NOT submission.is_self
+7. Make each '-item' declaration create a separate OR relationship, meaning "-item i5 -item i3" will look for i5 OR i3, not i5 AND i3
+    - will require changing "list statement_list" to just "statement_list", or have a way to figure out a way around the case of "i5 -item i3"
+
+8. Figure out issue of best way to parse messages. Issue is how to handle reserved words vs categories of edits
+9. Change salutation from -sales__bot to -/u/Alert_Bot
+
+10. Possibly check if message is a reply before handling any actions. If it's a reply, just use "add ____ to _____" instead of "edit __ add ____ to ____"
+
+11. Make sure if user is replying to a message from the bot with s NEW subscription, the subscription still works. (another
+    to do item was based on whether message was a reply or not
+
+
+Possible Features to Add
+-----------------------------------------------------------------------------------------------
+1. Add '_____ User have been alerted to this post.' as a comment to each post
+    - Save in table based on post permalink
+    - Update # every time
+2. Add ability to set reddit messages to false if email messages are set to true
+3. Add fuzzy search so that users can say "if submission has 80% of what I'm looking for, notify me"
+    -fuzzines 80
+4. Add -min-upvotes and/or -delay so that crappy submissions don't get sent out
+5. Parse subscription text into A JSON object before putting it into the database. Use the subscription class as a sort of JSON wrapper
+6. Add -sort option.

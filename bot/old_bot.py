@@ -13,7 +13,7 @@ import sqlite3
 import traceback
 from sys import stdout
 
-from helpers import color, times, database, inbox, output
+from utils import logger, times, database, inbox, output
 from private import accountinfo
 
 SLEEP_SECONDS = 45
@@ -24,21 +24,14 @@ connection = None
 reddit = None
 start_time = None
 
-run = True
-
 
 def run_bot():
-    global start_time, run
-    output.about_message()
+    global start_time
     while True:
         try:
-            check_for_commands()
-            if run:
-                read_inbox()
-                crawl_subreddit('buildapcsales')
-                color.print_color('yellow', times.get_time_passed(start_time))
+            read_inbox()
         except KeyboardInterrupt:
-            color.print_color('red', 'Interrupted')
+            logger.log('red', 'Interrupted')
             exit()
         except:
             handle_crash(traceback.format_exc())
@@ -69,7 +62,7 @@ def check_for_commands():
                 try:
                     unread_message.reply("Standing by for further instructions.")
                     unread_message.mark_as_read()
-                    color.print_color('red', '--------- Bot paused by developer ---------')
+                    logger.log('red', '--------- Bot paused by developer ---------')
                 except:
                     handle_crash(traceback.format_exc())
             if subject == 'run' or subject == 'start' or subject == 'resume':
@@ -77,12 +70,12 @@ def check_for_commands():
                 try:
                     unread_message.reply("Thanks, I was getting bored!")
                     unread_message.mark_as_read()
-                    color.print_color('green', '--------- Bot resumed by developer ---------')
+                    logger.log('green', '--------- Bot resumed by developer ---------')
                 except:
                     handle_crash(traceback.format_exc())
 
             if subject == 'test':
-                color.print_color('blue', '--------- I am being tested ---------')
+                logger.log('blue', '--------- I am being tested ---------')
                 try:
                     if run:
                         unread_message.reply("Bot is active!")
@@ -195,7 +188,7 @@ def read_inbox():
             try:
                 cursor = connection.cursor()
                 cursor.execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, (username,))
-                unread_message.reply(inbox.compose_subscriptions_message(username, cursor.fetchall()))
+                unread_message.reply(inbox.compose_all_subscriptions_message(username, cursor.fetchall()))
                 unread_message.mark_as_read()
                 output.subscriptions(username)
             except:
@@ -246,7 +239,7 @@ def read_inbox():
             subscription = (username, message_id, subject, times.get_current_timestamp())
             try:
                 cursor = connection.cursor()
-                cursor.execute(database.INSERT_ROW_SUBMISSIONS, subscription)
+                cursor.execute(database.INSERT_ROW_SUBSCRIPTIONS, subscription)
                 cursor = connection.cursor()
                 cursor.execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, (username,))
                 unread_message.reply(inbox.compose_subscribe_message(username, subject, cursor.fetchall()))
@@ -265,7 +258,7 @@ def read_inbox():
             try:
                 cursor = connection.cursor()
                 cursor.execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, (username,))
-                unread_message.reply(inbox.compose_information_message(username, cursor.fetchall()))
+                unread_message.reply(inbox.compose_help_message(username, cursor.fetchall()))
                 unread_message.mark_as_read()
                 output.information(username)
             except:
@@ -291,7 +284,7 @@ def read_inbox():
                 output.default_exception(username, subject, body)
                 reddit.send_message(accountinfo.developerusername, "Bot Exception - Default", traceback.format_exc())
         sleep(2)
-    color.print_color('cyan', str(i) + ' UNREAD MESSAGES')
+    logger.log('cyan', str(i) + ' UNREAD MESSAGES')
 
 
 def open_database():
@@ -332,7 +325,7 @@ def destroy():
         connection.close()
     connection = None
     reddit = None
-    color.print_color('red', '----------------- DESTROYED -----------------')
+    logger.log('red', '----------------- DESTROYED -----------------')
 
 
 def handle_crash(stacktrace):
@@ -356,9 +349,9 @@ if __name__ == "__main__":
         initialize()
         run_bot()
     except KeyboardInterrupt:
-        color.print_color('red', 'Interrupted')
+        logger.log('red', 'Interrupted')
         exit()
     except:
-        color.print_color('red', traceback.format_exc())
+        logger.log('red', traceback.format_exc())
         exit()
 
