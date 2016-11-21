@@ -155,9 +155,9 @@ If you send a message that doesn't follow the above guidelines, you will get an 
 **11/24/15 -** A ***HUGE*** thanks goes out to /u/he_must_workout for donating a Raspberry Pi (in the form of PayPal) for the bot! The Reddit community is truly amazing!
 
 ## Developer Info
-Developer Name: Tyler Brockett 
-Bot Code: [Github Repository](https://github.com/tylerbrockett/Alert-Bot-Reddit) 
-Bot Subreddit: [/r/Alert_Bot](https://reddit.com/r/Alert_Bot) 
-Reddit: /u/tylerbrockett 
-Email: tylerbrockett@gmail.com 
+Developer Name: Tyler Brockett &nbsp; 
+Bot Code: [Github Repository](https://github.com/tylerbrockett/Alert-Bot-Reddit) &nbsp; 
+Bot Subreddit: [/r/Alert_Bot](https://reddit.com/r/Alert_Bot) &nbsp; 
+Reddit: /u/tylerbrockett &nbsp; 
+Email: tylerbrockett@gmail.com &nbsp; 
 
