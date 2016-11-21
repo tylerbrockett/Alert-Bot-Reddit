@@ -15,29 +15,40 @@ class SubscriptionLexer:
         '-item',
         '-items',
         # BODY
-        '-url',
+        '-body',
         '-site',
         '-sites',
-        '-body',
+        '-url',
         '-content',
         '-selftext',
         '-link',
-        # SUBREDDIT
-        '-subreddit',
-        '-subreddits',
         # REDDITORS
         '-redditor',
         '-redditors',
-        # IGNORE BODY
-        '-ignore-site',
-        '-ignore-sites',
-        '-ignore-body',
+        '-user',
+        '-users',
         # IGNORE TITLE
+        '-ignore-title',
         '-ignore-item',
         '-ignore-items',
-        '-ignore-title',
+        # IGNORE BODY
+        '-ignore-body',
+        '-ignore-site',
+        '-ignore-sites',
+        '-ignore-url',
+        '-ignore-content',
+        '-ignore-selftext',
+        '-ignore-link',
+        # IGNORE REDDITORS
+        '-ignore-redditor',
+        '-ignore-redditors',
+        '-ignore-user',
+        '-ignore-users',
+        # SUBREDDIT
+        '-subreddit',
+        '-subreddits',
         # FLAGS
-        '-nsfw',
+        '-nsfw', '-show-nsfw',
         '-email',
         ','
     ]
@@ -53,20 +64,20 @@ class SubscriptionLexer:
             self.unget_char()
 
     def is_keyword(self, token):
-        if token.lower() in ['-body', '-site', '-sites', '-url', '-content', '-selftext', '-link']:
-            return TokenType.BODY
-        elif token.lower() in ['-title', '-item', '-items']:
+        if token.lower() in ['-title', '-item', '-items']:
             return TokenType.TITLE
-        elif token.lower() in ['-subreddit', '-subreddits']:
-            return TokenType.SUBREDDITS
-        elif token.lower() in ['-redditor', '-redditors']:
+        elif token.lower() in ['-body', '-site', '-sites', '-url', '-content', '-selftext', '-link']:
+            return TokenType.BODY
+        elif token.lower() in ['-redditor', '-redditors', '-user', '-users']:
             return TokenType.REDDITORS
-        elif token.lower() in ['-ignore-body', '-ignore-site', '-ignore-sites']:
+        elif token.lower() in ['-ignore-url', '-ignore-site', '-ignore-sites', '-ignore-body', '-ignore-content', '-ignore-selftext', '-ignore-link']:
+            return TokenType.IGNORE_TITLE
+        elif token.lower() in ['-ignore-redditor', '-ignore-redditors', '-user', '-users']:
             return TokenType.IGNORE_BODY
         elif token.lower() in ['-ignore-title', '-ignore-item', '-ignore-items']:
-            return TokenType.IGNORE_TITLE
-        elif token.lower() in ['-ignore-redditor', '-ignore-redditors']:
             return TokenType.IGNORE_REDDITORS
+        elif token.lower() in ['-subreddit', '-subreddits']:
+            return TokenType.SUBREDDITS
         elif token.lower() in ['-email']:
             return TokenType.EMAIL
         elif token.lower() in ['-nsfw', '-show-nsfw']:

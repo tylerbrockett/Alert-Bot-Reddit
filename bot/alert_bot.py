@@ -17,7 +17,7 @@ from bot_modules.inbox_handler import InboxHandler
 from bot_modules.match_handler import MatchHandler
 from bot_modules.reddit_handler import RedditHandler
 from bot_modules.sleep_handler import SleepHandler
-from bot_modules.subscription_handler import SubscriptionHandler
+from bot_modules.match_finder import MatchFinder
 import traceback
 from utils import times
 from utils.color import Color
@@ -40,7 +40,7 @@ class AlertBot:
                 if self.run:
                     InboxHandler.read_inbox(self.database, self.reddit)
                     subscriptions = self.database.get_subscriptions()
-                    matches = SubscriptionHandler.find_matches(subscriptions, self.reddit, self.database)
+                    matches = MatchFinder.find_matches(subscriptions, self.reddit, self.database)
                     MatchHandler.send_messages(self.reddit, self.database, matches)
                     self.database.purge_old_matches()
                     Logger.log(Color.YELLOW, times.get_time_passed(self.start_time))

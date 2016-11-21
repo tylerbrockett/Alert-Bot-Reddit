@@ -7,7 +7,7 @@ from bot_modules.database_handler import DatabaseHandler
 from parsing.message_parser import MessageParser
 from utils.subscription import Subscription
 import json
-from bot_modules.subscription_handler import SubscriptionHandler
+from bot_modules.match_finder import MatchFinder
 
 
 class Message:

@@ -1,7 +1,7 @@
 from utils.subscription import Subscription
 
 
-class SubscriptionHandler:
+class MatchFinder:
 
     @staticmethod
     def is_match(subscription, submission):
@@ -9,7 +9,10 @@ class SubscriptionHandler:
         mismatched_keys = []
         for key in subscription.data.keys():
             if key == Subscription.TITLE:
-                title_match = False  # Empty title_list is automatically 'True' because it has no effect on result
+                title_match = False
+                # Empty title_list is automatically 'True' because it has no effect on result
+                if len(subscription.data[key]) == 0:
+                    title_match = True
                 for title_list in subscription.data[key]:
                     title_list_match = True
                     for item in title_list:
@@ -20,7 +23,10 @@ class SubscriptionHandler:
                     mismatched_keys.append(key)
                 result = result and title_match
             if key == Subscription.BODY:
-                body_match = False  # Empty body_list is automatically 'True' because it has no effect on result
+                body_match = False
+                # Empty body_list is automatically 'True' because it has no effect on result
+                if len(subscription.data[key]) == 0:
+                    body_match = True
                 for body_list in subscription.data[key]:
                     body_list_match = True
                     for item in body_list:
@@ -32,11 +38,14 @@ class SubscriptionHandler:
                     mismatched_keys.append(key)
                 result = result and body_match
             elif key == Subscription.REDDITORS:
-                redditor_match = True
+                redditor_match = False
+                if len(subscription.data[key]) == 0:
+                    redditor_match = True
                 for redditor in subscription.data[key]:
-                    if redditor.lower() not in submission.author.lower():
-                        redditor_match = False
-                        mismatched_keys.append(key)
+                    if redditor.lower() == str(submission.author).lower():
+                        redditor_match = True
+                if not redditor_match:
+                    mismatched_keys.append(key)
                 result = result and redditor_match
             elif key == Subscription.IGNORE_TITLE:
                 ignore_title_match = True
@@ -55,7 +64,7 @@ class SubscriptionHandler:
             elif key == Subscription.IGNORE_REDDITORS:
                 ignore_redditors_match = True
                 for redditor in subscription.data[key]:
-                    if redditor.lower() in submission.author.lower():
+                    if redditor.lower() == str(submission.author).lower():
                         ignore_redditors_match = False
                         mismatched_keys.append(key)
                 result = result and ignore_redditors_match
@@ -80,7 +89,7 @@ class SubscriptionHandler:
                 # submissions = subreddits[subreddit.lower()]
                 submissions = reddit.get_submissions(subreddit)
                 for submission in submissions:
-                    is_match, mismatched_keys = SubscriptionHandler.is_match(subscription, submission)
+                    is_match, mismatched_keys = MatchFinder.is_match(subscription, submission)
                     if is_match:
                         already_exists = database.check_if_match_exists(subscription.username,
                                                                         subscription.to_string(),
