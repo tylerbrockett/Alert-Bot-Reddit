@@ -1,4 +1,3 @@
-from utils import database
 from private import accountinfo
 
 
@@ -26,7 +25,7 @@ def compose_greeting(username):
 
 
 def compose_salutation():
-    result = SIGNATURE + "\n\t \n\t \n" + \
+    result = '\n\t \n\t \n-/u/' + accountinfo.username + "\n\t \n\t \n" + \
              "/r/Alert_Bot | " + \
              "/u/" + accountinfo.developerusername + " | " + \
              "[Bot Code](https://github.com/tylerbrockett/Alert-Bot-Reddit)\n"
@@ -67,7 +66,10 @@ def compose_duplicate_subscription_message(username, existing_sub, new_sub):
 
 def compose_help_message(username, subs):
     result = compose_greeting(username) + \
-             INFORMATION + "\t \n\t \n" + format_subscription_list(subs, 'Your Subscriptions') + \
+             "Please visit the bot's [Github repository](https://github.com/tylerbrockett/Alert-Bot-Reddit) for " + \
+             "detailed information on how the bot works. If you still have questions, please visit /r/Alert_Bot " + \
+             "or message /u/tylerbrockett. Thanks!\t \n\t \n" + \
+             format_subscription_list(subs, 'Your Subscriptions') + \
              compose_salutation()
     return result
 
@@ -219,42 +221,3 @@ def compose_post_reply_forward(username, body):
              'Someone has responded to a post by the bot! the comment is quoted below:\n\n' + \
              'USERNAME: ' + username + '\nBODY:\n' + body
     return result
-
-
-SIGNATURE = '\n\t \n\t \n-/u/' + accountinfo.username
-
-# TODO UPDATE THIS!
-INFORMATION = \
-    "Thanks for your interest in the bot! This is how it works: \n\n" + \
-    \
-    "###Subscribing\n" + \
-    "Send the bot a private message with the subject line as the exact string you " + \
-    "want it to keep an eye out for, and the body as 'subscribe'. Keep it " + \
-    "semi-general as to not limit the search too much. For example, use " + \
-    "'i5-4590' instead of 'Intel Core i5-4590 3.3GHz LGA 1150'. \n\n" + \
-    \
-    "###What the bot does\n" + \
-    "The bot will send you a message that contains a link to that item each time " + \
-    "it come across a post in /r/buildapcsales that matches. It will be a reply " + \
-    "to the original message you sent. This will happen until you send the bot a " + \
-    "message unsubscribing from the part, which is described more in the next " + \
-    "line. \n\n" + \
-    \
-    "###Unsubscribing\n" + \
-    "If or when you want to unsubscribe, send the bot another private message with " + \
-    "the subject line as the item you want to unsubscribe from, and the body as " + \
-    "'Unsubscribe'. If you want to unsubscribe from ALL of the parts you are " + \
-    "subscribed to, make the body of the pm 'unsubscribe all' and the subject line " + \
-    "can be whatever you want. \n\n" + \
-    \
-    "###Getting Help\n" + \
-    "Remember that you can always send the bot a message with the subject line as " + \
-    "'Information' or 'Help' to get this message, and all of the parts you are " + \
-    "subscribed to. If you want more specific help, send a private message to /u/" + \
-    accountinfo.developerusername + " and I will try my absolute best to help you out.\n\n" + \
-    \
-    "###Feedback\n" + \
-    "I am always open to feedback, requests, or things of that nature. While I am " + \
-    "very much still in the process of learning, I will try my best to take your " + \
-    "feedback into consideration. Sending me feedback should use the subject line " + \
-    "'Feedback'."
