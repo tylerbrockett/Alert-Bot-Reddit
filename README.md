@@ -156,7 +156,7 @@ If you send a message that doesn't follow the above guidelines, you will get an 
 
 ## Developer Info
 Developer Name: Tyler Brockett 
-Bot Code: [Github Repository](https://github.com/tylerbrockett/Alert-Bot) 
+Bot Code: [Github Repository](https://github.com/tylerbrockett/Alert-Bot-Reddit) 
 Bot Subreddit: [/r/Alert_Bot](https://reddit.com/r/Alert_Bot) 
 Reddit: /u/tylerbrockett 
 Email: tylerbrockett@gmail.com 
