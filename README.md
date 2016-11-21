@@ -161,6 +161,6 @@ Bot Code: [Github Repository](https://github.com/tylerbrockett/Alert-Bot-Reddit)
 
 Bot Subreddit: [/r/Alert_Bot](https://reddit.com/r/Alert_Bot) 
 
-Reddit: /u/tylerbrockett 
+Reddit: [/u/tylerbrockett](https://reddit.com/u/tylerbrockett) 
 
 Email: tylerbrockett@gmail.com 
