@@ -4,7 +4,6 @@ This bot allows users to subscribe to certain posts based on the title, body, li
 This bot is excellent to keep track of subreddits that post links to sales or freebies!
 [Formerly known as /u/sales__bot for /r/buildapcsales.](https://www.reddit.com/r/buildapcsales/comments/3u2tg5/buildapcsales_bot/)
 
-
 ## How It Works
 
 ***NOTE:*** For each of these fields (subject and body) capitalization does *not* matter, it will yield the exact same results.
@@ -153,6 +152,12 @@ If you send a message that doesn't follow the above guidelines, you will get an 
 
 ## Edits
 **11/24/15 -** A ***HUGE*** thanks goes out to /u/he_must_workout for donating a Raspberry Pi (in the form of PayPal) for the bot! The Reddit community is truly amazing!
+
+## Donate
+If you really like the bot, please consider making a donation for my time! Thanks! 
+
+[![Donate](https://www.paypal.com/en_US/i/btn/btn_donate_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=KYGVTRSAMLKJ4)
+
 
 ## Developer Info
 Developer Name: Tyler Brockett 
