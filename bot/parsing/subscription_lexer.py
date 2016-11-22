@@ -70,11 +70,11 @@ class SubscriptionLexer:
             return TokenType.BODY
         elif token.lower() in ['-redditor', '-redditors', '-user', '-users']:
             return TokenType.REDDITORS
-        elif token.lower() in ['-ignore-url', '-ignore-site', '-ignore-sites', '-ignore-body', '-ignore-content', '-ignore-selftext', '-ignore-link']:
-            return TokenType.IGNORE_TITLE
-        elif token.lower() in ['-ignore-redditor', '-ignore-redditors', '-user', '-users']:
-            return TokenType.IGNORE_BODY
         elif token.lower() in ['-ignore-title', '-ignore-item', '-ignore-items']:
+            return TokenType.IGNORE_TITLE
+        elif token.lower() in ['-ignore-url', '-ignore-site', '-ignore-sites', '-ignore-body', '-ignore-content', '-ignore-selftext', '-ignore-link']:
+            return TokenType.IGNORE_BODY
+        elif token.lower() in ['-ignore-redditor', '-ignore-redditors', '-user', '-users']:
             return TokenType.IGNORE_REDDITORS
         elif token.lower() in ['-subreddit', '-subreddits']:
             return TokenType.SUBREDDITS

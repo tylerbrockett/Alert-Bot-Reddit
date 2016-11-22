@@ -167,8 +167,7 @@ def default(username, subject, body):
 
 
 def match(subscription, submission):
-    Logger.log(
-        Color.MAGENTA,
+    print(
         "-------------------------------\n" +
         "        SUBMISSION MATCH\n" +
         "username:   " + subscription.username + "\n" +
@@ -176,6 +175,7 @@ def match(subscription, submission):
         "item:       " + subscription.to_string() + "\n" +
         "title:      " + submission.title + "\n" +
         "Body:       " + submission.selftext + "\n" +
+        "URL:        " + submission.url + "\n" +
         "reddit url: " + submission.permalink + "\n" +
         '-------------------------------\n\n')
 
