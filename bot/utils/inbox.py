@@ -36,7 +36,7 @@ def compose_subscribe_message(username, new_sub, subs, subreddit_not_specified):
     result = compose_greeting(username) + \
              "Thanks for your subscription. " + \
              "You will continue to receive updates for posts that match your new subscription. " + \
-             "To unsubscribe, send me a message with the body 'unsubscribe {subscription#}'.\t \nAlternatively, " + \
+             "To unsubscribe, send me a message with the body 'unsubscribe #' where '#' is the actual subscription number.\t \nAlternatively, " + \
              "you can reply to this message or any replies from the bot in regards to this subscription and reply " + \
              "with 'unsubscribe' as the body.\t \n" + \
              ("\t \n**Note:** If no subreddit is specified, /r/buildapcsales will be used by default\t \n" if subreddit_not_specified else "") + \

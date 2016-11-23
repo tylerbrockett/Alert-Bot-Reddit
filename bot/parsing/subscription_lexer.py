@@ -1,4 +1,5 @@
 from parsing.token_type import TokenType
+import traceback
 
 
 class SubscriptionLexer:
@@ -151,6 +152,7 @@ class SubscriptionLexer:
                 tokens.append(token)
             return tokens
         except:
+            print(traceback.format_exc())
             raise SubscriptionLexerException("Exception occurred")
 
 

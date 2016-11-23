@@ -113,6 +113,7 @@ class MessageParser:
             self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_EDIT
             # TODO Add edit stuff here
         else:
+            print(traceback.format_exc())
             raise MessageParserException(MessageParserException.MALFORMED_REQUEST)
 
 
