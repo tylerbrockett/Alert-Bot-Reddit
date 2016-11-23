@@ -43,7 +43,7 @@ REMOVE_SUBSCRIPTION_BY_MESSAGE_ID = "DELETE FROM " + TABLE_SUBSCRIPTIONS + \
 
 GET_SUBSCRIPTIONS_BY_USERNAME = "SELECT * " + \
                                 "FROM " + TABLE_SUBSCRIPTIONS + " " + \
-                                "WHERE " + USERNAME + " = ? " + \
+                                "WHERE " + USERNAME + " = ? COLLATE NOCASE " + \
                                 "ORDER BY " + TIMESTAMP + " ASC"
 
 GET_SUBSCRIPTION = 'SELECT * FROM ' + TABLE_SUBSCRIPTIONS + ' ' + \

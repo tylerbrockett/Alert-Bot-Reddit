@@ -40,7 +40,9 @@ class AlertBot:
                 if self.run:
                     InboxHandler.read_inbox(self.database, self.reddit)
                     subscriptions = self.database.get_subscriptions()
+                    print(str(len(subscriptions)) + ' Subs')
                     matches = MatchFinder.find_matches(subscriptions, self.reddit, self.database)
+                    print(str(len(matches)) + ' Matches')
                     MatchHandler.send_messages(self.reddit, self.database, matches)
                     self.database.purge_old_matches()
                     Logger.log(Color.YELLOW, times.get_time_passed(self.start_time))

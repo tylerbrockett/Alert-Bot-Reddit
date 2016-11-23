@@ -81,14 +81,18 @@ class MatchFinder:
         for subscription in subscriptions:
             subreds = subscription.data[Subscription.SUBREDDITS]
             for subreddit in subreds:
-                # if subreddit not in subreddits.keys():
-                #     submissions = reddit.get_submissions(subreddit)
-                #     subreddits[subreddit.lower()] = submissions
-                # else:
-                #     print('SUBMISSIONS ' + str(subreddits[subreddit.lower()]))
-                # submissions = subreddits[subreddit.lower()]
-                submissions = reddit.get_submissions(subreddit)
+                if subreddit.lower() not in [k.lower() for k in subreddits.keys()]:
+                    print(subreddit.lower())
+                    submissions = reddit.get_submissions(subreddit.lower())
+                    temp = []
+                    for sub in submissions:
+                        temp.append(sub)
+                    subreddits[subreddit.lower()] = temp
+                submissions = subreddits[subreddit.lower()]
+                # submissions = reddit.get_submissions(subreddit)
+                num = 0
                 for submission in submissions:
+                    num += 1
                     is_match, mismatched_keys = MatchFinder.is_match(subscription, submission)
                     if is_match:
                         already_exists = database.check_if_match_exists(subscription.username,

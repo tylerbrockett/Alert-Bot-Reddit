@@ -48,10 +48,10 @@ class Subscription:
             if data:
                 i = 1
                 for term_set in data:
-                    result += 'Item ' + str(i) + '|' + ', '.join(term_set) + '\n'
+                    result += 'Title Item ' + str(i) + '|' + ', '.join(term_set) + '\n'
                     i += 1
             else:
-                result = 'Items|* (All)' + '\n'
+                result = 'Title Items|* (All)' + '\n'
         elif key == Subscription.BODY:
             if data:
                 i = 1
@@ -59,7 +59,7 @@ class Subscription:
                     result += 'Body Item ' + str(i) + '|' + ', '.join(term_set) + '\n'
                     i += 1
             else:
-                result = 'Body|Not specified' + '\n'
+                result = 'Body Items|Not specified' + '\n'
         elif key == Subscription.SUBREDDITS:
             if data:
                 result = ", ".join(['/r/' + str(r) for r in data])
@@ -104,7 +104,7 @@ class Subscription:
         return False
 
     def to_string(self):
-        return json.dumps(self.data, 2)
+        return json.dumps(self.data, sort_keys=True)
 
     def check_against_existing(self, existing_subs):
         duplicate_subs = []

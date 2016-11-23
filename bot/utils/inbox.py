@@ -164,6 +164,20 @@ def compose_invalid_subreddit_message(username, invalid_subreddits, message):
         compose_salutation()
     return result
 
+'''
+def compose_match_message(sub, submission, subs):
+    result = compose_greeting(sub.username) + \
+        "**Post Title:**\t \n" + \
+        "[" + submission.title + "](" + submission.permalink + ")\t \n\t \n" + \
+        (("**Body Text:**\t \n" + submission.selftext[:500] + (submission.selftext[500:] and '...')) if submission.is_self
+         else ("**Post Content Link:**\t \n[Content Link](" + submission.url + ")")) + \
+        "\t \n\t \n" + \
+        sub.to_table('Matched Subscription') + "\t \n\t \n" + \
+        'Reply to the bot with "Subs" or "Subscriptions" to view your subscriptions' + \
+        compose_salutation()
+    return result
+'''
+
 
 def compose_match_message(sub, submission, subs):
     result = compose_greeting(sub.username) + \

@@ -70,18 +70,21 @@ class SubscriptionParser:
             if len(term_list) == 1 and term_list[0] == '*':
                 self.data[Subscription.TITLE] = []
                 return
+        if not self.data[Subscription.SUBREDDITS]:
+            self.data[Subscription.SUBREDDITS] = ['buildapcsales']
 
     def parse_subscription(self):
         token, ttype = self.get_token()
         if ttype is TokenType.TOKEN:
             self.unget_token()
             self.parse_title_list()
+            self.parse_statement_list()
         elif ttype in SubscriptionParser.statement_token_types:
             self.unget_token()
             self.parse_statement_list()
-        elif ttype is TokenType.EOF:
-            return
-        self.parse_subscription()
+        token, ttype = self.get_token()
+        if ttype != TokenType.EOF:
+            raise SubscriptionParserException('Expecting EOF')
 
     def parse_statement_list(self):
         token, ttype = self.get_token()
