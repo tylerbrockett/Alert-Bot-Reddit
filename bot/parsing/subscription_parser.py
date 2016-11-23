@@ -78,7 +78,11 @@ class SubscriptionParser:
         if ttype is TokenType.TOKEN:
             self.unget_token()
             self.parse_title_list()
-            self.parse_statement_list()
+            t, tt = self.get_token()
+            if tt != TokenType.EOF:
+                self.parse_statement_list()
+            else:
+                self.unget_token()
         elif ttype in SubscriptionParser.statement_token_types:
             self.unget_token()
             self.parse_statement_list()
