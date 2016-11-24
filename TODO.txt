@@ -1,5 +1,0 @@
-1. Remove the line "Hi Username, "
-2. Move the line "We have found a match for your subscription to X" under the title of the sale.
-
-3. Make bot recognize "site: amazon; item: gpu"
-4. 
