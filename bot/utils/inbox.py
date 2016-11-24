@@ -164,7 +164,7 @@ def compose_invalid_subreddit_message(username, invalid_subreddits, message):
         compose_salutation()
     return result
 
-'''
+
 def compose_match_message(sub, submission, subs):
     result = compose_greeting(sub.username) + \
         "**Post Title:**\t \n" + \
@@ -176,9 +176,9 @@ def compose_match_message(sub, submission, subs):
         'Reply to the bot with "Subs" or "Subscriptions" to view your subscriptions' + \
         compose_salutation()
     return result
+
+
 '''
-
-
 def compose_match_message(sub, submission, subs):
     result = compose_greeting(sub.username) + \
         "**Post Title:**\t \n" + \
@@ -190,6 +190,7 @@ def compose_match_message(sub, submission, subs):
         format_subscription_list(subs, 'Your Subscriptions') + \
         compose_salutation()
     return result
+'''
 
 
 def compose_too_generic_message(username):
