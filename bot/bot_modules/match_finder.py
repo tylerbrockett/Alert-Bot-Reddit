@@ -57,7 +57,8 @@ class MatchFinder:
             elif key == Subscription.IGNORE_BODY:
                 ignore_body_match = True
                 for item in subscription.data[key]:
-                    if item.lower() in submission.selftext.lower():
+                    body_content = submission.selftext.lower() if submission.is_self else submission.url.lower()
+                    if item.lower() in body_content:
                         ignore_body_match = False
                         mismatched_keys.append(key)
                 result = result and ignore_body_match
