@@ -30,7 +30,8 @@ class InboxHandler:
             database.count_unique_subscriptions(),
             database.count_all_subscriptions(),
             len(database.get_unique_subreddits()),
-            database.count_total_matches())
+            database.count_total_matches(),
+            database.get_unique_subreddits())
         message.reply(formatted_message)
         message.mark_as_read()
 

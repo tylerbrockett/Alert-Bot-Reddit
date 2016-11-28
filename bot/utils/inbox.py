@@ -178,21 +178,6 @@ def compose_match_message(sub, submission, subs):
     return result
 
 
-'''
-def compose_match_message(sub, submission, subs):
-    result = compose_greeting(sub.username) + \
-        "**Post Title:**\t \n" + \
-        "[" + submission.title + "](" + submission.permalink + ")\t \n\t \n" + \
-        (("**Body Text:**\t \n" + submission.selftext[:500] + (submission.selftext[500:] and '...')) if submission.is_self
-         else ("**Post Content Link:**\t \n[Content Link](" + submission.url + ")")) + \
-        "\t \n\t \n" + \
-        sub.to_table('Matched Subscription') + "\t \n\t \n" + \
-        format_subscription_list(subs, 'Your Subscriptions') + \
-        compose_salutation()
-    return result
-'''
-
-
 def compose_too_generic_message(username):
     result = compose_greeting(username) + \
         "Unfortunately, your subscription request is too generic. Allowing such a subscription would probably hog " + \
@@ -201,17 +186,34 @@ def compose_too_generic_message(username):
     return result
 
 
-def compose_statistics(username, current_users, all_users, unique_subs, all_subs, unique_subreddits, all_matches):
+def format_subreddits(subreddits):
+    result = '###Subreddits\n'
+    if len(subreddits) == 0:
+        result += 'No Results'
+        return result
+    result += \
+        '\#|Subreddit|# of Subscriptions\n' + \
+        ':--|:--:|:--\n'
+    i = 0
+    for sub in subreddits:
+        i += 1
+        result += \
+            str(i) + '|' + '/r/' + sub[0] + '|' + str(sub[1]) + '\n'
+    return result
+
+
+def compose_statistics(username, current_users, all_users, unique_subs, all_subs, unique_subreddits, all_matches, subreddits):
     result = compose_greeting(username) + \
         '###Statistics\n' + \
         'Statistic|Value\n' + \
-        '--:|:--:' + '\n' + \
+        ':--|:--:' + '\n' + \
         'Current Users Subscribed|' + str(current_users) + '\n' + \
         'Total Users|' + str(all_users) + '\n' + \
         'Unique Subscriptions|' + str(unique_subs) + '\n' + \
         'Active Subscriptions|' + str(all_subs) + '\n' + \
         'Unique Subreddits|' + str(unique_subreddits) + '\n' + \
         "Total Matches to Date|" + str(all_matches) + "\n\n\n" + \
+        format_subreddits(subreddits) + '\n\n\n' + \
         "Thank ***YOU*** for being a part of that!\n" + \
         compose_salutation()
     return result

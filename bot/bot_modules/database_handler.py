@@ -253,7 +253,7 @@ class DatabaseHandler:
                         dict[subreddit] = 1
         except:
             return {}
-        return sorted(dict.items(), key=lambda x: x[1])
+        return sorted(dict.items(), key=lambda x: x[1], reverse=True)
 
 
 class DatabaseHandlerException(Exception):
