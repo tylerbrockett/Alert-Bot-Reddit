@@ -4,15 +4,13 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   10/6/2016
-Version:            v0.1
+Date Last Edited:   11/28/2016
+Version:            v2.0
 ==========================================
 """
 
 from bot_modules.command_handler import CommandHandler
-from bot_modules.command_handler import CommandHandlerException
 from bot_modules.database_handler import DatabaseHandler
-from bot_modules.database_handler import DatabaseHandlerException
 from bot_modules.inbox_handler import InboxHandler
 from bot_modules.match_handler import MatchHandler
 from bot_modules.reddit_handler import RedditHandler
@@ -50,10 +48,6 @@ class AlertBot:
             except KeyboardInterrupt:
                 Logger.log(Color.RED, 'Keyboard Interrupt - Bot killed')
                 exit()
-            except CommandHandlerException as ex:
-                handle_crash(traceback.format_exc(), self.reddit, self.database, True)
-            except DatabaseHandlerException as ex:
-                handle_crash(traceback.format_exc(), self.reddit, self.database, True)
             except:
                 handle_crash(traceback.format_exc(), self.reddit, self.database, True)
 

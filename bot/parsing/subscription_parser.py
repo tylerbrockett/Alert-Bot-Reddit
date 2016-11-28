@@ -1,6 +1,17 @@
-from subscription_lexer import SubscriptionLexer
+"""
+==========================================
+Author:             Tyler Brockett
+Username:           /u/tylerbrockett
+Description:        Alert Bot (Formerly sales__bot)
+Date Created:       11/13/2015
+Date Last Edited:   11/28/2016
+Version:            v2.0
+==========================================
+"""
+
+from parsing.subscription_lexer import SubscriptionLexer
 from utils.subscription import Subscription
-from token_type import TokenType
+from parsing.token_type import TokenType
 import json
 
 

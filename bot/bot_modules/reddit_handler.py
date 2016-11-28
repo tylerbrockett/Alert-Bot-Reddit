@@ -1,6 +1,16 @@
+"""
+==========================================
+Author:             Tyler Brockett
+Username:           /u/tylerbrockett
+Description:        Alert Bot (Formerly sales__bot)
+Date Created:       11/13/2015
+Date Last Edited:   11/28/2016
+Version:            v2.0
+==========================================
+"""
+
 import praw
 import traceback
-
 from private import accountinfo
 
 
@@ -62,7 +72,7 @@ class RedditHandler:
         for subreddit in subreddits:
             try:
                 self.reddit.get_subreddit(subreddit, fetch=True).get_new(limit=1)
-            except:
+            except praw.errors.InvalidSubreddit:
                 invalid.append(subreddit)
         return invalid
 

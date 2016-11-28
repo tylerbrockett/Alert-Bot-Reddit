@@ -1,16 +1,17 @@
 """
 ==========================================
-Author:         Tyler Brockett
-Description:    Reddit Alerts Bot
-Date:           12/14/2015
+Author:             Tyler Brockett
+Username:           /u/tylerbrockett
+Description:        Alert Bot (Formerly sales__bot)
+Date Created:       11/13/2015
+Date Last Edited:   11/28/2016
+Version:            v2.0
 ==========================================
 """
 
-import os
 import sqlite3
 import time
 import traceback
-from sys import stdout
 import praw
 
 from utils import database

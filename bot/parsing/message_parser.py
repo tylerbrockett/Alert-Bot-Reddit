@@ -1,9 +1,19 @@
+"""
+==========================================
+Author:             Tyler Brockett
+Username:           /u/tylerbrockett
+Description:        Alert Bot (Formerly sales__bot)
+Date Created:       11/13/2015
+Date Last Edited:   11/28/2016
+Version:            v2.0
+==========================================
+"""
+
 import json
 
 from utils.inbox import format_subject
-from message_lexer import MessageLexer
+from parsing.message_lexer import MessageLexer
 from parsing.subscription_parser import SubscriptionParser
-# from parsing.edit_parser import EditParser
 from parsing.token_type import TokenType
 import traceback
 
