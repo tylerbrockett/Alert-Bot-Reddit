@@ -28,4 +28,4 @@ def handle_crash(stacktrace, reddit, database, message_dev):
                 reddit.send_message(accountinfo.bot_errors, accountinfo.username + " - Exception Handled", stacktrace)
             reset = True
         except:
-            Logger.log(Color.RED, 'Failed to restart bot. Trying again in 30 seconds.')
+            Logger.log('Failed to restart bot. Trying again in 30 seconds.', Color.RED)

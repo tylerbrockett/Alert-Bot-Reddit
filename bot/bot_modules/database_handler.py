@@ -26,7 +26,6 @@ class DatabaseHandler:
 
     def connect(self):
         try:
-            print('PATH: ' + DB_LOCATION)
             if not path.isfile(DB_LOCATION):
                 files.create_file(DB_LOCATION)
             connection = sqlite3.connect(DB_LOCATION)

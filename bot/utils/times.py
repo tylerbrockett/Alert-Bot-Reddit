@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   11/28/2016
+Date Last Edited:   12/2/2016
 Version:            v2.0
 ==========================================
 """
@@ -18,7 +18,7 @@ from utils.color import Color
 class TimeHelper:
     def __init__(self, quiet_start=0, quiet_end=0):
         if quiet_end < quiet_start:
-            Logger.log(Color.RED, 'Invalid Quiet Hours.')
+            Logger.log('Invalid Quiet Hours.', Color.RED)
             exit()
         self.quiet_start = quiet_start
         self.quiet_stop = quiet_end

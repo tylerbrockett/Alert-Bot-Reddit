@@ -44,22 +44,22 @@ class CommandHandler:
             for message in messages:
                 subject, body = inbox.format_subject(message.subject.lower()), message.body.lower()
                 if body in CommandHandler.run or subject in CommandHandler.run:
-                    Logger.log(Color.GREEN, '--------- Bot resumed by developer ---------')
+                    Logger.log('--------- Bot resumed by developer ---------', Color.GREEN)
                     message.reply('Bot will be resumed')
                     commands.append(CommandHandler.RUN)
                     message.mark_as_read()
                 elif body in CommandHandler.pause or subject in CommandHandler.pause:
-                    Logger.log(Color.YELLOW, '--------- Bot paused by developer ---------')
+                    Logger.log('--------- Bot paused by developer ---------', Color.YELLOW)
                     message.reply('Bot will be paused')
                     commands.append(CommandHandler.PAUSE)
                     message.mark_as_read()
                 elif body in CommandHandler.kill or subject in CommandHandler.kill:
-                    Logger.log(Color.RED, '--------- Bot killed by developer ---------')
+                    Logger.log('--------- Bot killed by developer ---------', Color.RED)
                     message.reply('Bot will be killed')
                     commands.append(CommandHandler.KILL)
                     message.mark_as_read()
                 elif body in CommandHandler.test or subject in CommandHandler.test:
-                    Logger.log(Color.GREEN, '--------- Bot is being tested ---------')
+                    Logger.log('--------- Bot is being tested ---------', Color.GREEN)
                     message.reply('Bot is being tested')
                     commands.append(CommandHandler.TEST)
                     message.mark_as_read()

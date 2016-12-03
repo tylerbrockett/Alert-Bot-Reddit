@@ -31,7 +31,7 @@ class AlertBot:
         self.reddit = RedditHandler()
 
     def start(self):
-        Logger.log(Color.GREEN, 'Starting bot...')
+        Logger.log('Starting bot...', Color.GREEN)
         while True:
             try:
                 self.check_for_commands()
