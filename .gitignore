@@ -2,8 +2,13 @@
 #    Stuff I Added
 #=========================
 
+# Hide changes to tracked/indexed file (http://stackoverflow.com/questions/3319479/git-can-i-commit-a-file-and-ignore-the-content-changes):
+# git update-index --assume-unchanged [<file> ...]
+# To undo and start tracking again:
+# git update-index --no-assume-unchanged [<file> ...]
+
 # Sensitive Info
-#/*/accounts/
+accounts/
 /bot/database/subscriptions.db
 
 /bot/data/database/subscriptions.db
