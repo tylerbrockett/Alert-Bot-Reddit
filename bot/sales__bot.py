@@ -90,7 +90,7 @@ def connect_to_reddit():
     user_agent = 'SALES__B0T - A Sales Notifier R0B0T'
     reddit = praw.Reddit(user_agent=user_agent)
     # TODO Use OAuth instead of this login method
-    reddit.login(accountinfo.username, accountinfo.password, disable_warning=True)
+    reddit.login(accountinfo.old_username, accountinfo.password, disable_warning=True)
 
 
 def sleep(seconds):
