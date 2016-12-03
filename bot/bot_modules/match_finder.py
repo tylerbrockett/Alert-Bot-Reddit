@@ -113,6 +113,7 @@ class MatchFinder:
 
     @staticmethod
     def find_matches(subscriptions, reddit, database):
+        Logger.log('Finding Matches...', Color.GREEN)
         subreddits = {}
         matches = []
         for subscription in subscriptions:

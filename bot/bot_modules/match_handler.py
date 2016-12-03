@@ -17,7 +17,7 @@ class MatchHandler:
 
     @staticmethod
     def send_messages(reddit, database, matches):
-        print('Handling matches...')
+        print('Handling matches...', Color.GREEN)
         for subscription, submission in matches:
             try:
                 subs = database.get_subscriptions_by_user(subscription.username)

@@ -18,6 +18,8 @@ from utils.subscription import Subscription
 from os import path
 from definitions import DB_LOCATION
 from utils import files
+from utils.logger import Logger
+from utils.color import Color
 
 
 class DatabaseHandler:
@@ -211,7 +213,7 @@ class DatabaseHandler:
             return True
 
     def purge_old_matches(self):
-        print('purging')
+        Logger.log('purging...', Color.GREEN)
         current_time = times.get_current_timestamp()
         quarter_of_year = 31557600 / 4
         marked_old_time = current_time - quarter_of_year

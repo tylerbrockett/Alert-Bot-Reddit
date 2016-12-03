@@ -84,6 +84,7 @@ class InboxHandler:
             return
         database.insert_subscription(str(message.author), str(message.id), new_sub.to_string(), times.get_current_timestamp())
         existing_subs.append(new_sub)
+        # TODO Remove subreddit not specified stuff, taken care of in SubscriptionParser.py
         subreddit_not_specified = len(new_sub.data[Subscription.SUBREDDITS]) == 0
         message.reply(inbox.compose_subscribe_message(str(message.author), new_sub, existing_subs, subreddit_not_specified))
         database.commit()
@@ -166,7 +167,7 @@ class InboxHandler:
     # TODO Add the ability to EDIT existing subscriptions
     @staticmethod
     def read_inbox(database, reddit):
-        Logger.log('Reading inbox...')
+        Logger.log('Reading inbox...', Color.GREEN)
         unread = []
         try:
             unread = reddit.get_unread()
@@ -196,7 +197,7 @@ class InboxHandler:
                     action = m.data[MessageParser.KEY_ACTION]
                     payload = m.get_payload()
 
-                    print(json.dumps(m.data, 2))
+                    Logger.log(json.dumps(m.data, 2), Color.MAGENTA)
 
                     if valid and action == MessageParser.ACTION_STATISTICS:
                         InboxHandler.handle_statistics_message(database, message)
