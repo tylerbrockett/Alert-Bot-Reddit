@@ -10,6 +10,8 @@ Version:            v2.0
 """
 
 from utils.subscription import Subscription
+from utils.logger import Logger
+from utils.color import Color
 
 
 class MatchFinder:
@@ -117,7 +119,7 @@ class MatchFinder:
             subreds = subscription.data[Subscription.SUBREDDITS]
             for subreddit in subreds:
                 if subreddit.lower() not in [k.lower() for k in subreddits.keys()]:
-                    print(subreddit.lower())
+                    Logger.log(subreddit.lower(), Color.CYAN)
                     submissions = reddit.get_submissions(subreddit.lower())
                     temp = []
                     for sub in submissions:
