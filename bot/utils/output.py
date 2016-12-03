@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   11/28/2016
+Date Last Edited:   12/2/2016
 Version:            v2.0
 ==========================================
 """
@@ -16,222 +16,244 @@ from utils.color import Color
 
 def subscribe_exception(username, item):
     Logger.log(
-        Color.RED,
         'subscribe exception caught\n' +
-        "username:   " + username + "\n" +
-        "item:       " + item + "\n" +
-        "stacktrace: " + "\n" +
-        traceback.format_exc() + "\n\n")
+        'username:   ' + username + '\n' +
+        'item:       ' + item + '\n' +
+        'stacktrace: ' + '\n' +
+        traceback.format_exc() + '\n\n',
+
+        Color.RED)
 
 
 def unsubscribe_all_exception(username):
     Logger.log(
-        Color.RED,
         'unsubscribe all exception caught\n' +
-        "username:   " + username + "\n" +
-        "stacktrace: " + "\n" +
-        traceback.format_exc() + "\n\n")
+        'username:   ' + username + '\n' +
+        'stacktrace: ' + '\n' +
+        traceback.format_exc() + '\n\n',
+
+        Color.RED)
 
 
 def unsubscribe_exception(username, item):
     Logger.log(
-        Color.RED,
         'unsubscribe exception caught\n' +
-        "username:   " + username + "\n" +
-        "item:       " + item + "\n" +
-        "stacktrace: " + "\n" +
-        traceback.format_exc() + "\n\n")
+        'username:   ' + username + '\n' +
+        'item:       ' + item + '\n' +
+        'stacktrace: ' + '\n' +
+        traceback.format_exc() + '\n\n',
+
+        Color.RED)
 
 
 def default_exception(username, subject, body):
     Logger.log(
-        Color.RED,
         'unsubscribe exception caught\n' +
-        "username:   " + username + "\n" +
-        "subject:    " + subject + "\n" +
-        "body:       " + body + "\n" +
-        "stacktrace: " + "\n" +
-        traceback.format_exc() + "\n\n")
+        'username:   ' + username + '\n' +
+        'subject:    ' + subject + '\n' +
+        'body:       ' + body + '\n' +
+        'stacktrace: ' + '\n' +
+        traceback.format_exc() + '\n\n',
+
+        Color.RED)
 
 
 def information_exception(username):
     Logger.log(
-        Color.RED,
         'information exception caught\n' +
-        "username:   " + username + "\n" +
-        "stacktrace: " + "\n" +
-        traceback.format_exc() + "\n\n")
+        'username:   ' + username + '\n' +
+        'stacktrace: ' + '\n' +
+        traceback.format_exc() + '\n\n',
+
+        Color.RED)
 
 
 def subscriptions_exception(username):
     Logger.log(
-        Color.RED,
         'subscriptions exception caught\n' +
-        "username:   " + username + "\n" +
-        "stacktrace: " + "\n" +
-        traceback.format_exc() + "\n\n")
+        'username:   ' + username + '\n' +
+        'stacktrace: ' + '\n' +
+        traceback.format_exc() + '\n\n',
+
+        Color.RED)
 
 
 def feedback_exception(username, user_feedback):
     Logger.log(
-        Color.RED,
         'feedback exception caught\n' +
-        "username:   " + username + "\n" +
-        "feedback:   " + "\n" + user_feedback + "\n" +
-        "stacktrace: " + "\n" +
-        traceback.format_exc() + "\n\n")
+        'username:   ' + username + '\n' +
+        'feedback:   ' + '\n' + user_feedback + '\n' +
+        'stacktrace: ' + '\n' +
+        traceback.format_exc() + '\n\n',
+
+        Color.RED)
 
 
 def match_exception(username, item, message_id, title, permalink, url):
     Logger.log(
-        Color.RED,
-        "match exception caught\n" +
-        "username:   " + username + "\n" +
-        "message id: " + message_id + "\n" +
-        "item:       " + item + "\n" +
-        "title:      " + title + "\n" +
-        "reddit url: " + permalink + "\n" +
-        "sale link:  " + url + "\n" +
-        "stacktrace:\n" + traceback.format_exc() + "\n\n")
+        'match exception caught\n' +
+        'username:   ' + username + '\n' +
+        'message id: ' + message_id + '\n' +
+        'item:       ' + item + '\n' +
+        'title:      ' + title + '\n' +
+        'reddit url: ' + permalink + '\n' +
+        'sale link:  ' + url + '\n' +
+        'stacktrace:\n' + traceback.format_exc() + '\n\n',
+
+        Color.RED)
 
 
 def get_submissions_exception():
     Logger.log(
-        Color.RED,
-        "get submissions exception caught\n" +
-        "stacktrace:\n" + traceback.format_exc() + "\n\n")
+        'get submissions exception caught\n' +
+        'stacktrace:\n' + traceback.format_exc() + '\n\n',
+
+        Color.RED)
 
 
 def read_inbox_exception():
     Logger.log(
-        Color.RED,
-        "read inbox exception caught\n" +
-        "stacktrace:\n" + traceback.format_exc() + "\n\n")
+        'read inbox exception caught\n' +
+        'stacktrace:\n' + traceback.format_exc() + '\n\n',
+
+        Color.RED)
 
 
 def subscribe(username, item):
     Logger.log(
-        Color.GREEN,
         '-------------------------------\n' +
         '           SUBSCRIBE\n' +
-        'username: ' + username + "\n" +
-        'item:     ' + item + "\n" +
-        '-------------------------------\n\n')
+        'username: ' + username + '\n' +
+        'item:     ' + item + '\n' +
+        '-------------------------------\n\n',
+
+        Color.GREEN)
 
 
 def unsubscribe_all(username):
     Logger.log(
-        Color.RED,
         '-------------------------------\n' +
         '         UNSUBSCRIBE ALL\n' +
-        'username: ' + username + "\n" +
-        '-------------------------------\n\n')
+        'username: ' + username + '\n' +
+        '-------------------------------\n\n',
+
+        Color.RED)
 
 
 def unsubscribe(username, item):
     Logger.log(
-        Color.RED,
         '-------------------------------\n' +
         '           UNSUBSCRIBE\n' +
-        'username: ' + username + "\n" +
+        'username: ' + username + '\n' +
         'item:     ' + item + '\n' +
-        '-------------------------------\n\n')
+        '-------------------------------\n\n',
+
+        Color.RED)
 
 
 def information(username):
     Logger.log(
-        Color.GREEN,
         '-------------------------------\n' +
         '         INFORMATION\n' +
-        'username: ' + username + "\n" +
-        '-------------------------------\n\n')
+        'username: ' + username + '\n' +
+        '-------------------------------\n\n',
+
+        Color.GREEN)
 
 
 def subscriptions(username):
     Logger.log(
-        Color.GREEN,
         '-------------------------------\n' +
         '         SUBSCRIPTIONS\n' +
-        'username: ' + username + "\n" +
-        '-------------------------------\n\n')
+        'username: ' + username + '\n' +
+        '-------------------------------\n\n',
+
+        Color.GREEN)
 
 
 def feedback(username, user_feedback):
     Logger.log(
-        Color.GREEN,
         '-------------------------------\n' +
         '            FEEDBACK\n' +
-        'username: ' + username + "\n" +
-        'feedback: ' + user_feedback + "\n" +
-        '-------------------------------\n\n')
+        'username: ' + username + '\n' +
+        'feedback: ' + user_feedback + '\n' +
+        '-------------------------------\n\n',
+
+        Color.GREEN)
 
 
 def default(username, subject, body):
     Logger.log(
-        Color.YELLOW,
         '-------------------------------\n' +
-        "             DEFAULT\n" +
-        "username: " + username + "\n" +
-        "subject:  " + subject + "\n" +
-        "body:     " + body + "\n" +
-        '-------------------------------\n\n')
+        '             DEFAULT\n' +
+        'username: ' + username + '\n' +
+        'subject:  ' + subject + '\n' +
+        'body:     ' + body + '\n' +
+        '-------------------------------\n\n',
+
+        Color.YELLOW)
 
 
 def match(subscription, submission):
-    print(
-        "-------------------------------\n" +
-        "        SUBMISSION MATCH\n" +
-        "username:   " + subscription.username + "\n" +
-        "message id: " + subscription.message_id + "\n" +
-        "item:       " + subscription.to_string() + "\n" +
-        "title:      " + submission.title + "\n" +
-        "Body:       " + submission.selftext + "\n" +
-        "URL:        " + submission.url + "\n" +
-        "reddit url: " + submission.permalink + "\n" +
-        '-------------------------------\n\n')
-
-
-def statistics(username, users, subscriptions, items, matches):
     Logger.log(
-        Color.GREEN,
-        "-------------------------------\n" +
-        "        STATISTICS\n" +
-        "username:      " + username + "\n" +
-        "user count:    " + str(users) + "\n" +
-        "subscriptions: " + str(subscriptions) + "\n" +
-        "unique items:  " + str(items) + "\n" +
-        "matches:       " + str(matches) + "\n" +
-        '-------------------------------\n\n')
+        '-------------------------------\n' +
+        '        SUBMISSION MATCH\n' +
+        'username:   ' + subscription.username + '\n' +
+        'message id: ' + subscription.message_id + '\n' +
+        'item:       ' + subscription.to_string() + '\n' +
+        'title:      ' + submission.title + '\n' +
+        'Body:       ' + submission.selftext + '\n' +
+        'URL:        ' + submission.url + '\n' +
+        'reddit url: ' + submission.permalink + '\n' +
+        '-------------------------------\n\n',
+
+        Color.MAGENTA)
+
+
+def statistics(username, users, subs, items, matches):
+    Logger.log(
+        '-------------------------------\n' +
+        '        STATISTICS\n' +
+        'username:      ' + username + '\n' +
+        'user count:    ' + str(users) + '\n' +
+        'subscriptions: ' + str(subs) + '\n' +
+        'unique items:  ' + str(items) + '\n' +
+        'matches:       ' + str(matches) + '\n' +
+        '-------------------------------\n\n',
+
+        Color.GREEN)
 
 
 def username_mention(username, body):
     Logger.log(
-        Color.GREEN,
-        "-------------------------------\n" +
-        "        USERNAME MENTION\n" +
-        "username: " + username + "\n" +
-        "body:     " + body + "\n" +
-        "-------------------------------\n\n")
+        '-------------------------------\n' +
+        '        USERNAME MENTION\n' +
+        'username: ' + username + '\n' +
+        'body:     ' + body + '\n' +
+        '-------------------------------\n\n',
+
+        Color.GREEN)
 
 
 def post_reply(username, body):
     Logger.log(
-        Color.GREEN,
-        "-------------------------------\n" +
-        "        POST REPLY\n" +
-        "username: " + username + "\n" +
-        "body:     " + body + "\n" +
-        "-------------------------------\n\n")
+        '-------------------------------\n' +
+        '        POST REPLY\n' +
+        'username: ' + username + '\n' +
+        'body:     ' + body + '\n' +
+        '-------------------------------\n\n',
+
+        Color.GREEN)
 
 
 def about_message():
     Logger.log(
-        Color.YELLOW,
-        "================================================================\n" +
-        "\t\tSALES__BOT - A Sales Notifier Bot\n" +
-        "================================================================\n\n")
+        '================================================================\n' +
+        '\t\tSALES__BOT - A Sales Notifier Bot\n' +
+        '================================================================\n\n',
+        Color.YELLOW)
     Logger.log(
-        Color.BLUE,
         '\n--------------------------------------------------\n' +
         '\t\twww.reddit.com/r/buildapcsales' + '\n' +
-        '--------------------------------------------------\n')
+        '--------------------------------------------------\n',
+        Color.BLUE)

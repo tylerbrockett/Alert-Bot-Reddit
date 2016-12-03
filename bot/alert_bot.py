@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   11/28/2016
+Date Last Edited:   12/2/2016
 Version:            v2.0
 ==========================================
 """
@@ -38,15 +38,15 @@ class AlertBot:
                 if self.run:
                     InboxHandler.read_inbox(self.database, self.reddit)
                     subscriptions = self.database.get_subscriptions()
-                    print(str(len(subscriptions)) + ' Subs')
+                    Logger.log(str(len(subscriptions)) + ' Subs')
                     matches = MatchFinder.find_matches(subscriptions, self.reddit, self.database)
-                    print(str(len(matches)) + ' Matches')
+                    Logger.log(str(len(matches)) + ' Matches')
                     MatchHandler.send_messages(self.reddit, self.database, matches)
                     self.database.purge_old_matches()
-                    Logger.log(Color.YELLOW, times.get_time_passed(self.start_time))
+                    Logger.log(times.get_time_passed(self.start_time), Color.YELLOW)
                 SleepHandler.sleep(20)
             except KeyboardInterrupt:
-                Logger.log(Color.RED, 'Keyboard Interrupt - Bot killed')
+                Logger.log('Keyboard Interrupt - Bot killed', Color.RED)
                 exit()
             except:
                 handle_crash(traceback.format_exc(), self.reddit, self.database, True)

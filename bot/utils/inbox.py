@@ -4,12 +4,12 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   11/28/2016
+Date Last Edited:   12/2/2016
 Version:            v2.0
 ==========================================
 """
 
-from private import accountinfo
+from accounts import accountinfo
 
 
 def format_subject(s):
@@ -32,26 +32,26 @@ def format_subscription_list(subs, title):
 
 
 def compose_greeting(username):
-    return "Hi " + username + ",\n\n"
+    return 'Hi ' + username + ',\n\n'
 
 
 def compose_salutation():
-    result = '\n\t \n\t \n-/u/' + accountinfo.username + "\n\t \n\t \n" + \
-             "/r/Alert_Bot | " + \
-             "/u/" + accountinfo.developerusername + " | " + \
-             "[Bot Code](https://github.com/tylerbrockett/Alert-Bot-Reddit)\n"
+    result = '\n\t \n\t \n-/u/' + accountinfo.username + '\n\t \n\t \n' + \
+             '/r/Alert_Bot | ' + \
+             '/u/' + accountinfo.developerusername + ' | ' + \
+             '[Bot Code](https://github.com/tylerbrockett/Alert-Bot-Reddit)\n'
     return result
 
 
 def compose_subscribe_message(username, new_sub, subs, subreddit_not_specified):
     result = compose_greeting(username) + \
-             "Thanks for your subscription. " + \
-             "You will continue to receive updates for posts that match your new subscription. " + \
-             "To unsubscribe, send me a message with the body 'unsubscribe #' where '#' is the actual subscription number.\t \nAlternatively, " + \
-             "you can reply to this message or any replies from the bot in regards to this subscription and reply " + \
-             "with 'unsubscribe' as the body.\t \n" + \
-             ("\t \n**Note:** If no subreddit is specified, /r/buildapcsales will be used by default\t \n" if subreddit_not_specified else "") + \
-             new_sub.to_table('New Subscription') + "\t \n\t \n" + \
+             'Thanks for your subscription. ' + \
+             'You will continue to receive updates for posts that match your new subscription. ' + \
+             'To unsubscribe, send me a message with the body "unsubscribe #" where "#" is the actual subscription number.\t \nAlternatively, ' + \
+             'you can reply to this message or any replies from the bot in regards to this subscription and reply ' + \
+             'with "unsubscribe" as the body.\t \n' + \
+             ('\t \n**Note:** If no subreddit is specified, /r/buildapcsales will be used by default\t \n' if subreddit_not_specified else '') + \
+             new_sub.to_table('New Subscription') + '\t \n\t \n' + \
              format_subscription_list(subs, 'Your Subscriptions') + \
              compose_salutation()
     return result
@@ -77,9 +77,9 @@ def compose_duplicate_subscription_message(username, existing_sub, new_sub):
 
 def compose_help_message(username, subs):
     result = compose_greeting(username) + \
-             "Please visit the bot's [Github repository](https://github.com/tylerbrockett/Alert-Bot-Reddit) for " + \
-             "detailed information on how the bot works. If you still have questions, please visit /r/Alert_Bot " + \
-             "or message /u/tylerbrockett. Thanks!\t \n\t \n" + \
+             'Please visit the bot\'s [Github repository](https://github.com/tylerbrockett/Alert-Bot-Reddit) for ' + \
+             'detailed information on how the bot works. If you still have questions, please visit /r/Alert_Bot ' + \
+             'or message /u/tylerbrockett. Thanks!\t \n\t \n' + \
              format_subscription_list(subs, 'Your Subscriptions') + \
              compose_salutation()
     return result
@@ -87,10 +87,10 @@ def compose_help_message(username, subs):
 
 def compose_unsubscribe_invalid_sub_message(username, subs):
     result = compose_greeting(username) + \
-        "I'm sorry, but it looks like the subscription you're trying to unsubscribe from is invalid. Please " + \
-        "make sure you are replying to a message that was in regards to a valid and active subscription. If you " + \
-        "think you are receiving this message in error, please feel free to message /u/" + \
-        accountinfo.developerusername + " to try to get this sorted out.\n\n" + \
+        'I\'m sorry, but it looks like the subscription you\'re trying to unsubscribe from is invalid. Please ' + \
+        'make sure you are replying to a message that was in regards to a valid and active subscription. If you ' + \
+        'think you are receiving this message in error, please feel free to message /u/' + \
+        accountinfo.developerusername + ' to try to get this sorted out.\n\n' + \
         format_subscription_list(subs, 'Your Subscriptions') + \
         compose_salutation()
     return result
@@ -98,7 +98,7 @@ def compose_unsubscribe_invalid_sub_message(username, subs):
 
 def compose_unsubscribe_message(username, removed_subs, subs):
     result = compose_greeting(username) + \
-             "You have unsubscribed from the following item. Thanks for using the bot!\n\n" + \
+             'You have unsubscribed from the following item. Thanks for using the bot!\n\n' + \
              removed_subs[0].to_table('Unsubscribed From') + \
              '\n' + \
              format_subscription_list(subs, 'Your Subscriptions') + \
@@ -108,15 +108,15 @@ def compose_unsubscribe_message(username, removed_subs, subs):
 
 def compose_unsubscribe_all_message(username):
     result = compose_greeting(username) + \
-             "You have successfully unsubscribed from all subscriptions." + \
+             'You have successfully unsubscribed from all subscriptions.' + \
              compose_salutation()
     return result
 
 
 def compose_unsubscribe_from_num_message(username, removed_sub, subs):
     result = compose_greeting(username) + \
-        "You have successfully unsubscribed from the following item.\t \n\t \n" + \
-        removed_sub.to_table('Unsubscribed From') + "\t \n\t \n" + \
+        'You have successfully unsubscribed from the following item.\t \n\t \n' + \
+        removed_sub.to_table('Unsubscribed From') + '\t \n\t \n' + \
         format_subscription_list(subs, 'Your Subscriptions') + \
         compose_salutation()
     return result
@@ -124,31 +124,31 @@ def compose_unsubscribe_from_num_message(username, removed_sub, subs):
 
 def compose_edit_message(username):
     result = compose_greeting(username) + \
-        "Unfortunately, the bot has only partially implemented this feature, so it is not available quite " + \
-        "yet. Please try again at a later date. Sorry for the inconvenience! " + \
+        'Unfortunately, the bot has only partially implemented this feature, so it is not available quite ' + \
+        'yet. Please try again at a later date. Sorry for the inconvenience! ' + \
         compose_salutation()
     return result
 
 
 def compose_feedback_message(username):
     result = compose_greeting(username) + \
-             "Thank you very much for your feedback! \t \n" + \
-             "I am open to whatever requests the community makes. If your message is urgent, please feel free to " + \
-             "PM me at /u/" + accountinfo.developerusername + ". Thanks again!" + \
+             'Thank you very much for your feedback! \t \n' + \
+             'I am open to whatever requests the community makes. If your message is urgent, please feel free to ' + \
+             'PM me at /u/' + accountinfo.developerusername + '. Thanks again!' + \
              compose_salutation()
     return result
 
 
 def compose_reject_message(username, subject, body):
     result = compose_greeting(username) + \
-             "**There was an error processing your request.** Please review your message and " + \
-             "make sure it follows the guidelines that have been set. Please private message the bot " + \
-             "with the subject 'Information' to get detailed information on how the bot works, " + \
-             "or message /u/" + accountinfo.developerusername + " if you want specialized help or have any " + \
-             "questions for me. Thank you for your patience! \n\t \n\t \n" + \
-             "**Your request:** \t \n" + \
-             "Subject:\t" + subject + "\t \n" + \
-             "Body:\t\t" + body + \
+             '**There was an error processing your request.** Please review your message and ' + \
+             'make sure it follows the guidelines that have been set. Please accounts message the bot ' + \
+             'with the subject "Information" to get detailed information on how the bot works, ' + \
+             'or message /u/' + accountinfo.developerusername + ' if you want specialized help or have any ' + \
+             'questions for me. Thank you for your patience! \n\t \n\t \n' + \
+             '**Your request:** \t \n' + \
+             'Subject:\t' + subject + '\t \n' + \
+             'Body:\t\t' + body + \
              compose_salutation()
     return result
 
@@ -178,21 +178,21 @@ def compose_invalid_subreddit_message(username, invalid_subreddits, message):
 
 def compose_match_message(sub, submission, subs):
     result = compose_greeting(sub.username) + \
-        "**Post Title:**\t \n" + \
-        "[" + submission.title + "](" + submission.permalink + ")\t \n\t \n" + \
-        (("**Body Text:**\t \n" + submission.selftext[:500] + (submission.selftext[500:] and '...')) if submission.is_self
-         else ("**Post Content Link:**\t \n[Content Link](" + submission.url + ")")) + \
-        "\t \n\t \n" + \
-        sub.to_table('Matched Subscription') + "\t \n\t \n" + \
-        'Reply to the bot with "Subs" or "Subscriptions" to view your subscriptions' + \
+        '**Post Title:**\t \n' + \
+        '[' + submission.title + '](' + submission.permalink + ')\t \n\t \n' + \
+        (('**Body Text:**\t \n' + submission.selftext[:500] + (submission.selftext[500:] and '...')) if submission.is_self
+         else ('**Post Content Link:**\t \n[Content Link](' + submission.url + ')')) + \
+        '\t \n\t \n' + \
+        sub.to_table('Matched Subscription') + '\t \n\t \n' + \
+        'Reply to the bot with "Subs" or "Subscriptions" to view your subscriptions.' + \
         compose_salutation()
     return result
 
 
 def compose_too_generic_message(username):
     result = compose_greeting(username) + \
-        "Unfortunately, your subscription request is too generic. Allowing such a subscription would probably hog " + \
-        "the bot's resources. Try constraining the subscription a bit. Sorry, and thanks for your understanding." + \
+        'Unfortunately, your subscription request is too generic. Allowing such a subscription would probably hog ' + \
+        'the bot\'s resources. Try constraining the subscription a bit. Sorry, and thanks for your understanding.' + \
         compose_salutation()
     return result
 
@@ -223,17 +223,17 @@ def compose_statistics(username, current_users, all_users, unique_subs, all_subs
         'Unique Subscriptions|' + str(unique_subs) + '\n' + \
         'Active Subscriptions|' + str(all_subs) + '\n' + \
         'Unique Subreddits|' + str(unique_subreddits) + '\n' + \
-        "Total Matches to Date|" + str(all_matches) + "\n\n\n" + \
+        'Total Matches to Date|' + str(all_matches) + '\n\n\n' + \
         format_subreddits(subreddits) + '\n\n\n' + \
-        "Thank ***YOU*** for being a part of that!\n" + \
+        'Thank ***YOU*** for being a part of that!\n' + \
         compose_salutation()
     return result
 
 
 def compose_feedback_forward(username, body):
     result = compose_greeting(accountinfo.developerusername) + \
-             "You have received feedback from /u/" + username + ". The feedback is quoted below:\n\n'" + \
-             body + "'" + compose_salutation()
+             'You have received feedback from /u/' + username + '. The feedback is quoted below:\n\n"' + \
+             body + '"' + compose_salutation()
     return result
 
 

@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   11/28/2016
+Date Last Edited:   12/2/2016
 Version:            v2.0
 ==========================================
 """
@@ -15,75 +15,98 @@ from utils.subscription import Subscription
 class MatchFinder:
 
     @staticmethod
+    def is_title_match(subscription, submission):
+        title_match = False
+        # Empty title_list is automatically 'True' because it has no effect on result
+        if len(subscription.data[Subscription.TITLE]) == 0:
+            title_match = True
+        for title_list in subscription.data[Subscription.TITLE]:
+            title_list_match = True
+            for item in title_list:
+                if item.lower() not in submission.title.lower():
+                    title_list_match = False
+            title_match = title_match or title_list_match
+        return title_match
+
+    @staticmethod
+    def is_body_match(subscription, submission):
+        body_match = False
+        # Empty body_list is automatically 'True' because it has no effect on result
+        if len(subscription.data[Subscription.BODY]) == 0:
+            body_match = True
+        for body_list in subscription.data[Subscription.BODY]:
+            body_list_match = True
+            for item in body_list:
+                body_content = submission.selftext.lower() if submission.is_self else submission.url.lower()
+                if item.lower() not in body_content:
+                    body_list_match = False
+            body_match = body_match or body_list_match
+        return body_match
+
+    @staticmethod
+    def is_redditor_match(subscription, submission):
+        redditor_match = False
+        if len(subscription.data[Subscription.REDDITORS]) == 0:
+            redditor_match = True
+        for redditor in subscription.data[Subscription.REDDITORS]:
+            if redditor.lower() == str(submission.author).lower():
+                redditor_match = True
+        return redditor_match
+
+    @staticmethod
+    def is_ignore_title_match(subscription, submission):
+        ignore_title_match = True
+        for item in subscription.data[Subscription.IGNORE_TITLE]:
+            if item.lower() in submission.title.lower():
+                ignore_title_match = False
+        return ignore_title_match
+
+    @staticmethod
+    def is_ignore_body_match(subscription, submission):
+        ignore_body_match = True
+        for item in subscription.data[Subscription.IGNORE_BODY]:
+            body_content = submission.selftext.lower() if submission.is_self else submission.url.lower()
+            if item.lower() in body_content:
+                ignore_body_match = False
+        return ignore_body_match
+
+    @staticmethod
+    def is_ignore_redditors_match(subscription, submission):
+        ignore_redditors_match = True
+        for redditor in subscription.data[Subscription.IGNORE_REDDITORS]:
+            if redditor.lower() == str(submission.author).lower():
+                ignore_redditors_match = False
+        return ignore_redditors_match
+
+    @staticmethod
+    def is_nsfw_match(subscription, submission):
+        if submission.over_18 and not subscription.data[Subscription.NSFW]:
+            return False
+        return True
+
+    @staticmethod
     def is_match(subscription, submission):
         result = True
         mismatched_keys = []
         for key in subscription.data.keys():
-            if key == Subscription.TITLE:
-                title_match = False
-                # Empty title_list is automatically 'True' because it has no effect on result
-                if len(subscription.data[key]) == 0:
-                    title_match = True
-                for title_list in subscription.data[key]:
-                    title_list_match = True
-                    for item in title_list:
-                        if item.lower() not in submission.title.lower():
-                            title_list_match = False
-                    title_match = title_match or title_list_match
-                if not title_match:
-                    mismatched_keys.append(key)
-                result = result and title_match
-            if key == Subscription.BODY:
-                body_match = False
-                # Empty body_list is automatically 'True' because it has no effect on result
-                if len(subscription.data[key]) == 0:
-                    body_match = True
-                for body_list in subscription.data[key]:
-                    body_list_match = True
-                    for item in body_list:
-                        body_content = submission.selftext.lower() if submission.is_self else submission.url.lower()
-                        if item.lower() not in body_content:
-                            body_list_match = False
-                    body_match = body_match or body_list_match
-                if not body_match:
-                    mismatched_keys.append(key)
-                result = result and body_match
-            elif key == Subscription.REDDITORS:
-                redditor_match = False
-                if len(subscription.data[key]) == 0:
-                    redditor_match = True
-                for redditor in subscription.data[key]:
-                    if redditor.lower() == str(submission.author).lower():
-                        redditor_match = True
-                if not redditor_match:
-                    mismatched_keys.append(key)
-                result = result and redditor_match
-            elif key == Subscription.IGNORE_TITLE:
-                ignore_title_match = True
-                for item in subscription.data[key]:
-                    if item.lower() in submission.title.lower():
-                        ignore_title_match = False
-                        mismatched_keys.append(key)
-                result = result and ignore_title_match
-            elif key == Subscription.IGNORE_BODY:
-                ignore_body_match = True
-                for item in subscription.data[key]:
-                    body_content = submission.selftext.lower() if submission.is_self else submission.url.lower()
-                    if item.lower() in body_content:
-                        ignore_body_match = False
-                        mismatched_keys.append(key)
-                result = result and ignore_body_match
-            elif key == Subscription.IGNORE_REDDITORS:
-                ignore_redditors_match = True
-                for redditor in subscription.data[key]:
-                    if redditor.lower() == str(submission.author).lower():
-                        ignore_redditors_match = False
-                        mismatched_keys.append(key)
-                result = result and ignore_redditors_match
-            elif key == Subscription.NSFW:
-                if submission.over_18 and not subscription.data[key]:
-                    result = result and False
-                    mismatched_keys.append(key)
+            key_match = True
+            if Subscription.TITLE == key:
+                key_match = MatchFinder.is_title_match(subscription, submission)
+            elif Subscription.BODY == key:
+                key_match = MatchFinder.is_body_match(subscription, submission)
+            elif Subscription.REDDITORS == key:
+                key_match = MatchFinder.is_redditor_match(subscription, submission)
+            elif Subscription.IGNORE_TITLE == key:
+                key_match = MatchFinder.is_ignore_title_match(subscription, submission)
+            elif Subscription.IGNORE_BODY == key:
+                key_match = MatchFinder.is_ignore_body_match(subscription, submission)
+            elif Subscription.IGNORE_REDDITORS == key:
+                key_match = MatchFinder.is_ignore_redditors_match(subscription, submission)
+            elif Subscription.NSFW == key:
+                key_match = MatchFinder.is_nsfw_match(subscription, submission)
+            if not key_match:
+                mismatched_keys.append(key)
+            result = result and key_match
         return result, sorted(set(mismatched_keys))
 
     @staticmethod

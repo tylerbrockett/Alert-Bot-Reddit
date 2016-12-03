@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   11/28/2016
+Date Last Edited:   12/2/2016
 Version:            v2.0
 ==========================================
 """
@@ -34,5 +34,5 @@ class MatchHandler:
 class MatchHandlerException(Exception):
 
     def __init__(self, error_args):
-        Exception.__init__(self, "MatchHandlerException: {0}".format(error_args))
+        Exception.__init__(self, 'MatchHandlerException: {0}'.format(error_args))
         self.errorArgs = error_args

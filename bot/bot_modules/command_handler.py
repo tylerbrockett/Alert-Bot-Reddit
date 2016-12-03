@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   11/28/2016
+Date Last Edited:   12/2/2016
 Version:            v2.0
 ==========================================
 """
@@ -12,7 +12,7 @@ Version:            v2.0
 from utils import inbox
 from utils.color import Color
 from utils.logger import Logger
-from private import accountinfo
+from accounts import accountinfo
 
 
 class CommandHandler:
@@ -70,5 +70,5 @@ class CommandHandler:
 
 class CommandHandlerException(Exception):
     def __init__(self, error_args):
-        Exception.__init__(self, "CommandHandlerException: {0}".format(error_args))
+        Exception.__init__(self, 'CommandHandlerException: {0}'.format(error_args))
         self.errorArgs = error_args

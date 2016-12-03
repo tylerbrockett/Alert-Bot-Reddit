@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   11/28/2016
+Date Last Edited:   12/2/2016
 Version:            v2.0
 ==========================================
 """
@@ -86,7 +86,7 @@ class DatabaseHandler:
             if subscription.status == Subscription.STATUS_VALID:
                 subs.append(subscription)
             else:
-                print("INVALID SUB:   " + subscription.to_string())
+                print('INVALID SUB:   ' + subscription.to_string())
                 self.remove_subscription(subscription)  # TODO Should this really be here?
                 raise DatabaseHandlerException('ERROR - get_subscriptions - Subscription not valid')
         return subs
@@ -103,7 +103,7 @@ class DatabaseHandler:
             if subscription.status == Subscription.STATUS_VALID:
                 subs.append(subscription)
             else:
-                print("INVALID SUB:   " + subscription.to_string())
+                print('INVALID SUB:   ' + subscription.to_string())
                 self.remove_subscription(subscription)  # TODO Should this really be here?
                 raise DatabaseHandlerException('ERROR - get_subscriptions - subscription not valid')
         return subs
@@ -270,5 +270,5 @@ class DatabaseHandlerException(Exception):
     INTEGRITY_ERROR = 'Integrity Error - Row already exists'
 
     def __init__(self, error_args):
-        Exception.__init__(self, "DBHelper Exception: {0}".format(error_args))
+        Exception.__init__(self, 'DBHelper Exception: {0}'.format(error_args))
         self.errorArgs = error_args

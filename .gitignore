@@ -3,7 +3,7 @@
 #=========================
 
 # Sensitive Info
-/*/private/
+#/*/accounts/
 /bot/database/subscriptions.db
 
 /bot/data/database/subscriptions.db

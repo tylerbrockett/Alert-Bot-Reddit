@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   11/28/2016
+Date Last Edited:   12/2/2016
 Version:            v2.0
 ==========================================
 """
@@ -21,49 +21,24 @@ class SubscriptionLexer:
     active_token = False
     token = ''
     token_type = TokenType.NO_TOKEN
-    reserved_tokens = [
-        # TITLE
-        '-title',
-        '-item',
-        '-items',
-        # BODY
-        '-body',
-        '-site',
-        '-sites',
-        '-url',
-        '-content',
-        '-selftext',
-        '-link',
-        # REDDITORS
-        '-redditor',
-        '-redditors',
-        '-user',
-        '-users',
-        # IGNORE TITLE
-        '-ignore-title',
-        '-ignore-item',
-        '-ignore-items',
-        # IGNORE BODY
-        '-ignore-body',
-        '-ignore-site',
-        '-ignore-sites',
-        '-ignore-url',
-        '-ignore-content',
-        '-ignore-selftext',
-        '-ignore-link',
-        # IGNORE REDDITORS
-        '-ignore-redditor',
-        '-ignore-redditors',
-        '-ignore-user',
-        '-ignore-users',
-        # SUBREDDIT
-        '-subreddit',
-        '-subreddits',
-        # FLAGS
-        '-nsfw', '-show-nsfw',
-        '-email',
-        ','
-    ]
+    whitespace = [' ', '\n', '\r']
+
+    title_keywords = ['-title', '-item', '-items']
+    body_keywords = ['-body', '-site', '-sites', '-url', '-content', '-selftext', '-link']
+    redditors_keywords = ['-redditor', '-redditors', '-user', '-users']
+    ignore_title_keywords = ['-ignore-title', '-ignore-item', '-ignore-items']
+    ignore_body_keywords = ['-ignore-body', '-ignore-site', '-ignore-sites', '-ignore-url', '-ignore-content', '-ignore-selftext', '-ignore-link']
+    ignore_redditors_keywords = ['-ignore-redditor', '-ignore-redditors', '-ignore-user', '-ignore-users']
+    subreddit_keywords = ['-subreddit', '-subreddits']
+    nsfw_keywords = ['-nsfw', '-show-nsfw']
+    email_keywords = ['-email']
+
+    reserved_tokens = sum(
+        [title_keywords, body_keywords, redditors_keywords,
+         ignore_title_keywords, ignore_body_keywords, ignore_redditors_keywords,
+         subreddit_keywords,
+         nsfw_keywords, email_keywords],
+        [])
 
     def __init__(self, sub):
         self.original_string = sub
@@ -76,23 +51,23 @@ class SubscriptionLexer:
             self.unget_char()
 
     def is_keyword(self, token):
-        if token.lower() in ['-title', '-item', '-items']:
+        if token.lower() in SubscriptionLexer.title_keywords:
             return TokenType.TITLE
-        elif token.lower() in ['-body', '-site', '-sites', '-url', '-content', '-selftext', '-link']:
+        elif token.lower() in SubscriptionLexer.body_keywords:
             return TokenType.BODY
-        elif token.lower() in ['-redditor', '-redditors', '-user', '-users']:
+        elif token.lower() in SubscriptionLexer.redditors_keywords:
             return TokenType.REDDITORS
-        elif token.lower() in ['-ignore-title', '-ignore-item', '-ignore-items']:
+        elif token.lower() in SubscriptionLexer.ignore_title_keywords:
             return TokenType.IGNORE_TITLE
-        elif token.lower() in ['-ignore-url', '-ignore-site', '-ignore-sites', '-ignore-body', '-ignore-content', '-ignore-selftext', '-ignore-link']:
+        elif token.lower() in SubscriptionLexer.ignore_body_keywords:
             return TokenType.IGNORE_BODY
-        elif token.lower() in ['-ignore-redditor', '-ignore-redditors', '-user', '-users']:
+        elif token.lower() in SubscriptionLexer.ignore_redditors_keywords:
             return TokenType.IGNORE_REDDITORS
-        elif token.lower() in ['-subreddit', '-subreddits']:
+        elif token.lower() in SubscriptionLexer.subreddit_keywords:
             return TokenType.SUBREDDITS
-        elif token.lower() in ['-email']:
+        elif token.lower() in SubscriptionLexer.email_keywords:
             return TokenType.EMAIL
-        elif token.lower() in ['-nsfw', '-show-nsfw']:
+        elif token.lower() in SubscriptionLexer.nsfw_keywords:
             return TokenType.NSFW
         return self.FALSE
 
@@ -114,7 +89,7 @@ class SubscriptionLexer:
     def scan_token(self):
         self.token_type = TokenType.NO_TOKEN
         c = self.get_char()
-        while c != ' ' and c != '' and c not in self.reserved_tokens:
+        while c not in SubscriptionLexer.whitespace and c != '' and c not in self.reserved_tokens:
             self.token += c
             c = self.get_char()
         if not self.EOF:
@@ -164,10 +139,10 @@ class SubscriptionLexer:
             return tokens
         except:
             print(traceback.format_exc())
-            raise SubscriptionLexerException("Exception occurred")
+            raise SubscriptionLexerException('Exception occurred')
 
 
 class SubscriptionLexerException(Exception):
     def __init__(self, errorArgs):
-        Exception.__init__(self, "Subscription Lexer Exception: {0}".format(errorArgs))
+        Exception.__init__(self, 'Subscription Lexer Exception: {0}'.format(errorArgs))
         self.errorArgs = errorArgs

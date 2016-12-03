@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   11/28/2016
+Date Last Edited:   12/2/2016
 Version:            v2.0
 ==========================================
 """
@@ -21,15 +21,6 @@ class MessageLexer:
     token = ''
     token_type = TokenType.NO_TOKEN
     whitespace = [' ', '\n', '\r']
-    reserved_tokens = [
-        'statistics', 'stats',
-        'subscriptions', 'subs',
-        'unsubscribe', 'unsub', 'all',
-        'subscribe', 'sub',
-        'edit', 'change',
-        'help', 'info', 'information',
-        'feedback', 'suggestion', 'suggestions', 'advice', 'feature', 'features', 'request', 'requests'
-    ]
 
     statistics_keywords = ['statistics', 'stats']
     subscriptions_keywords = ['subscriptions', 'subs']
@@ -39,6 +30,12 @@ class MessageLexer:
     edit_keywords = ['edit', 'change']
     help_keywords = ['help', 'info', 'information']
     feedback_keywords = ['feedback', 'suggestion', 'suggestions', 'advice', 'feature', 'features', 'request', 'requests']
+
+    reserved_tokens = sum(
+        [statistics_keywords, subscriptions_keywords, unsubscribe_keywords,
+         all_keywords, subscribe_keywords, edit_keywords, help_keywords, feedback_keywords],
+        []
+    )
 
     def __init__(self, message):
         self.message = message
@@ -87,7 +84,7 @@ class MessageLexer:
     def scan_token(self):
         self.token_type = TokenType.NO_TOKEN
         c = self.get_char()
-        while c not in self.whitespace and c != '' and c not in self.reserved_tokens:
+        while c not in MessageLexer.whitespace and c != '' and c not in self.reserved_tokens:
             self.token += c
             c = self.get_char()
         if not self.EOF:
@@ -149,5 +146,5 @@ class MessageLexer:
 class MessageLexerException(Exception):
 
     def __init__(self, errorArgs):
-        Exception.__init__(self, "Message Lexer Exception: {0}".format(errorArgs))
+        Exception.__init__(self, 'Message Lexer Exception: {0}'.format(errorArgs))
         self.errorArgs = errorArgs

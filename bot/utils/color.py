@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   11/28/2016
+Date Last Edited:   12/2/2016
 Version:            v2.0
 ==========================================
 """
@@ -29,5 +29,4 @@ class Color:
     @staticmethod
     def random():
         r = randint(1, len(Color.colors) - 1)
-        color = Color.colors[r]
-        return color
+        return Color.colors[r]

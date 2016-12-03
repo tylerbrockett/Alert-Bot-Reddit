@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   11/28/2016
+Date Last Edited:   12/2/2016
 Version:            v2.0
 ==========================================
 """
@@ -14,7 +14,7 @@ from bot_modules.sleep_handler import SleepHandler
 from bot_modules.database_handler import DatabaseHandlerException
 from utils.logger import Logger
 from utils.color import Color
-from private import accountinfo
+from accounts import accountinfo
 from utils.subscription import Subscription
 from parsing.message_parser import MessageParser
 from parsing.message_lexer import MessageLexer
@@ -103,7 +103,7 @@ class InboxHandler:
 
     @staticmethod
     def handle_unsubscribe_from_num_message(database, message, payload):
-        print("Unsub from num")
+        print('Unsub from num')
         removed = database.remove_subscription_by_number(str(message.author), int(payload))
         subs = database.get_subscriptions_by_user(str(message.author))
         if removed:
@@ -243,6 +243,6 @@ class InboxHandlerException(Exception):
     READ_MESSAGES_EXCEPTION = 'Error reading messages'
 
     def __init__(self, error_args, traceback=None):
-        Exception.__init__(self, "InboxHandlerException: {0}".format(error_args))
+        Exception.__init__(self, 'InboxHandlerException: {0}'.format(error_args))
         self.errorArgs = error_args
         print(traceback)

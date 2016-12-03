@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   11/28/2016
+Date Last Edited:   12/2/2016
 Version:            v2.0
 ==========================================
 """
@@ -17,7 +17,7 @@ class Logger:
 
     @staticmethod
     def print_color(string, color):
-        print(color + str(string) + Logger.RESET)
+        print(color + string + Logger.RESET)
 
     @staticmethod
     def log(string, col=None):
@@ -28,8 +28,8 @@ class Logger:
             elif col in Color.colors:
                 Logger.print_color(string, col)
             else:
-                print(str(string))
+                print(string)
         # Handle terminals that don't support ANSI color codes I think?
         # I Don't remember if they throw an error or not.
         except:
-            print(str(string))
+            print(string)
