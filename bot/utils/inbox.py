@@ -32,7 +32,7 @@ def format_subscription_list(subs, title):
 
 
 def compose_greeting(username):
-    return 'Hi ' + username + ',\n\n'
+    return 'Hi /u/' + username + ',\n\n'
 
 
 def compose_salutation():

@@ -33,7 +33,7 @@ def run_bot():
 
 
 def compose_message(username):
-    ret = 'Hi /u/' + username + ',\n' \
+    ret = 'Hi /u/' + username + ',\n\t \n' \
         'There have been ***HUGE*** changes to the /r/buildapcsales bot. \n\t\n' \
         'First off, it has changed to /u/' + accountinfo.username + '\n\nUnfortunately, the new bot doesn\t have ' \
         'your old subscriptions. Subscriptions were tied to the message ID of your subscription message to the bot, ' \
