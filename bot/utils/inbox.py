@@ -257,7 +257,7 @@ def compose_username_mention_forward(developer_username, username, body):
 
 def compose_username_mention_reply(username):
     result = 'Hi /u/' + username + ', thanks for the mention!\t \n ' + \
-             'For those of you that aren\'t privy to this bot, it\'s purpose is to puruse Reddit for you, and ' + \
+             'For those of you that aren\'t privy to this bot, it\'s purpose is to peruse Reddit for you, and ' + \
              'alert you when it finds a match based on what you tell it to look for. You can filter by subreddit, ' + \
              'words/phrases in the title or selftext/link of the post, the Redditor that created the post, etc. ' + \
              'It is great for finding things you want in subreddits like /r/freebies! ' + \
