@@ -9,11 +9,11 @@ This bot is excellent to keep track of subreddits that post links to sales or fr
 ***NOTE:*** For each of these fields (subject and body) capitalization does *not* matter, it will yield the exact same results.
 
 #### To subscribe
-Send a private message to /u/Alert_Bot with the body of the message specifying what you want the bot to look out for. Detailed grammar will be found at the bottom of this page (in the next few days, hopefully).
+Send a private message to /u/Alert_Bot with the body of the message specifying what you want the bot to look out for. The body of the message is what the bot cares about, so the following examples should be in the body of the message. The subject of the message can be anything, but I recommend making it descriptive to you, so you can see what the message is about at a quick glance.
 Essentially there is the subscribe action, and a list of parameters. Parameter List:
 
 #####Parameter Values
-***NOTES:*** All parameters can be combined to form one specific, constrained subscription. Also note that most parameters support a comma separated list of words or phrases as well, each of which need to show up in order to constitute a match. The nice thing about this is that the order of the words does ***NOT*** matter. 
+***NOTES:*** All parameters can be combined to form one specific, constrained subscription. Order of parameters does ***NOT*** matter. Also note that most parameters support a comma separated list of words or phrases as well, each of which need to show up in order to constitute a match. The nice thing about this is that the order of the words does ***NOT*** matter. 
 
 * ***-title***
     * Function:
