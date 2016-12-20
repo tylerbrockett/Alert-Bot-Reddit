@@ -9,6 +9,8 @@ Version:            v2.0
 ==========================================
 """
 
+import praw
+from praw import exceptions
 from utils import inbox, times
 from bot_modules.sleep_handler import SleepHandler
 from bot_modules.database_handler import DatabaseHandlerException
@@ -144,11 +146,15 @@ class InboxHandler:
 
     @staticmethod
     def handle_username_mention_message(reddit, message):
-        Logger.log('Username mention message')
+        try:
+            Logger.log('Username mention message')
+            message.reply(inbox.compose_username_mention_reply(str(message.author)))
+            message.mark_as_read()
+        except praw.exceptions.APIException as e:
+            Logger.log(Color.RED, str(e))
+            Logger.log(Color.RED, 'Handled RateLimitExceeded praw error - Commenting too frequently')
         reddit.send_message(accountinfo.developerusername, 'USERNAME MENTION', inbox.compose_username_mention_forward(accountinfo.developerusername, str(message.author), message.body))
         reddit.send_message(accountinfo.developerusername2, 'USERNAME MENTION', inbox.compose_username_mention_forward(accountinfo.developerusername2, str(message.author), message.body))
-        message.reply(inbox.compose_username_mention_reply(str(message.author)))
-        message.mark_as_read()
 
     @staticmethod
     def handle_post_reply_message(reddit, message):
