@@ -9,8 +9,6 @@ Version:            v2.0
 ==========================================
 """
 
-import praw
-from praw import exceptions
 from utils import inbox, times
 from bot_modules.sleep_handler import SleepHandler
 from bot_modules.database_handler import DatabaseHandlerException
