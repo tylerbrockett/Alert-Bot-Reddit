@@ -21,6 +21,9 @@ accounts/
 # IDE files
 /*/.idea/
 
+# Test files
+/bot/test.py
+
 #=========================
 #    Original Stuff
 #=========================
