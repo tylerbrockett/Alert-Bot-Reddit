@@ -150,7 +150,7 @@ class InboxHandler:
             Logger.log('Username mention message')
             message.reply(inbox.compose_username_mention_reply(str(message.author)))
             message.mark_as_read()
-        except praw.exceptions.APIException as e:
+        except Exception as e:  # Figure out more specific exception thrown (praw.exceptions.APIException?)
             Logger.log(Color.RED, str(e))
             Logger.log(Color.RED, 'Handled RateLimitExceeded praw error - Commenting too frequently')
         reddit.send_message(accountinfo.developerusername, 'USERNAME MENTION', inbox.compose_username_mention_forward(accountinfo.developerusername, str(message.author), message.body))
