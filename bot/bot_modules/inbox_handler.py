@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   12/2/2016
+Date Last Edited:   12/19/2016
 Version:            v2.0
 ==========================================
 """
@@ -123,7 +123,7 @@ class InboxHandler:
     @staticmethod
     def handle_unsubscribe_all_message(database, message):
         Logger.log('Unsub all message')
-        had_subscriptions = database.remove_all_subscriptions(str(message.author))
+        removed_subscriptions = database.remove_all_subscriptions(str(message.author))
         message.reply(inbox.compose_unsubscribe_all_message(str(message.author)))
         message.mark_as_read()
 
@@ -137,23 +137,24 @@ class InboxHandler:
     @staticmethod
     def handle_feedback_message(reddit, message):
         Logger.log('Feedback message')
-        reddit.send_message(accountinfo.developerusername,  'FEEDBACK', inbox.compose_feedback_forward(str(message.author), message.body))
-        reddit.send_message(accountinfo.developerusername2, 'FEEDBACK', inbox.compose_feedback_forward(str(message.author), message.body))
+        reddit.send_message(accountinfo.developerusername,  'FEEDBACK', inbox.compose_feedback_forward(accountinfo.developerusername, str(message.author), message.body))
+        reddit.send_message(accountinfo.developerusername2, 'FEEDBACK', inbox.compose_feedback_forward(accountinfo.developerusername2, str(message.author), message.body))
         message.reply(inbox.compose_feedback_message(str(message.author)))
         message.mark_as_read()
 
     @staticmethod
     def handle_username_mention_message(reddit, message):
         Logger.log('Username mention message')
-        reddit.send_message(accountinfo.developerusername,  'USERNAME MENTION', inbox.compose_username_mention_forward(str(message.author), message.body))
-        reddit.send_message(accountinfo.developerusername2, 'USERNAME MENTION', inbox.compose_username_mention_forward(str(message.author), message.body))
+        reddit.send_message(accountinfo.developerusername, 'USERNAME MENTION', inbox.compose_username_mention_forward(accountinfo.developerusername, str(message.author), message.body))
+        reddit.send_message(accountinfo.developerusername2, 'USERNAME MENTION', inbox.compose_username_mention_forward(accountinfo.developerusername2, str(message.author), message.body))
+        message.reply(inbox.compose_username_mention_reply(str(message.author)))
         message.mark_as_read()
 
     @staticmethod
     def handle_post_reply_message(reddit, message):
         Logger.log('Post reply message')
-        reddit.send_message(accountinfo.developerusername, 'USERNAME MENTION', inbox.compose_username_mention_forward(str(message.author), message.body))
-        reddit.send_message(accountinfo.developerusername, 'USERNAME MENTION', inbox.compose_username_mention_forward(str(message.author), message.body))
+        reddit.send_message(accountinfo.developerusername, 'USERNAME MENTION', inbox.compose_username_mention_forward(accountinfo.developerusername, str(message.author), message.body))
+        reddit.send_message(accountinfo.developerusername, 'USERNAME MENTION', inbox.compose_username_mention_forward(accountinfo.developerusername2, str(message.author), message.body))
         message.mark_as_read()
 
     @staticmethod

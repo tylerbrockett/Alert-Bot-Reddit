@@ -4,12 +4,16 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   12/2/2016
+Date Last Edited:   12/19/2016
 Version:            v2.0
 ==========================================
 """
 
 from accounts import accountinfo
+
+
+GITHUB_HOME = 'https://github.com/tylerbrockett/Alert-Bot-Reddit'
+GITHUB_README = 'https://github.com/tylerbrockett/Alert-Bot-Reddit/blob/master/README.md'
 
 
 def format_subject(s):
@@ -37,20 +41,23 @@ def compose_greeting(username):
 
 def compose_salutation():
     result = '\n\t \n\t \n-/u/' + accountinfo.username + '\n\t \n\t \n' + \
-             '/r/Alert_Bot | ' + \
+             accountinfo.bot_subreddit + ' | ' + \
              '/u/' + accountinfo.developerusername + ' | ' + \
-             '[Bot Code](https://github.com/tylerbrockett/Alert-Bot-Reddit)\n'
+             '[Bot Code](' + GITHUB_HOME + ')\n'
     return result
+
+
+DEFAULT_SUB_MESSAGE = '\t \n**Note:** No subreddit was specified, so /r/buildapcsales will be used by default\t \n'
 
 
 def compose_subscribe_message(username, new_sub, subs, subreddit_not_specified):
     result = compose_greeting(username) + \
              'Thanks for your subscription. ' + \
              'You will continue to receive updates for posts that match your new subscription. ' + \
-             'To unsubscribe, send me a message with the body "unsubscribe #" where "#" is the actual subscription number.\t \nAlternatively, ' + \
-             'you can reply to this message or any replies from the bot in regards to this subscription and reply ' + \
-             'with "unsubscribe" as the body.\t \n' + \
-             ('\t \n**Note:** If no subreddit is specified, /r/buildapcsales will be used by default\t \n' if subreddit_not_specified else '') + \
+             'To unsubscribe, send me a message with the body "unsubscribe #" (without quotes) where "#" is the ' + \
+             'actual subscription number.\t \nAlternatively, you can reply to this message or any replies from ' + \
+             'the bot in regards to this subscription and reply with "unsubscribe" as the body.\t \n' + \
+             (DEFAULT_SUB_MESSAGE if subreddit_not_specified else '') + \
              new_sub.to_table('New Subscription') + '\t \n\t \n' + \
              format_subscription_list(subs, 'Your Subscriptions') + \
              compose_salutation()
@@ -67,8 +74,8 @@ def compose_all_subscriptions_message(username, all_subscriptions):
 def compose_duplicate_subscription_message(username, existing_sub, new_sub):
     result = compose_greeting(username) + \
              'We think you already have an existing subscription matching the criteria specified. Below ' + \
-             'both subscriptions are listed. If you believe there has been a mistake, please PM me at ' + \
-             '/u/' + accountinfo.developerusername + ' and let me know.\n\n' + \
+             'both subscriptions are listed. If you believe there has been a mistake, please visit ' + \
+             accountinfo.bot_subreddit + ' or message /u/' + accountinfo.developerusername + '.\n\n' + \
              existing_sub.to_table('Existing Subscription') + '\n\n' + \
              new_sub.to_table('New Subscription') + '\n' + \
              compose_salutation()
@@ -77,9 +84,9 @@ def compose_duplicate_subscription_message(username, existing_sub, new_sub):
 
 def compose_help_message(username, subs):
     result = compose_greeting(username) + \
-             'Please visit the bot\'s [Github repository](https://github.com/tylerbrockett/Alert-Bot-Reddit) for ' + \
-             'detailed information on how the bot works. If you still have questions, please visit /r/Alert_Bot ' + \
-             'or message /u/tylerbrockett. Thanks!\t \n\t \n' + \
+             'Please visit the bot\'s [Github Readme](' + GITHUB_README + ') for ' + \
+             'detailed information on how the bot works. If you still have questions, please visit ' + \
+             accountinfo.bot_subreddit + 'or message /u/' + accountinfo.developerusername + '. Thanks!\t \n\t \n' + \
              format_subscription_list(subs, 'Your Subscriptions') + \
              compose_salutation()
     return result
@@ -89,8 +96,8 @@ def compose_unsubscribe_invalid_sub_message(username, subs):
     result = compose_greeting(username) + \
         'I\'m sorry, but it looks like the subscription you\'re trying to unsubscribe from is invalid. Please ' + \
         'make sure you are replying to a message that was in regards to a valid and active subscription. If you ' + \
-        'think you are receiving this message in error, please feel free to message /u/' + \
-        accountinfo.developerusername + ' to try to get this sorted out.\n\n' + \
+        'think you are receiving this message in error, please visit ' + accountinfo.bot_subreddit + ' or message ' + \
+        '/u/' + accountinfo.developerusername + ' to get this sorted out.\n\n' + \
         format_subscription_list(subs, 'Your Subscriptions') + \
         compose_salutation()
     return result
@@ -142,10 +149,9 @@ def compose_feedback_message(username):
 def compose_reject_message(username, subject, body):
     result = compose_greeting(username) + \
              '**There was an error processing your request.** Please review your message and ' + \
-             'make sure it follows the guidelines that have been set. Please accounts message the bot ' + \
-             'with the subject "Information" to get detailed information on how the bot works, ' + \
-             'or message /u/' + accountinfo.developerusername + ' if you want specialized help or have any ' + \
-             'questions for me. Thank you for your patience! \n\t \n\t \n' + \
+             'make sure it follows [the guidelines](' + GITHUB_README + ') that have been set. ' + \
+             'You can also visit ' + accountinfo.bot_subreddit + ' or message /u/' + accountinfo.developerusername + \
+             '. Thank you for your patience! \n\t \n\t \n' + \
              '**Your request:** \t \n' + \
              'Subject:\t' + subject + '\t \n' + \
              'Body:\t\t' + body + \
@@ -167,8 +173,8 @@ def format_subreddit_list(subreddits, title):
 def compose_invalid_subreddit_message(username, invalid_subreddits, message):
     result = compose_greeting(username) + \
         'Unfortunately, it appears that the following subreddit(s) you tried to subscribe to were invalid. If you ' + \
-        'believe this is a mistake please message /u/' + accountinfo.developerusername + '. Sorry for the ' + \
-        'inconvenience!\t \n\t \n' + \
+        'believe this is a mistake please visit ' + accountinfo.bot_subreddit + ' or message ' + \
+        '/u/' + accountinfo.developerusername + '. Sorry for the inconvenience!\t \n\t \n' + \
         '**Subject:**\t' + message.subject + '\t \n' + \
         '**Body:**\t\t' + message.body + '\t \n' + \
         format_subreddit_list(invalid_subreddits, 'Invalid Subreddits') + \
@@ -176,13 +182,18 @@ def compose_invalid_subreddit_message(username, invalid_subreddits, message):
     return result
 
 
+def format_submission_body_summary(submission):
+    if submission.is_self:
+        return '**Body Text:**\t \n' + submission.selftext[:500] + (submission.selftext[500:] and '...')
+    else:
+        return '**Post Content Link:**\t \n[Content Link](' + submission.url + ')'
+
+
 def compose_match_message(sub, submission, subs):
     result = compose_greeting(sub.username) + \
         '**Post Title:**\t \n' + \
         '[' + submission.title + '](' + submission.permalink + ')\t \n\t \n' + \
-        (('**Body Text:**\t \n' + submission.selftext[:500] + (submission.selftext[500:] and '...')) if submission.is_self
-         else ('**Post Content Link:**\t \n[Content Link](' + submission.url + ')')) + \
-        '\t \n\t \n' + \
+        format_submission_body_summary(submission) + '\t \n\t \n' + \
         sub.to_table('Matched Subscription') + '\t \n\t \n' + \
         'Reply to the bot with "Subs" or "Subscriptions" to view your subscriptions.' + \
         compose_salutation()
@@ -230,22 +241,33 @@ def compose_statistics(username, current_users, all_users, unique_subs, all_subs
     return result
 
 
-def compose_feedback_forward(username, body):
-    result = compose_greeting(accountinfo.developerusername) + \
+def compose_feedback_forward(developer_username, username, body):
+    result = compose_greeting(developer_username) + \
              'You have received feedback from /u/' + username + '. The feedback is quoted below:\n\n"' + \
              body + '"' + compose_salutation()
     return result
 
 
-def compose_username_mention_forward(username, body):
-    result = compose_greeting(accountinfo.developerusername) + \
+def compose_username_mention_forward(developer_username, username, body):
+    result = compose_greeting(developer_username) + \
              'The bot has been mentioned in a post! the body of the message is quoted below:\n\n' + \
-             'USERNAME: ' + username + '\nBODY:\n' + body
+             'USERNAME: ' + username + '\t \nBODY:\n' + body
     return result
 
 
-def compose_post_reply_forward(username, body):
-    result = compose_greeting(accountinfo.developerusername) + \
+def compose_username_mention_reply(username):
+    result = 'Hi /u/' + username + ', thanks for the mention!\t \n ' + \
+             'For those of you that aren\'t privy to this bot, it\'s purpose is to puruse Reddit for you, and ' + \
+             'alert you when it finds a match based on what you tell it to look for. You can filter by subreddit, ' + \
+             'words/phrases in the title or selftext/link of the post, the Redditor that created the post, etc. ' + \
+             'It is great for finding things you want in subreddits like /r/freebies! ' + \
+             'For more information, please visit [the Github README](' + GITHUB_README + ').' + \
+             compose_salutation()
+    return result
+
+
+def compose_post_reply_forward(developer_username, username, body):
+    result = compose_greeting(developer_username) + \
              'Someone has responded to a post by the bot! the comment is quoted below:\n\n' + \
              'USERNAME: ' + username + '\nBODY:\n' + body
     return result
