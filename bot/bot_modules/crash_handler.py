@@ -9,6 +9,7 @@ Version:            v2.0
 ==========================================
 """
 
+from accounts.accountinfo import bot
 from accounts import accountinfo
 from bot_modules.sleep_handler import SleepHandler
 from utils.logger import Logger
@@ -24,8 +25,8 @@ def handle_crash(stacktrace, reddit, database, message_dev):
             reddit.reset()
             database.reset()
             if message_dev:
-                print('Message Dev')
-                reddit.send_message(accountinfo.bot_errors, accountinfo.username + " - Exception Handled", stacktrace)
+                print('Messaging Dev - Crash Handler')
+                reddit.send_message(accountinfo.bot_errors, bot['username'] + ' - Exception Handled', stacktrace)
             reset = True
         except:
             Logger.log('Failed to restart bot. Trying again in 30 seconds.', Color.RED)

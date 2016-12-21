@@ -21,6 +21,7 @@ from utils import times
 from utils.color import Color
 from utils.logger import Logger
 from bot_modules.crash_handler import handle_crash
+from accounts.accountinfo import bot
 
 
 class AlertBot:
@@ -28,7 +29,7 @@ class AlertBot:
         self.start_time = times.get_current_timestamp()
         self.run = True
         self.database = DatabaseHandler()
-        self.reddit = RedditHandler()
+        self.reddit = RedditHandler(bot)
 
     def start(self):
         Logger.log('Starting bot...', Color.GREEN)

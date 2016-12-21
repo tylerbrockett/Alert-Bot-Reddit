@@ -12,7 +12,7 @@ Version:            v2.0
 from utils import inbox
 from utils.color import Color
 from utils.logger import Logger
-from accounts import accountinfo
+from accounts.accountinfo import bot
 
 
 class CommandHandler:
@@ -32,7 +32,7 @@ class CommandHandler:
         unread_messages = reddit.get_unread()
         for message in unread_messages:
             username = str(message.author).lower()
-            if username == accountinfo.developerusername:
+            if username == bot['username']:
                 dev_messages.append(message)
         return dev_messages
 

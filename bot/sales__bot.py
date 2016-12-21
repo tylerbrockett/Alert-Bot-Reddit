@@ -14,7 +14,7 @@ from sys import stdout
 from utils import inbox
 from utils.color import Color
 from utils.logger import Logger
-from accounts import accountinfo
+from accounts.accountinfo import bot, old_bot, developer, bot_errors
 
 reddit = None
 
@@ -35,13 +35,13 @@ def run_bot():
 def compose_message(username):
     ret = 'Hi /u/' + username + ',\n\t \n' \
         'There have been ***HUGE*** changes to the /r/buildapcsales bot. \n\t\n' \
-        'First off, it has changed to /u/' + accountinfo.username + '\n\nUnfortunately, the new bot doesn\t have ' \
+        'First off, it has changed to /u/' + bot['username'] + '\n\nUnfortunately, the new bot doesn\t have ' \
         'your old subscriptions. Subscriptions were tied to the message ID of your subscription message to the bot, ' \
         'and the new bot couldn\'t reply to the old bot\'s messages. This makes total sense now, but it hadn\'t ' \
         'occurred to me when I started this update. If you want to know your old subscriptions, let me know ' \
-        '(/u/' + accountinfo.developerusername + ' and I can send them to you.\n\t \n' \
-        'You should be able to use /u/' + accountinfo.username + ' exactly as you have been using /u/' + \
-        accountinfo.old_username + ', but there have been MANY new features you may want to take note of. ' \
+        '(/u/' + developer['username'] + ' and I can send them to you.\n\t \n' \
+        'You should be able to use /u/' + bot['username'] + ' exactly as you have been using /u/' + \
+        old_bot['username'] + ', but there have been MANY new features you may want to take note of. ' \
         '[Take a look here](https://github.com/tylerbrockett/Alert-Bot-Reddit/blob/master/README.md) \n\n'
     return ret
 
@@ -54,7 +54,7 @@ def read_inbox():
     try:
         unread_messages = reddit.get_unread(limit=None)
     except:
-        reddit.send_message(accountinfo.developerusername, "SALES__BOT Exception - Read Inbox", traceback.format_exc())
+        reddit.send_message(developer['username'], "SALES__BOT Exception - Read Inbox", traceback.format_exc())
 
     for unread_message in unread_messages:
         username, message_id, subject, body = \
@@ -65,11 +65,11 @@ def read_inbox():
         Logger.log('message from ' + username)
         if subject == 'username mention':
             unread_message.mark_as_read()
-            reddit.send_message(accountinfo.developerusername, "SALES__BOT - Username Mention", 'username: ' + username + '\n\n' + body)
+            reddit.send_message(developer['username'], "SALES__BOT - Username Mention", 'username: ' + username + '\n\n' + body)
 
         elif subject == 'post reply':
             unread_message.mark_as_read()
-            reddit.send_message(accountinfo.developerusername, "SALES__BOT - Post Reply", 'username: ' + username + '\n\n' + body)
+            reddit.send_message(developer['username'], "SALES__BOT - Post Reply", 'username: ' + username + '\n\n' + body)
         else:
             try:
                 Logger.log('sending message to ' + username)
@@ -80,17 +80,16 @@ def read_inbox():
                 unread_message.mark_as_read()
             except:
                 Logger.log('message failed to send - ' + traceback.format_exc())
-                reddit.send_message(accountinfo.developerusername, "SALES__BOT Exception - Default", traceback.format_exc())
+                reddit.send_message(developer['username'], "SALES__BOT Exception - Default", traceback.format_exc())
         sleep(2)
 
 
 def connect_to_reddit():
     global reddit
     # Connecting to Reddit
-    user_agent = 'SALES__B0T - A Sales Notifier R0B0T'
-    reddit = praw.Reddit(user_agent=user_agent)
+    reddit = praw.Reddit(user_agent=old_bot['user_agent'])
     # TODO Use OAuth instead of this login method
-    reddit.login(accountinfo.old_username, accountinfo.password, disable_warning=True)
+    reddit.login(old_bot['username'], old_bot['password'], disable_warning=True)
 
 
 def sleep(seconds):
@@ -120,7 +119,7 @@ def handle_crash(stacktrace):
         try:
             Logger.log('Trying to reset')
             initialize()
-            reddit.send_message(accountinfo.bot_errors, "Exception Handled", stacktrace)
+            reddit.send_message(bot_errors['username'], "Exception Handled", stacktrace)
             reset = True
         except:
             sleep(15)

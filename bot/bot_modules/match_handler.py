@@ -29,7 +29,7 @@ class MatchHandler:
                 database.commit()
                 output.match(subscription, submission)
             except:
-                print(traceback.format_exc())
+                Logger.log(traceback.format_exc(), Color.RED)
                 raise MatchHandlerException('handle_matches')
 
 

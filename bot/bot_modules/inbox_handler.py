@@ -14,7 +14,7 @@ from bot_modules.sleep_handler import SleepHandler
 from bot_modules.database_handler import DatabaseHandlerException
 from utils.logger import Logger
 from utils.color import Color
-from accounts import accountinfo
+from accounts.accountinfo import developer
 from utils.subscription import Subscription
 from parsing.message_parser import MessageParser
 from parsing.message_lexer import MessageLexer
@@ -27,8 +27,7 @@ class InboxHandler:
     @staticmethod
     def handle_message_from_reddit(reddit, message):
         Logger.log('Message from reddit')
-        reddit.send_message(accountinfo.developerusername, 'FWD: ' + message.subject, message.body)
-        reddit.send_message(accountinfo.developerusername2, 'FWD: ' + message.subject, message.body)
+        reddit.send_message(developer['username'], 'FWD: ' + message.subject, message.body)
         message.mark_as_read()
 
     @staticmethod
@@ -82,11 +81,13 @@ class InboxHandler:
             message.reply(inbox.compose_invalid_subreddit_message(str(message.author), invalid_subreddits, message))
             message.mark_as_read()
             return
-        database.insert_subscription(str(message.author), str(message.id), new_sub.to_string(), times.get_current_timestamp())
+        database.insert_subscription(str(message.author), str(message.id), new_sub.to_string(),
+                                     times.get_current_timestamp())
         existing_subs.append(new_sub)
         # TODO Remove subreddit not specified stuff, taken care of in SubscriptionParser.py
         subreddit_not_specified = len(new_sub.data[Subscription.SUBREDDITS]) == 0
-        message.reply(inbox.compose_subscribe_message(str(message.author), new_sub, existing_subs, subreddit_not_specified))
+        message.reply(
+            inbox.compose_subscribe_message(str(message.author), new_sub, existing_subs, subreddit_not_specified))
         database.commit()
         message.mark_as_read()
 
@@ -137,8 +138,9 @@ class InboxHandler:
     @staticmethod
     def handle_feedback_message(reddit, message):
         Logger.log('Feedback message')
-        reddit.send_message(accountinfo.developerusername,  'FEEDBACK', inbox.compose_feedback_forward(accountinfo.developerusername, str(message.author), message.body))
-        reddit.send_message(accountinfo.developerusername2, 'FEEDBACK', inbox.compose_feedback_forward(accountinfo.developerusername2, str(message.author), message.body))
+        reddit.send_message(developer['username'], 'FEEDBACK',
+                            inbox.compose_feedback_forward(developer['username'], str(message.author),
+                                                           message.body))
         message.reply(inbox.compose_feedback_message(str(message.author)))
         message.mark_as_read()
 
@@ -148,25 +150,27 @@ class InboxHandler:
             Logger.log('Username mention message')
             message.reply(inbox.compose_username_mention_reply(str(message.author)))
             message.mark_as_read()
+            reddit.send_message(developer['username'], 'USERNAME MENTION',
+                                inbox.compose_username_mention_forward(developer['username'],
+                                                                       str(message.author), message.body))
         except Exception as e:  # Figure out more specific exception thrown (praw.exceptions.APIException?)
-            Logger.log(Color.RED, str(e))
-            Logger.log(Color.RED, 'Handled RateLimitExceeded praw error - Commenting too frequently')
-        reddit.send_message(accountinfo.developerusername, 'USERNAME MENTION', inbox.compose_username_mention_forward(accountinfo.developerusername, str(message.author), message.body))
-        reddit.send_message(accountinfo.developerusername2, 'USERNAME MENTION', inbox.compose_username_mention_forward(accountinfo.developerusername2, str(message.author), message.body))
+            Logger.log(str(e), Color.RED)
+            Logger.log('Handled RateLimitExceeded praw error - Commenting too frequently', Color.RED)
 
     @staticmethod
     def handle_post_reply_message(reddit, message):
         Logger.log('Post reply message')
-        reddit.send_message(accountinfo.developerusername, 'USERNAME MENTION', inbox.compose_username_mention_forward(accountinfo.developerusername, str(message.author), message.body))
-        reddit.send_message(accountinfo.developerusername, 'USERNAME MENTION', inbox.compose_username_mention_forward(accountinfo.developerusername2, str(message.author), message.body))
+        reddit.send_message(developer['username'], 'USERNAME MENTION',
+                            inbox.compose_username_mention_forward(developer['username'], str(message.author),
+                                                                   message.body))
         message.mark_as_read()
 
     @staticmethod
     def handle_reject_message(reddit, message):
         Logger.log('handle reject message')
         message.reply(inbox.compose_reject_message(str(message.author), message.subject, message.body))
-        reddit.send_message(accountinfo.developerusername,  'REJECT MESSAGE - ' + str(message.author), inbox.compose_reject_message(str(message.author), message.subject, message.body))
-        reddit.send_message(accountinfo.developerusername2, 'REJECT MESSAGE - ' + str(message.author), inbox.compose_reject_message(str(message.author), message.subject, message.body))
+        reddit.send_message(developer['username'], 'REJECT MESSAGE - ' + str(message.author),
+                            inbox.compose_reject_message(str(message.author), message.subject, message.body))
         message.mark_as_read()
 
     # TODO Add the ability to EDIT existing subscriptions
@@ -183,8 +187,8 @@ class InboxHandler:
         for message in unread:
             num_messages += 1
             username = str(message.author).lower()
-            subject  = inbox.format_subject(str(message.subject).lower())
-            body     = str(message.body).lower()
+            subject = inbox.format_subject(str(message.subject).lower())
+            body = str(message.body).lower()
             try:
                 if username == 'reddit':
                     InboxHandler.handle_message_from_reddit(reddit, message)
@@ -231,13 +235,13 @@ class InboxHandler:
                 Logger.log(traceback.format_exc(), Color.RED)
                 if ex.errorArgs == DatabaseHandlerException.INTEGRITY_ERROR:
                     message.mark_as_read()
-                    reddit.send_message(accountinfo.developerusername,
+                    reddit.send_message(developer['username'],
                                         'Integrity Error',
                                         'SUBJECT: ' + str(inbox.format_subject(message.subject)) + '\n\n' +
                                         'BODY:\n' + str(message.body))
             except:
                 Logger.log(traceback.format_exc(), Color.RED)
-                reddit.send_message(accountinfo.developerusername,
+                reddit.send_message(developer['username'],
                                     'ERROR HANDLING MESSAGE - POTENTIALLY STUCK IN INBOX',
                                     'SUBJECT: ' + str(message.subject) + '\n\n' +
                                     'BODY:\n' + str(message.body))

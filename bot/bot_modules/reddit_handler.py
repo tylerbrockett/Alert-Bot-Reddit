@@ -11,21 +11,24 @@ Version:            v2.0
 
 import praw
 import traceback
-from accounts import accountinfo
 
 
 class RedditHandler:
 
-    def __init__(self):
+    def __init__(self, credentials):
+        self.credentials = credentials
         self.reddit = self.connect()
         self.NUM_POSTS = 20
 
     def connect(self):
         try:
-            self.reddit = praw.Reddit(user_agent=accountinfo.user_agent)
-            # TODO Use OAuth instead of this login method
-            self.reddit.login(accountinfo.username, accountinfo.password, disable_warning=True)
-            return self.reddit
+            reddit = praw.Reddit(
+                client_id=self.credentials['client_id'],
+                client_secret=self.credentials['client_secret'],
+                password=self.credentials['password'],
+                user_agent=self.credentials['user_agent'],
+                username=self.credentials['username'])
+            return reddit
         except:
             raise RedditHelperException('Error connecting to Reddit\n\n' + traceback.format_exc())
 
