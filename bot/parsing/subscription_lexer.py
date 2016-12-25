@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   12/2/2016
+Date Last Edited:   12/24/2016
 Version:            v2.0
 ==========================================
 """
@@ -29,7 +29,7 @@ class SubscriptionLexer:
     ignore_title_keywords = ['-ignore-title', '-ignore-item', '-ignore-items']
     ignore_body_keywords = ['-ignore-body', '-ignore-site', '-ignore-sites', '-ignore-url', '-ignore-content', '-ignore-selftext', '-ignore-link']
     ignore_redditors_keywords = ['-ignore-redditor', '-ignore-redditors', '-ignore-user', '-ignore-users']
-    subreddit_keywords = ['-subreddit', '-subreddits']
+    subreddit_keywords = ['-subreddit', '-subreddits', '-sub', '-subs']
     nsfw_keywords = ['-nsfw', '-show-nsfw']
     email_keywords = ['-email']
 

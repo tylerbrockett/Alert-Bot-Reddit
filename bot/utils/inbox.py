@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   12/19/2016
+Date Last Edited:   12/20/2016
 Version:            v2.0
 ==========================================
 """
@@ -195,7 +195,8 @@ def compose_match_message(sub, submission, subs):
         '[' + submission.title + '](' + submission.permalink + ')\t \n\t \n' + \
         format_submission_body_summary(submission) + '\t \n\t \n' + \
         sub.to_table('Matched Subscription') + '\t \n\t \n' + \
-        'Reply to the bot with "Subs" or "Subscriptions" to view your subscriptions.' + \
+        'Reply to the bot with "subs" or "subscriptions" to view your subscriptions. Reply with "unsub", ' + \
+        '"unsubscribe", or "stop" to remove this subscription.' + \
         compose_salutation()
     return result
 
@@ -257,10 +258,10 @@ def compose_username_mention_forward(developer_username, username, body):
 
 def compose_username_mention_reply(username):
     result = 'Hi /u/' + username + ', thanks for the mention!\t \n ' + \
-             'For those of you that aren\'t privy to this bot, it\'s purpose is to peruse Reddit for you, and ' + \
+             'For those of you that don\'t know about this bot, it\'s purpose is to peruse Reddit for you, and ' + \
              'alert you when it finds a match based on what you tell it to look for. You can filter by subreddit, ' + \
              'words/phrases in the title or selftext/link of the post, the Redditor that created the post, etc. ' + \
-             'It is great for finding things you want in subreddits like /r/freebies! ' + \
+             'It is great for finding things you want in subreddits with sales or giveaways! ' + \
              'For more information, please visit [the Github README](' + GITHUB_README + ').' + \
              compose_salutation()
     return result

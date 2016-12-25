@@ -4,22 +4,45 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   12/2/2016
+Date Last Edited:   12/25/2016
 Version:            v2.0
 ==========================================
 """
 
-developer_email = 'email@domain.com'
+bot_subreddit = '/r/bots_subreddit'
 
-old_username = 'bot_old_username'
-username = 'bot_username'
-password = 'bot_password'
-user_agent = 'User-Agent: user_agent_description_here'
+bot_account = {
+    'username': 'bots_username',
+    'password': 'bots_password',
+    'user_agent': 'python-praw:com.developer.bot:v1.0 (by /u/developers_username)',
+    'client_id': 'xxxxxxxxxxxxxx',
+    'client_secret': 'xxxxxxxxxxxxxxxxxxxxxxxxxxx'
+}
 
-developerusername = 'developer_username'
-developerusername2 = 'developer_username_2'
+bot_beta = {
+    'username': 'bots_beta_username',
+    'password': 'bots_beta_password',
+    'user_agent': 'python-praw:com.developer.bot_beta:v1.0 (by /u/developers_username)',
+    'client_id': 'xxxxxxxxxxxxxx',
+    'client_secret': 'xxxxxxxxxxxxxxxxxxxxxxxxxxx'
+}
 
-bot_email = 'bot_email'
-bot_email_password = 'bot_email_password'
+developer = {
+    'username': 'developers_username',
+    'password': 'developers_password',
+    'user_agent': 'python-praw:com.developer.developer:v1.0 (by /u/developers_username)',
+    'email': 'developers_email@domain.com'
+}
 
-bot_errors = 'bot_error_handler_account'  # So developer account doesn't get clogged with errors.
+bot_errors = {
+    'username': 'bot_error_handling_account',
+    'password': 'bot_error_handling_account_password',
+    'user_agent': 'python-praw:com.developer.bot_error_account:v1.0 (by /u/developers_username)'
+}
+
+bot_email = {
+    'email': 'bots_email_account@domain.com',
+    'password': 'bots_email_password'
+}
+
+bot = bot_account
