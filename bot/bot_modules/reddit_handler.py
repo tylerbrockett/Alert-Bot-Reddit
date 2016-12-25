@@ -14,6 +14,8 @@ import traceback
 from utils.logger import Logger
 from utils.color import Color
 from utils import output
+from prawcore.exceptions import Redirect
+
 
 class RedditHandler:
 
@@ -82,8 +84,9 @@ class RedditHandler:
         invalid = []
         for subreddit in subreddits:
             try:
-                len(self.reddit.subreddit(subreddit).new(limit=1))
-            except TypeError:  # was praw.errors.InvalidSubreddit without 'len()' around call in the try block
+                for submission in self.reddit.subreddit(subreddit).new(limit=1):
+                    print('subreddit is valid')
+            except Redirect:  # was praw.errors.InvalidSubreddit without 'len()' around call in the try block
                 Logger.log(traceback.format_exc(), Color.RED)
                 invalid.append(subreddit)
         return invalid
