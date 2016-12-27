@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   12/2/2016
+Date Last Edited:   12/20/2016
 Version:            v2.0
 ==========================================
 """
@@ -12,7 +12,7 @@ Version:            v2.0
 from utils import inbox
 from utils.color import Color
 from utils.logger import Logger
-from accounts import accountinfo
+from accounts.accountinfo import bot
 
 
 class CommandHandler:
@@ -32,7 +32,7 @@ class CommandHandler:
         unread_messages = reddit.get_unread()
         for message in unread_messages:
             username = str(message.author).lower()
-            if username == accountinfo.developerusername:
+            if username == bot['username']:
                 dev_messages.append(message)
         return dev_messages
 
@@ -47,22 +47,22 @@ class CommandHandler:
                     Logger.log('--------- Bot resumed by developer ---------', Color.GREEN)
                     message.reply('Bot will be resumed')
                     commands.append(CommandHandler.RUN)
-                    message.mark_as_read()
+                    message.mark_read()
                 elif body in CommandHandler.pause or subject in CommandHandler.pause:
                     Logger.log('--------- Bot paused by developer ---------', Color.YELLOW)
                     message.reply('Bot will be paused')
                     commands.append(CommandHandler.PAUSE)
-                    message.mark_as_read()
+                    message.mark_read()
                 elif body in CommandHandler.kill or subject in CommandHandler.kill:
                     Logger.log('--------- Bot killed by developer ---------', Color.RED)
                     message.reply('Bot will be killed')
                     commands.append(CommandHandler.KILL)
-                    message.mark_as_read()
+                    message.mark_read()
                 elif body in CommandHandler.test or subject in CommandHandler.test:
                     Logger.log('--------- Bot is being tested ---------', Color.GREEN)
                     message.reply('Bot is being tested')
                     commands.append(CommandHandler.TEST)
-                    message.mark_as_read()
+                    message.mark_read()
         except:
             raise CommandHandlerException('Error occurred reading commands')
         return commands

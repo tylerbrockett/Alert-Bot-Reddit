@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   12/2/2016
+Date Last Edited:   12/24/2016
 Version:            v2.0
 ==========================================
 """
@@ -21,7 +21,6 @@ def subscribe_exception(username, item):
         'item:       ' + item + '\n' +
         'stacktrace: ' + '\n' +
         traceback.format_exc() + '\n\n',
-
         Color.RED)
 
 
@@ -31,7 +30,6 @@ def unsubscribe_all_exception(username):
         'username:   ' + username + '\n' +
         'stacktrace: ' + '\n' +
         traceback.format_exc() + '\n\n',
-
         Color.RED)
 
 
@@ -42,7 +40,6 @@ def unsubscribe_exception(username, item):
         'item:       ' + item + '\n' +
         'stacktrace: ' + '\n' +
         traceback.format_exc() + '\n\n',
-
         Color.RED)
 
 
@@ -54,7 +51,6 @@ def default_exception(username, subject, body):
         'body:       ' + body + '\n' +
         'stacktrace: ' + '\n' +
         traceback.format_exc() + '\n\n',
-
         Color.RED)
 
 
@@ -64,7 +60,6 @@ def information_exception(username):
         'username:   ' + username + '\n' +
         'stacktrace: ' + '\n' +
         traceback.format_exc() + '\n\n',
-
         Color.RED)
 
 
@@ -74,7 +69,6 @@ def subscriptions_exception(username):
         'username:   ' + username + '\n' +
         'stacktrace: ' + '\n' +
         traceback.format_exc() + '\n\n',
-
         Color.RED)
 
 
@@ -85,7 +79,6 @@ def feedback_exception(username, user_feedback):
         'feedback:   ' + '\n' + user_feedback + '\n' +
         'stacktrace: ' + '\n' +
         traceback.format_exc() + '\n\n',
-
         Color.RED)
 
 
@@ -99,7 +92,6 @@ def match_exception(username, item, message_id, title, permalink, url):
         'reddit url: ' + permalink + '\n' +
         'sale link:  ' + url + '\n' +
         'stacktrace:\n' + traceback.format_exc() + '\n\n',
-
         Color.RED)
 
 
@@ -107,7 +99,6 @@ def get_submissions_exception():
     Logger.log(
         'get submissions exception caught\n' +
         'stacktrace:\n' + traceback.format_exc() + '\n\n',
-
         Color.RED)
 
 
@@ -115,7 +106,6 @@ def read_inbox_exception():
     Logger.log(
         'read inbox exception caught\n' +
         'stacktrace:\n' + traceback.format_exc() + '\n\n',
-
         Color.RED)
 
 
@@ -126,7 +116,6 @@ def subscribe(username, item):
         'username: ' + username + '\n' +
         'item:     ' + item + '\n' +
         '-------------------------------\n\n',
-
         Color.GREEN)
 
 
@@ -136,7 +125,6 @@ def unsubscribe_all(username):
         '         UNSUBSCRIBE ALL\n' +
         'username: ' + username + '\n' +
         '-------------------------------\n\n',
-
         Color.RED)
 
 
@@ -147,7 +135,6 @@ def unsubscribe(username, item):
         'username: ' + username + '\n' +
         'item:     ' + item + '\n' +
         '-------------------------------\n\n',
-
         Color.RED)
 
 
@@ -157,7 +144,6 @@ def information(username):
         '         INFORMATION\n' +
         'username: ' + username + '\n' +
         '-------------------------------\n\n',
-
         Color.GREEN)
 
 
@@ -167,7 +153,6 @@ def subscriptions(username):
         '         SUBSCRIPTIONS\n' +
         'username: ' + username + '\n' +
         '-------------------------------\n\n',
-
         Color.GREEN)
 
 
@@ -178,7 +163,6 @@ def feedback(username, user_feedback):
         'username: ' + username + '\n' +
         'feedback: ' + user_feedback + '\n' +
         '-------------------------------\n\n',
-
         Color.GREEN)
 
 
@@ -190,7 +174,6 @@ def default(username, subject, body):
         'subject:  ' + subject + '\n' +
         'body:     ' + body + '\n' +
         '-------------------------------\n\n',
-
         Color.YELLOW)
 
 
@@ -206,7 +189,6 @@ def match(subscription, submission):
         'URL:        ' + submission.url + '\n' +
         'reddit url: ' + submission.permalink + '\n' +
         '-------------------------------\n\n',
-
         Color.MAGENTA)
 
 
@@ -220,7 +202,6 @@ def statistics(username, users, subs, items, matches):
         'unique items:  ' + str(items) + '\n' +
         'matches:       ' + str(matches) + '\n' +
         '-------------------------------\n\n',
-
         Color.GREEN)
 
 
@@ -231,7 +212,6 @@ def username_mention(username, body):
         'username: ' + username + '\n' +
         'body:     ' + body + '\n' +
         '-------------------------------\n\n',
-
         Color.GREEN)
 
 
@@ -242,18 +222,12 @@ def post_reply(username, body):
         'username: ' + username + '\n' +
         'body:     ' + body + '\n' +
         '-------------------------------\n\n',
-
         Color.GREEN)
 
 
-def about_message():
+def startup_message(bot):
     Logger.log(
         '================================================================\n' +
-        '\t\tSALES__BOT - A Sales Notifier Bot\n' +
-        '================================================================\n\n',
-        Color.YELLOW)
-    Logger.log(
-        '\n--------------------------------------------------\n' +
-        '\t\twww.reddit.com/r/buildapcsales' + '\n' +
-        '--------------------------------------------------\n',
-        Color.BLUE)
+        '\t\tStarting /u/' + bot['username'] + '\n' +
+        '================================================================\n',
+        Color.GREEN)

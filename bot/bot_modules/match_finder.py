@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   12/2/2016
+Date Last Edited:   12/21/2016
 Version:            v2.0
 ==========================================
 """
@@ -127,10 +127,7 @@ class MatchFinder:
                         temp.append(sub)
                     subreddits[subreddit.lower()] = temp
                 submissions = subreddits[subreddit.lower()]
-                # submissions = reddit.get_submissions(subreddit)
-                num = 0
                 for submission in submissions:
-                    num += 1
                     is_match, mismatched_keys = MatchFinder.is_match(subscription, submission)
                     if is_match:
                         already_exists = database.check_if_match_exists(subscription.username,

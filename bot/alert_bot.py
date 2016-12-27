@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   12/2/2016
+Date Last Edited:   12/20/2016
 Version:            v2.0
 ==========================================
 """
@@ -21,6 +21,7 @@ from utils import times
 from utils.color import Color
 from utils.logger import Logger
 from bot_modules.crash_handler import handle_crash
+from accounts.accountinfo import bot
 
 
 class AlertBot:
@@ -28,7 +29,7 @@ class AlertBot:
         self.start_time = times.get_current_timestamp()
         self.run = True
         self.database = DatabaseHandler()
-        self.reddit = RedditHandler()
+        self.reddit = RedditHandler(bot)
 
     def start(self):
         Logger.log('Starting bot...', Color.GREEN)

@@ -19,6 +19,7 @@ from utils.logger import Logger
 from utils import database
 from utils import inbox
 from accounts import accountinfo
+from accounts.accountinfo import developer
 import definitions
 from praw.errors import InvalidUser
 from bot_modules.database_handler import DatabaseHandler
@@ -34,7 +35,7 @@ class Notifications:
     def connect_to_reddit(self):
         user_agent = 'tylerbrockett - developer'
         reddit = praw.Reddit(user_agent=user_agent)
-        reddit.login(accountinfo.developerusername, accountinfo.developerpassword, disable_warning=True)
+        reddit.login(developer['username'], developer['password'], disable_warning=True)
         return reddit
 
     def connect_to_db(self):
@@ -103,7 +104,7 @@ class Notifications:
 
     def handle_crash(self, stacktrace):
         print(stacktrace)
-        self.reddit.send_message(accountinfo.developerusername, 'Bot Alerts Crashed', stacktrace)
+        self.reddit.send_message(developer['username'], 'Bot Alerts Crashed', stacktrace)
         self.db.close()
         exit()
 

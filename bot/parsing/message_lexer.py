@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   12/2/2016
+Date Last Edited:   12/24/2016
 Version:            v2.0
 ==========================================
 """
@@ -24,7 +24,7 @@ class MessageLexer:
 
     statistics_keywords = ['statistics', 'stats']
     subscriptions_keywords = ['subscriptions', 'subs']
-    unsubscribe_keywords = ['unsubscribe', 'unsub']
+    unsubscribe_keywords = ['unsubscribe', 'unsub', 'stop']
     all_keywords = ['all']
     subscribe_keywords = ['subscribe', 'sub']
     edit_keywords = ['edit', 'change']
