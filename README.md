@@ -153,9 +153,10 @@ To send me feedback, send me a message with the subject as "Feedback" and the bo
 If you send a message that doesn't follow the above guidelines, you will get an error message from the bot saying the request wasn't recognized.
 
 ## Future Plans
-* I think the next major feature I want to add is the ability to send out email notifications if the user specifies it.
+* Ability to edit subscription (add/remove parameters)
+* Ability to send out email notifications if the user specifies it
 
-## Known Issues
+## Issues / things to watch out for
 1. Be careful with how you are specifying your subscriptions. It is EXTREMELY easy to wind up with subscriptions that overlap, and thus you're being notified twice for the same post.
 
 ## Edits
