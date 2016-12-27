@@ -32,12 +32,14 @@ class SubscriptionLexer:
     subreddit_keywords = ['-subreddit', '-subreddits', '-sub', '-subs']
     nsfw_keywords = ['-nsfw', '-show-nsfw']
     email_keywords = ['-email']
+    symbols_keywords = [',']
 
     reserved_tokens = sum(
         [title_keywords, body_keywords, redditors_keywords,
          ignore_title_keywords, ignore_body_keywords, ignore_redditors_keywords,
          subreddit_keywords,
-         nsfw_keywords, email_keywords],
+         nsfw_keywords, email_keywords,
+         symbols_keywords],
         [])
 
     def __init__(self, sub):
