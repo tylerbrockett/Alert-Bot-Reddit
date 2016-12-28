@@ -31,13 +31,17 @@ developer = {
     'username': 'developers_username',
     'password': 'developers_password',
     'user_agent': 'python-praw:com.developer.developer:v1.0 (by /u/developers_username)',
+    'client_id': 'xxxxxxxxxxxxxx',
+    'client_secret': 'xxxxxxxxxxxxxxxxxxxxxxxxxxx',
     'email': 'developers_email@domain.com'
 }
 
 bot_errors = {
     'username': 'bot_error_handling_account',
     'password': 'bot_error_handling_account_password',
-    'user_agent': 'python-praw:com.developer.bot_error_account:v1.0 (by /u/developers_username)'
+    'user_agent': 'python-praw:com.developer.bot_error_account:v1.0 (by /u/developers_username)',
+    'client_id': 'xxxxxxxxxxxxxx',
+    'client_secret': 'xxxxxxxxxxxxxxxxxxxxxxxxxxx'
 }
 
 bot_email = {
