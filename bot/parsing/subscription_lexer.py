@@ -29,7 +29,7 @@ class SubscriptionLexer:
     ignore_title_keywords = ['-ignore-title', '-ignore-item', '-ignore-items']
     ignore_body_keywords = ['-ignore-body', '-ignore-site', '-ignore-sites', '-ignore-url', '-ignore-content', '-ignore-selftext', '-ignore-link']
     ignore_redditors_keywords = ['-ignore-redditor', '-ignore-redditors', '-ignore-user', '-ignore-users']
-    subreddit_keywords = ['-subreddit', '-subreddits', '-sub', '-subs']
+    subreddit_keywords = ['-subreddit', '-subreddits', '-sub', '-subs', '-reddit', '-red']
     nsfw_keywords = ['-nsfw', '-show-nsfw']
     email_keywords = ['-email']
     symbols_keywords = [',']
