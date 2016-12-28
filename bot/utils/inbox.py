@@ -86,7 +86,7 @@ def compose_help_message(username, subs):
     result = compose_greeting(username) + \
              'Please visit the bot\'s [Github Readme](' + GITHUB_README + ') for ' + \
              'detailed information on how the bot works. If you still have questions, please visit ' + \
-             accountinfo.bot_subreddit + 'or message /u/' + developer['username'] + '. Thanks!\t \n\t \n' + \
+             accountinfo.bot_subreddit + ' or message /u/' + developer['username'] + '. Thanks!\t \n\t \n' + \
              format_subscription_list(subs, 'Your Subscriptions') + \
              compose_salutation()
     return result
