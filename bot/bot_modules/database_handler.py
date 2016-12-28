@@ -62,6 +62,9 @@ class DatabaseHandler:
     def commit(self):
         self.connection.commit()
 
+    def rollback(self):
+        self.connection.rollback()
+
     # ==============================================================================
     #           SUBSCRIPTIONS
     # ==============================================================================
@@ -265,6 +268,21 @@ class DatabaseHandler:
         except:
             return {}
         return sorted(dict.items(), key=lambda x: x[1], reverse=True)
+
+    # ==============================================================================
+    #           NOTIFICATIONS - Message From Developer
+    # ==============================================================================
+
+    def get_redditors_needing_notification(self):
+        return self.connection.cursor().execute(database.GET_USERNAMES_THAT_NEED_ALERT).fetchall()
+
+    def insert_into_notifications(self, username, notified):
+        self.connection.cursor().execute(database.INSERT_ROW_ALERTS, (username, notified))  # 1 is True
+        self.commit()
+
+    def drop_table_notifications(self):
+        self.connection.cursor().execute(database.DROP_TABLE_ALERTS)
+        self.commit()
 
 
 class DatabaseHandlerException(Exception):
