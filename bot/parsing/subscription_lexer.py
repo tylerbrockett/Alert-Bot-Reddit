@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   12/24/2016
+Date Last Edited:   12/27/2016
 Version:            v2.0
 ==========================================
 """

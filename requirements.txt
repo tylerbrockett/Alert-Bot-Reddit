@@ -1,0 +1,8 @@
+# To install via requirements file:
+# 1. cd into directory where requirements.txt is located
+# 2. Activate virtualenv
+# 3. pip install -r /path/to/requirements.txt
+
+.virtualenv
+praw>=4.0
+
