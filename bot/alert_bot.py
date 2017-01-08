@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   12/20/2016
+Date Last Edited:   01/08/2017
 Version:            v2.0
 ==========================================
 """
@@ -50,7 +50,7 @@ class AlertBot:
                 Logger.log('Keyboard Interrupt - Bot killed', Color.RED)
                 exit()
             except:
-                handle_crash(traceback.format_exc(), self.reddit, self.database, True)
+                handle_crash(traceback.format_exc(), bot, message_dev=True, reddit=self.reddit, database=self.database)
 
     def check_for_commands(self):
         Logger.log('Checking for commands')

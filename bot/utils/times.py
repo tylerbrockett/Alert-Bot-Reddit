@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   12/2/2016
+Date Last Edited:   01/08/2017
 Version:            v2.0
 ==========================================
 """
@@ -47,7 +47,7 @@ class TimeHelper:
 
 
 def get_formatted_time():
-    return time.strftime('%l:%M%p on %b %d, %Y')
+    return time.strftime('%I:%M:%S%p on %A, %B %d, %Y')
 
 
 def get_current_timestamp():

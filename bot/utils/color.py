@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   12/2/2016
+Date Last Edited:   01/08/2017
 Version:            v2.0
 ==========================================
 """
@@ -23,8 +23,12 @@ class Color:
     CYAN = '\033[36m'
 
     RANDOM = -1
+    RAINBOW = -2
+
+    RESET = '\033[39m'
 
     colors = [BLACK, WHITE, RED, GREEN, YELLOW, BLUE, MAGENTA, CYAN]
+    rainbow = [RED, YELLOW, GREEN, CYAN, BLUE, MAGENTA]
 
     @staticmethod
     def random():
