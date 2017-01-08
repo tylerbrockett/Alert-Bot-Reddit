@@ -32,6 +32,7 @@ class TokenType:
     EDIT = 25
     HELP = 26
     FEEDBACK = 27
+    NUM_SYMBOL = 28
 
     # EDIT TOKENS
     NUM = 30

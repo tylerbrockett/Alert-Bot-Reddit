@@ -30,10 +30,11 @@ class MessageLexer:
     edit_keywords = ['edit', 'change']
     help_keywords = ['help', 'info', 'information']
     feedback_keywords = ['feedback', 'suggestion', 'suggestions', 'advice', 'feature', 'features', 'request', 'requests']
+    number_keywords = ['#']
 
     reserved_tokens = sum(
-        [statistics_keywords, subscriptions_keywords, unsubscribe_keywords,
-         all_keywords, subscribe_keywords, edit_keywords, help_keywords, feedback_keywords],
+        [statistics_keywords, subscriptions_keywords, unsubscribe_keywords, all_keywords,
+         subscribe_keywords, edit_keywords, help_keywords, feedback_keywords, number_keywords],
         []
     )
 
@@ -64,6 +65,8 @@ class MessageLexer:
             return TokenType.HELP
         elif token.lower() in MessageLexer.feedback_keywords:
             return TokenType.FEEDBACK
+        elif token.lower() in MessageLexer.number_keywords:
+            return TokenType.NUM_SYMBOL
         return self.FALSE
 
     def unget_token(self):
@@ -114,7 +117,10 @@ class MessageLexer:
         self.token = ''
 
         c = self.get_char()
-        if self.EOF:
+        if c == '#':
+            self.token_type = TokenType.NUM_SYMBOL
+            self.token = c
+        elif self.EOF:
             self.token_type = TokenType.EOF
         elif self.is_num(c):
             self.unget_char()

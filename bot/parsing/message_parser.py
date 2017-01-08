@@ -90,6 +90,9 @@ class MessageParser:
         elif ttype == TokenType.UNSUBSCRIBE:
             self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_UNSUBSCRIBE
             token, ttype, index = self.get_token()
+            # Ignore the # symbol
+            if ttype == TokenType.NUM_SYMBOL:
+                token, ttype, index = self.get_token()
             if ttype == TokenType.ALL:
                 self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_UNSUBSCRIBE_ALL
                 token, ttype, index = self.get_token()
