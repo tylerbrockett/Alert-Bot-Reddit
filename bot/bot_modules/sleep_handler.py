@@ -19,7 +19,7 @@ class SleepHandler:
     def sleep(seconds):
         seconds += 1
         for i in range(1, seconds):
-            stdout.write('\r \r')
+            stdout.write('\033[K\r')
             if i % 4 == 0:
                 stdout.write('sleeping (' + str(seconds - i) + ') |')
             elif i % 4 == 1:
