@@ -76,7 +76,7 @@ class OldBot:
     def compose_message(username):
         ret = 'Hi /u/' + username + ',\n\t \n' \
             'There have been ***HUGE*** changes to the /r/buildapcsales bot. \n\t\n' \
-            'First off, it has changed to /u/' + bot['username'] + '\n\nUnfortunately, the new bot doesn\t have ' \
+            'First off, it has changed to /u/' + bot['username'] + '\n\nUnfortunately, the new bot doesn\'t have ' \
             'your old subscriptions. Subscriptions were tied to the message ID of your subscription message to the ' \
             'bot, and the new bot couldn\'t reply to the old bot\'s messages. This makes total sense now, but it ' \
             'hadn\'t occurred to me when I started this update. If you want to know your old subscriptions, let me ' \
