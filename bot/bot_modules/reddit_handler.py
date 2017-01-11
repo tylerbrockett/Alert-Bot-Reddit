@@ -51,8 +51,12 @@ class RedditHandler:
         return self.reddit
 
     def get_unread(self):
+        ret = []
         unread = self.reddit.inbox.unread(limit=None)
-        return unread
+        for message in unread:
+            ret.append(message)
+        ret.reverse()
+        return ret
 
     def get_message(self, message_id):
         return self.reddit.inbox.message(message_id)
