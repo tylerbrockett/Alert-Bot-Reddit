@@ -16,21 +16,21 @@ from utils import times
 from utils import database
 from utils.subscription import Subscription
 from os import path
-from definitions import DB_LOCATION
 from utils import files
 from utils.logger import Logger
 from utils.color import Color
 
 
 class DatabaseHandler:
-    def __init__(self):
+    def __init__(self, db_location):
+        self.db_location = db_location
         self.connection = self.connect()
 
     def connect(self):
         try:
-            if not path.isfile(DB_LOCATION):
-                files.create_file(DB_LOCATION)
-            connection = sqlite3.connect(DB_LOCATION)
+            if not path.isfile(self.db_location):
+                files.create_file(self.db_location)
+            connection = sqlite3.connect(self.db_location)
             connection.text_factory = str
             connection.execute('PRAGMA foreign_keys = ON;')
             cursor = connection.cursor()

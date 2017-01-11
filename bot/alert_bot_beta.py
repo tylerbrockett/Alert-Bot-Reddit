@@ -16,21 +16,21 @@ from bot_modules.match_handler import MatchHandler
 from bot_modules.reddit_handler import RedditHandler
 from bot_modules.sleep_handler import SleepHandler
 from bot_modules.match_finder import MatchFinder
-from definitions import DB_LOCATION
+from definitions import BETA_DB_LOCATION
 import traceback
 from utils import times
 from utils.color import Color
 from utils.logger import Logger
 from bot_modules.crash_handler import handle_crash
-from accounts.accountinfo import bot
+from accounts.accountinfo import bot_beta
 
 
-class AlertBot:
+class AlertBotBeta:
     def __init__(self):
         self.start_time = times.get_current_timestamp()
         self.run = True
-        self.database = DatabaseHandler(DB_LOCATION)
-        self.reddit = RedditHandler(bot)
+        self.database = DatabaseHandler(BETA_DB_LOCATION)
+        self.reddit = RedditHandler(bot_beta)
 
     def start(self):
         Logger.log('Starting bot...', Color.GREEN)
@@ -51,7 +51,7 @@ class AlertBot:
                 Logger.log('Keyboard Interrupt - Bot killed', Color.RED)
                 exit()
             except:
-                handle_crash(traceback.format_exc(), bot, message_dev=True, reddit=self.reddit, database=self.database)
+                handle_crash(traceback.format_exc(), bot_beta, message_dev=True, reddit=self.reddit, database=self.database)
 
     def check_for_commands(self):
         Logger.log('Checking for commands')
@@ -64,5 +64,5 @@ class AlertBot:
             exit()
 
 if __name__ == '__main__':
-    alert_bot = AlertBot()
-    alert_bot.start()
+    alert_bot_beta = AlertBotBeta()
+    alert_bot_beta.start()

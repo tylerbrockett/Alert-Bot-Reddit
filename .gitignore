@@ -9,11 +9,8 @@
 
 # Sensitive Info
 accounts/
+/bot/database/BETA.db
 /bot/database/subscriptions.db
-
-/bot/data/database/subscriptions.db
-/bot/data/database/BEFORE-REMOVING-DUPLICATE-SUBS.db
-/bot/database/BEFORE-REMOVING-DUPLICATE-SUBS.db
 
 # "compiled" files
 *.pyc
