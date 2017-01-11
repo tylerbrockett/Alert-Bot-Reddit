@@ -12,7 +12,8 @@ Version:            v2.0
 from utils import inbox
 from utils.color import Color
 from utils.logger import Logger
-from accounts.accountinfo import bot
+from accounts.accountinfo import developer
+import traceback
 
 
 class CommandHandler:
@@ -32,7 +33,7 @@ class CommandHandler:
         unread_messages = reddit.get_unread()
         for message in unread_messages:
             username = str(message.author).lower()
-            if username == bot['username']:
+            if username == developer['username']:
                 dev_messages.append(message)
         return dev_messages
 
@@ -64,6 +65,7 @@ class CommandHandler:
                     commands.append(CommandHandler.TEST)
                     message.mark_read()
         except:
+            Logger.log(traceback.format_exc(), Color.RED)
             raise CommandHandlerException('Error occurred reading commands')
         return commands
 
