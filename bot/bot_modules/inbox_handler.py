@@ -243,7 +243,8 @@ class InboxHandler:
                 Logger.log(traceback.format_exc(), Color.RED)
                 reddit.send_message(developer['username'],
                                     'ERROR HANDLING MESSAGE - POTENTIALLY STUCK IN INBOX',
-                                    'SUBJECT: ' + str(message.subject) + '\n\n' +
+                                    'AUTHOR: /u/' + str(message.author) + '\t \n' +
+                                    'SUBJECT: ' + str(message.subject) + '\t \n' +
                                     'BODY:\n' + str(message.body))
             SleepHandler.sleep(2)
         Logger.log(str(num_messages) + ' unread messages handled', Color.CYAN)
