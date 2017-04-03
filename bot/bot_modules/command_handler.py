@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   12/20/2016
+Date Last Edited:   04/02/2017
 Version:            v2.0
 ==========================================
 """
@@ -12,7 +12,7 @@ Version:            v2.0
 from utils import inbox
 from utils.color import Color
 from utils.logger import Logger
-from accounts.accountinfo import developer
+from accounts.accountinfo import accounts
 import traceback
 
 
@@ -33,7 +33,7 @@ class CommandHandler:
         unread_messages = reddit.get_unread()
         for message in unread_messages:
             username = str(message.author).lower()
-            if username == developer['username']:
+            if username == accounts['developer']['username']:
                 dev_messages.append(message)
         return dev_messages
 

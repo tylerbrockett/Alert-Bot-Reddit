@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   01/08/2017
+Date Last Edited:   04/02/2017
 Version:            v2.0
 ==========================================
 """
@@ -12,7 +12,6 @@ Version:            v2.0
 from utils.color import Color
 import traceback
 from random import randint
-from sys import stdout
 
 
 class Logger:

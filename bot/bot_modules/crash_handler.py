@@ -4,12 +4,12 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   01/08/2017
+Date Last Edited:   04/02/2017
 Version:            v2.0
 ==========================================
 """
 
-from accounts.accountinfo import bot_errors, developer
+from accounts.accountinfo import accounts
 from bot_modules.sleep_handler import SleepHandler
 from utils.logger import Logger
 from utils.color import Color
@@ -25,9 +25,9 @@ def handle_crash(stacktrace, bot_credentials, message_dev=False, reddit=None, da
                 reddit.reset()
             if database:
                 database.reset()
-            reddit.send_message(bot_errors['username'], bot_credentials['username'] + ' - Exception Handled', stacktrace)
+            reddit.send_message(accounts['bot_errors']['username'], bot_credentials['username'] + ' - Exception Handled', stacktrace)
             if message_dev:
-                reddit.send_message(developer['username'], bot_credentials['username'] + ' - Exception Handled', stacktrace)
+                reddit.send_message(accounts['developer']['username'], bot_credentials['username'] + ' - Exception Handled', stacktrace)
                 print('Messaging Dev - Crash Handler')
             reset = True
         except:

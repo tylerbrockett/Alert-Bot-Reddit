@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   12/28/2016
+Date Last Edited:   04/02/2017
 Version:            v2.0
 ==========================================
 """
@@ -13,12 +13,10 @@ import time
 import traceback
 from utils.color import Color
 from utils.logger import Logger
-from utils import database
-from utils import inbox
-from accounts.accountinfo import developer
+from accounts.accountinfo import accounts
 from accounts import accountinfo
-from bot_modules.database_handler import DatabaseHandler, DatabaseHandlerException
-from bot_modules.reddit_handler import RedditHandler, RedditHelperException
+from bot_modules.database_handler import DatabaseHandler
+from bot_modules.reddit_handler import RedditHandler
 
 
 class Notifications:
@@ -28,8 +26,8 @@ class Notifications:
         self.needs_alert = []
         self.errors = []
         self.invalid_users = []
-        self.db = DatabaseHandler()
-        self.reddit = RedditHandler(developer)
+        self.db = DatabaseHandler(accounts['bot'])
+        self.reddit = RedditHandler(accounts['developer'])
 
     def reset(self):
         reset = False
@@ -99,14 +97,14 @@ class Notifications:
         '\t \n\t \n' + \
         \
         '\n\t \n\t \n' \
-        '-/u/' + developer['username'] + \
+        '-/u/' + accounts['developer']['username'] + \
         '\n\t \n\t \n' + \
         accountinfo.bot_subreddit + ' | [Bot Code](https://github.com/tylerbrockett/Alert-Bot-Reddit)\n'
 
-if __name__ == '__main__':
-    notifications = Notifications()
-    try:
-        notifications.run_alerts()
-        notifications.finish_up()
-    except:
-        Logger.log(traceback.format_exc(), Color.YELLOW)
+
+notifications = Notifications()
+try:
+    notifications.run_alerts()
+    notifications.finish_up()
+except:
+    Logger.log(traceback.format_exc(), Color.YELLOW)

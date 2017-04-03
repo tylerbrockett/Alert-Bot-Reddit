@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   01/08/2017
+Date Last Edited:   04/02/2017
 Version:            v2.0
 ==========================================
 """
@@ -16,24 +16,26 @@ from bot_modules.match_handler import MatchHandler
 from bot_modules.reddit_handler import RedditHandler
 from bot_modules.sleep_handler import SleepHandler
 from bot_modules.match_finder import MatchFinder
-from definitions import DB_LOCATION
 import traceback
 from utils import times
 from utils.color import Color
 from utils.logger import Logger
 from bot_modules.crash_handler import handle_crash
-from accounts.accountinfo import bot
+from accounts.accountinfo import accounts
+from utils import database
+import sys
 
 
 class AlertBot:
-    def __init__(self):
+    def __init__(self, username):
+        self.bot = accounts[username]
         self.start_time = times.get_current_timestamp()
         self.run = True
-        self.database = DatabaseHandler(DB_LOCATION)
-        self.reddit = RedditHandler(bot)
+        self.database = DatabaseHandler(database.get_db_location(self.bot))
+        self.reddit = RedditHandler(self.bot)
 
     def start(self):
-        Logger.log('Starting bot...', Color.GREEN)
+        Logger.log('Starting bot as ' + self.bot['username'] + '...', Color.GREEN)
         while True:
             try:
                 self.check_for_commands()
@@ -51,7 +53,7 @@ class AlertBot:
                 Logger.log('Keyboard Interrupt - Bot killed', Color.RED)
                 exit()
             except:
-                handle_crash(traceback.format_exc(), bot, message_dev=True, reddit=self.reddit, database=self.database)
+                handle_crash(traceback.format_exc(), self.bot, message_dev=True, reddit=self.reddit, database=self.database)
 
     def check_for_commands(self):
         Logger.log('Checking for commands')
@@ -63,6 +65,7 @@ class AlertBot:
         if CommandHandler.KILL in commands:
             exit()
 
-if __name__ == '__main__':
-    alert_bot = AlertBot()
-    alert_bot.start()
+
+bot_username = sys.argv[1]
+alert_bot = AlertBot(bot_username)
+alert_bot.start()

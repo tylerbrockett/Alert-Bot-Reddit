@@ -4,13 +4,17 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   12/2/2016
+Date Last Edited:   04/02/2017
 Version:            v2.0
 ==========================================
 """
 
-DB_FILE_NAME = 'subscriptions.db'
-BETA_DB_FILE_NAME = 'BETA.db'
+from definitions import ROOT_DIR
+import os
+
+
+def get_db_location(bot):
+    return os.path.join(ROOT_DIR, 'database', bot['database'])
 
 
 # ======================================================================================================
@@ -113,7 +117,7 @@ INSERT_ROW_MATCHES = 'INSERT INTO ' + \
                          TABLE_MATCHES + \
                          ' VALUES (?,?,?,?)'
 
-INSERT_ROW_ALL_MATCHES = 'INSERT INTO ' + \
+INSERT_ROW_ALL_MATCHES = 'INSERT OR IGNORE INTO ' + \
                          TABLE_ALL_MATCHES + \
                          ' VALUES (?,?,?,?)'
 
