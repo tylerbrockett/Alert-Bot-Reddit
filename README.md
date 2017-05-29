@@ -17,7 +17,7 @@ If you really like the bot, please consider making a donation for my time! Thank
 ***NOTE:*** For each of these fields (subject and body) capitalization does *not* matter, it will yield the exact same results.
 
 #### To subscribe
-Send a private message to /u/Alert_Bot with the body of the message specifying what you want the bot to look out for. The body of the message is what the bot cares about, so the following examples should be in the body of the message. The subject of the message can be anything, but I recommend making it descriptive to you, so you can see what the message is about at a quick glance.
+Send a [private message to /u/Alert_Bot](https://www.reddit.com/message/compose/?to=alert_bot) with the body of the message specifying what you want the bot to look out for. The body of the message is what the bot cares about, so the following examples should be in the body of the message. The subject of the message can be anything, but I recommend making it descriptive to you, so you can see what the message is about at a quick glance.
 Essentially there is the subscribe action, and a list of parameters. Parameter List:
 
 #####Parameter Values
