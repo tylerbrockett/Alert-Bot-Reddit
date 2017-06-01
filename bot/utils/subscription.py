@@ -136,8 +136,8 @@ class Subscription:
             'Ignore Body Terms|' + self.format(Subscription.IGNORE_BODY) + '\n' + \
             'Redditors|' + self.format(Subscription.REDDITORS) + '\n' + \
             'Ignore Redditors|' + self.format(Subscription.IGNORE_REDDITORS) + '\n' + \
-            'Allow NSFW|' + self.format(Subscription.NSFW) + '\n' + \
-            'Email|' + self.format(Subscription.EMAIL) + '\n'
+            'Allow NSFW|' + self.format(Subscription.NSFW) + '\n'  # + \
+            # 'Email|' + self.format(Subscription.EMAIL) + '\n'
         return ret
 
     @staticmethod
