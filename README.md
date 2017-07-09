@@ -172,7 +172,7 @@ The ***-subreddit*** parameter specifies which subreddits to look in for posts m
 * -subreddit
 * -subreddits
         
-#### Flags:
+### Flags:
 Flags do not take a parameter list as an argument.
 
 ### -nsfw
