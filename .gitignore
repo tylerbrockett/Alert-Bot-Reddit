@@ -8,7 +8,7 @@
 # git update-index --no-assume-unchanged [<file> ...]
 
 # Sensitive Info
-accounts/
+accountinfo.py
 /bot/database/BETA.db
 /bot/database/subscriptions.db
 
@@ -16,7 +16,7 @@ accounts/
 *.pyc
 
 # IDE files
-/*/.idea/
+.idea/
 
 # Test files
 /bot/test.py
