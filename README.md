@@ -188,22 +188,22 @@ By default, the bot will ignore posts that are marked as NSFW. Some subreddits u
 * -show-nsfw
         
 
-#### Unsubscribe
+## To Unsubscribe
 There are 3 ways to unsubscribe from posts. All of these require sending the message as the **body** of the message. The subject doesn't matter.
 * **Unsubscribe All -** Send the bot the message ***'unsubscribe all'*** in order to stop being notified of any posts.
 * **Unsubscribe by reply -** Reply to an alert with ***'unsubscribe'*** in order to remove that subscription.
 * **Unsubscribe by subscription number -** Send the bot a message with ***'unsubscribe #'*** (where the '#' symbol is the actual subscription number) in order to remove that subscription. This requires knowing the order you subscribed in, or by sending the bot a message with "subs" or "subscriptions" to find out.
 
-#### Viewing your subscriptions
+## Viewing your subscriptions
 Send the bot a message with the body of the message as either ***"subs"*** or ***"subscriptions"***, and it will reply with a list of your subscriptions and the order in which you subscribed.
 
-#### Viewing Statistics
+## Viewing Statistics
 If you're a nerd like me, you can get the bot to send you statistics on it. Send the bot a message with either ***"stats"*** or ***"statistics"***. The bot will respond with the number of users subscribed, the number of subscriptions it's handling, the number of subsreddits it's parsing for the subscriptions, etc.
 
-#### Getting Help
+## Getting Help
 To get detailed information on how the bot works, send the bot a message with the subject or body as 'help'.
 
-#### Reject message
+## Reject message
 If you send a message that doesn't follow the above guidelines, you will get an error message from the bot saying the request wasn't recognized.
 
 ## Future Plans
