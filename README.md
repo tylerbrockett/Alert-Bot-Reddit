@@ -17,13 +17,16 @@ If you really like the bot, please consider making a donation for my time. Thank
 ***Note:*** For each of these fields (subject and body) capitalization does *not* matter, it will yield the exact same results.
 
 ## To subscribe
+
 Send a [private message to /u/Alert_Bot](https://www.reddit.com/message/compose/?to=alert_bot) with the body of the message specifying what you want the bot to look out for. The body of the message is what the bot cares about, so the following examples should be in the body of the message. The subject of the message can be anything, but I recommend making it descriptive to you, so you can see what the message is about at a quick glance.
 Essentially there is the subscribe action, and a list of parameters. Parameter List:
 
-###Parameter Values
+### Parameter Values
+
 ***Notes:*** All parameters can be combined to form one specific, constrained subscription. Order of parameters does ***not*** matter. Also note that most parameters support a comma separated list of words or phrases as well, each of which need to show up in order to constitute a match. The nice thing about this is that the order of the words does ***not*** matter. 
 
-####-title *\<parameter list\>*
+#### -title *\<parameter list\>*
+
 The ***-title*** parameter specifies words or phrases to watch out for in the title of the post. A list of words or phrases can be specified in each ***-title*** parameter, separated by a comma. All words or phrases in each element of the list must be present in the title, but order of the words or phrases doesn't matter. Multiple ***-title*** parameters can be specified. In that case, only one of the ***-title*** parameters needs to match.
 
 **Examples:**
@@ -46,7 +49,8 @@ The ***-title*** parameter specifies words or phrases to watch out for in the ti
 * -items
 
         
-####-body *\<parameter list\>*
+#### -body *\<parameter list\>*
+
 The ***-body*** parameter specifies words or phrases to watch out for in the body of the post. A list of words or phrases can be specified in each ***-body*** parameter, separated by a comma. All words or phrases in each element of the list must be present in the body, but order of the words or phrases doesn't matter. Multiple ***-body*** parameters can be specified. In that case, only one of the ***-body*** parameters needs to match.
 
 **Examples:**
@@ -73,7 +77,8 @@ The ***-body*** parameter specifies words or phrases to watch out for in the bod
 * -link
 
 
-####-redditor *\<parameter list\>*
+####- redditor *\<parameter list\>*
+
 The ***-redditor*** parameter is used to filter posts from a subreddit by a specific user. A list of redditors can be specified, separated by a comma. If multiple redditors are specified, only one redditor needs to be present to constitute a match.    
 ***Note:*** The '/u/' or 'u/' prefixes for redditors will be stripped, so it doesn't matter if you include it or not.
 
@@ -91,7 +96,8 @@ The ***-redditor*** parameter is used to filter posts from a subreddit by a spec
 * -user
 * -users
 
-####-ignore-title *\<parameter list\>*
+#### -ignore-title *\<parameter list\>*
+
 The ***-ignore-title*** parameter is used when you want to ignore posts that contain the specified words or phrases. A list of words or phrases can be specified, separated by a comma. If only ***one*** word or phrase in that list matches, the post is ignored.
 
 **Examples:**
@@ -107,7 +113,8 @@ The ***-ignore-title*** parameter is used when you want to ignore posts that con
 * -ignore-item
 * -ignore-items
 
-####-ignore-body *\<parameter list\>*
+#### -ignore-body *\<parameter list\>*
+
 The ***-ignore-title*** parameter is used when you want to ignore posts that contain the specified words or phrases. A list of words or phrases can be specified, separated by a comma. If only ***one*** word or phrase in that list matches, the post is ignored.
 
 **Examples:**
@@ -127,7 +134,7 @@ The ***-ignore-title*** parameter is used when you want to ignore posts that con
 * -ignore-selftext
 * -ignore-link
 
-####-ignore-redditor *\<parameter list\>*
+#### -ignore-redditor *\<parameter list\>*
 
 The ***-ignore-redditor*** parameter is used to ignore posts from a subreddit by a specific user. A list of redditors can be specified, separated by a comma. If multiple redditors are specified, only one redditor needs to be present for the post to be ignored.    
 ***Note:*** The '/u/' or 'u/' prefixes for redditors will be stripped, so it doesn't matter if you include it or not.
@@ -147,7 +154,7 @@ The ***-ignore-redditor*** parameter is used to ignore posts from a subreddit by
 * -ignore-users
 
 
-####-subreddit *\<parameter list\>*
+#### -subreddit *\<parameter list\>*
 
 The ***-subreddit*** parameter specifies which subreddits to look in for posts matching your criteria. A list of subreddits can be specified, separated by a comma, and the bot will look in all of them.    
 ***Note:*** Also note that the '/r/' or 'r/' prefixes for subreddits will be stripped, so it doesn't matter if you include it or not.    
@@ -165,10 +172,10 @@ The ***-subreddit*** parameter specifies which subreddits to look in for posts m
 * -subreddit
 * -subreddits
         
-####Flags:
+#### Flags:
 Flags do not take a parameter list as an argument.
 
-###-nsfw
+###- nsfw
 By default, the bot will ignore posts that are marked as NSFW. Some subreddits use this tag to mark posts as expired and for other reasons. This tag will remove the default "ignore nsfw posts" behavior.
 
 **Examples:**
