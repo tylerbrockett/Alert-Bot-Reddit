@@ -198,7 +198,7 @@ There are 3 ways to unsubscribe from posts. All of these require sending the mes
 Send the bot a message with the body of the message as either ***"subs"*** or ***"subscriptions"***, and it will reply with a list of your subscriptions and the order in which you subscribed.
 
 ## Viewing Statistics
-If you're a nerd like me, you can get the bot to send you statistics on it. Send the bot a message with either ***"stats"*** or ***"statistics"***. The bot will respond with the number of users subscribed, the number of subscriptions it's handling, the number of subsreddits it's parsing for the subscriptions, etc.
+If you're a nerd like me, you can get the bot to send you statistics on it. If you send the bot a message with either ***"stats"*** or ***"statistics"*** , it will respond with the number of users subscribed, the number of subscriptions it's handling, the number of subsreddits it's parsing for the subscriptions, etc.
 
 ## Getting Help
 To get detailed information on how the bot works, send the bot a message with the subject or body as 'help'.
