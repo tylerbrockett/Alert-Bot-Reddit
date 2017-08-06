@@ -139,19 +139,19 @@ class SubscriptionParser:
             raise SubscriptionParserException('Error - parse_statement_list - Expected ' + str(SubscriptionParser.statement_tokens))
 
     def parse_title_list(self):
-        title_list = sorted(set(self.parse_list([])))
+        title_list = sorted(set(self.parse_phrase_list([])))
         if title_list not in self.data[Subscription.TITLE]:
             self.data[Subscription.TITLE].append(title_list)
             self.data[Subscription.TITLE].sort()
 
     def parse_body_list(self):
-        body_list = sorted(set(self.parse_list([])))
+        body_list = sorted(set(self.parse_phrase_list([])))
         if body_list not in self.data[Subscription.BODY]:
             self.data[Subscription.BODY].append(body_list)
             self.data[Subscription.BODY].sort()
 
     def parse_redditors_list(self):
-        redditor_list = self.parse_list([])
+        redditor_list = self.parse_id_list([])
         redditor_list = [r.lower().replace('/u/', '') for r in redditor_list]
         redditor_list = [r.lower().replace('u/', '') for r in redditor_list]
         redditor_list = sorted(set(redditor_list))
@@ -161,7 +161,7 @@ class SubscriptionParser:
                 self.data[Subscription.REDDITORS].sort()
 
     def parse_subreddits_list(self):
-        subreddit_list = self.parse_list([])
+        subreddit_list = self.parse_id_list([])
         subreddit_list = [s.lower().replace('/r/', '') for s in subreddit_list]
         subreddit_list = [s.lower().replace('r/', '') for s in subreddit_list]
         subreddit_list = sorted(set(subreddit_list))
@@ -177,21 +177,21 @@ class SubscriptionParser:
         self.data[Subscription.NSFW] = True
 
     def parse_ignore_title_list(self):
-        ignore_list = sorted(set(self.parse_list([])))
+        ignore_list = sorted(set(self.parse_phrase_list([])))
         for item in ignore_list:
             if item not in self.data[Subscription.IGNORE_TITLE]:
                 self.data[Subscription.IGNORE_TITLE].append(item)
                 self.data[Subscription.IGNORE_TITLE].sort()
 
     def parse_ignore_body_list(self):
-        ignore_list = sorted(set(self.parse_list([])))
+        ignore_list = sorted(set(self.parse_phrase_list([])))
         for item in ignore_list:
             if item not in self.data[Subscription.IGNORE_BODY]:
                 self.data[Subscription.IGNORE_BODY].append(item)
                 self.data[Subscription.IGNORE_BODY].sort()
 
     def parse_ignore_redditors_list(self):
-        ignore_list = self.parse_list([])
+        ignore_list = self.parse_id_list([])
         ignore_list = [r.lower().replace('/u/', '') for r in ignore_list]
         ignore_list = [r.lower().replace('u/', '') for r in ignore_list]
         ignore_list = sorted(set(ignore_list))
@@ -200,7 +200,25 @@ class SubscriptionParser:
                 self.data[Subscription.IGNORE_REDDITORS].append(item)
                 self.data[Subscription.IGNORE_REDDITORS].sort()
 
-    def parse_list(self, ret):
+    def parse_id_list(self, ret):
+        token, ttype = self.get_token()
+        if ttype is TokenType.TOKEN:
+            ret += [token]
+            token, ttype = self.get_token()
+            if ttype is TokenType.COMMA:
+                token, ttype = self.get_token()
+                if ttype is TokenType.TOKEN:
+                    self.unget_token()
+                    return self.parse_id_list(ret)
+                else:
+                    raise SubscriptionParserException('Error - parse_id_list - Expected TOKEN after COMMA or SEMICOLON')
+            else:
+                self.unget_token()
+                return ret
+        else:
+            raise SubscriptionParserException('Error - parse_id_list - Expected TOKEN')
+
+    def parse_phrase_list(self, ret):
         token, ttype = self.get_token()
         if ttype is TokenType.TOKEN:
             self.unget_token()
@@ -210,14 +228,14 @@ class SubscriptionParser:
                 token, ttype = self.get_token()
                 if ttype is TokenType.TOKEN:
                     self.unget_token()
-                    return self.parse_list(ret)
+                    return self.parse_phrase_list(ret)
                 else:
-                    raise SubscriptionParserException('Error - parse_list - Expected TOKEN after COMMA or SEMICOLON')
+                    raise SubscriptionParserException('Error - parse_phrase_list - Expected TOKEN after COMMA or SEMICOLON')
             else:
                 self.unget_token()
                 return ret
         else:
-            raise SubscriptionParserException('Error - parse_list - Expected TOKEN')
+            raise SubscriptionParserException('Error - parse_phrase_list - Expected TOKEN')
 
     def parse_element(self, ret):
         token, ttype = self.get_token()
