@@ -13,6 +13,7 @@ import json
 
 from utils.inbox import format_subject
 from parsing.message_lexer import MessageLexer
+from parsing.message_lexer import MessageLexerException
 from parsing.subscription_parser import SubscriptionParser
 from parsing.token_type import TokenType
 import traceback
@@ -22,7 +23,7 @@ class MessageParser:
 
     KEY_ACTION = 'action'
     KEY_PAYLOAD = 'payload'
-    KEY_VALID = 'valid'
+    KEY_ERROR = 'error'
 
     ACTION_UNKNOWN = 'action_unknown'
     ACTION_STATISTICS = 'action_statistics'
@@ -42,7 +43,7 @@ class MessageParser:
     def get_token(self):
         self.index += 1
         if self.index >= len(self.tokens) or self.index < 0:
-            raise MessageParserException('Error - Index out of bounds [' + str(self.index) + ']')
+            raise MessageParserException('Index out of bounds [' + str(self.index) + ']')
         return self.tokens[self.index]
 
     def __init__(self, message):
@@ -52,14 +53,13 @@ class MessageParser:
         self.data = {
             MessageParser.KEY_ACTION: MessageParser.ACTION_UNKNOWN,
             MessageParser.KEY_PAYLOAD: {},
-            MessageParser.KEY_VALID: False
+            MessageParser.KEY_ERROR: None
         }
         try:
             self.tokens = MessageLexer(str(message.body)).tokenize()
             self.parse_message()
-            self.data[MessageParser.KEY_VALID] = True
         except:
-            self.data[MessageParser.KEY_VALID] = False
+            self.data[MessageParser.KEY_ERROR] = traceback.format_exc()
 
     def get_data(self):
         return self.data
@@ -76,17 +76,17 @@ class MessageParser:
             self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_STATISTICS
             token, ttype, index = self.get_token()
             if ttype != TokenType.EOF:
-                raise MessageParserException(MessageParserException.MALFORMED_REQUEST)
+                raise MessageParserException(MessageParserException.EXPECTED_EOF)
         elif ttype == TokenType.HELP:
             self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_HELP
             token, ttype, index = self.get_token()
             if ttype != TokenType.EOF:
-                raise MessageParserException(MessageParserException.MALFORMED_REQUEST)
+                raise MessageParserException(MessageParserException.EXPECTED_EOF)
         elif ttype == TokenType.SUBSCRIPTIONS:
             self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_GET_SUBSCRIPTIONS
             token, ttype, index = self.get_token()
             if ttype != TokenType.EOF:
-                raise MessageParserException(MessageParserException.MALFORMED_REQUEST)
+                raise MessageParserException(MessageParserException.EXPECTED_EOF)
         elif ttype == TokenType.UNSUBSCRIBE:
             self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_UNSUBSCRIBE
             token, ttype, index = self.get_token()
@@ -97,15 +97,15 @@ class MessageParser:
                 self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_UNSUBSCRIBE_ALL
                 token, ttype, index = self.get_token()
                 if ttype != TokenType.EOF:
-                    raise MessageParserException(MessageParserException.MALFORMED_REQUEST)
+                    raise MessageParserException(MessageParserException.EXPECTED_EOF)
             elif ttype == TokenType.NUM:
                 self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_UNSUBSCRIBE_FROM_NUM
                 self.data[MessageParser.KEY_PAYLOAD] = token
                 token, ttype, index = self.get_token()
                 if ttype != TokenType.EOF:
-                    raise MessageParserException(MessageParserException.MALFORMED_REQUEST)
+                    raise MessageParserException(MessageParserException.EXPECTED_EOF)
             elif ttype != TokenType.EOF:
-                raise MessageParserException(MessageParserException.MALFORMED_REQUEST)
+                raise MessageParserException(MessageParserException.EXPECTED_EOF)
             else:
                 self.data[MessageParser.KEY_ACTION] = MessageParser.ACTION_UNSUBSCRIBE
         elif ttype == TokenType.SUBSCRIBE:
@@ -131,7 +131,9 @@ class MessageParser:
 
 
 class MessageParserException(Exception):
-    MALFORMED_REQUEST = 'Malformed Request'
+    EXPECTED_EOF = 'Expected EOF (extraneous text after accepted text)'
+    MALFORMED_REQUEST = 'Message must begin with one of the aliases of the following actions: ' + \
+                        'subscribe, unsubscribe, subscriptions, help, feedback'
 
     def __init__(self, errorArgs):
         Exception.__init__(self, 'Message Parser Exception: {0}'.format(errorArgs))

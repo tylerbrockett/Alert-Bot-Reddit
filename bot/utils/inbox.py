@@ -146,15 +146,17 @@ def compose_feedback_message(username):
     return result
 
 
-def compose_reject_message(username, subject, body):
+def compose_reject_message(username, subject, body, error):
     result = compose_greeting(username) + \
              '**There was an error processing your request.** Please review your message and ' + \
              'make sure it follows [the guidelines](' + GITHUB_README + ') that have been set. ' + \
              'You can also visit ' + accountinfo.bot_subreddit + ' or message /u/' + accounts['developer']['username'] + \
              '. Thank you for your patience! \n\t \n\t \n' + \
+             '**Error:** \t \n' + \
+             error + '\t \n\t \n' + \
              '**Your request:** \t \n' + \
              'Subject:\t' + subject + '\t \n' + \
-             'Body:\t\t' + body + \
+             'Body:   \t' + body + \
              compose_salutation()
     return result
 

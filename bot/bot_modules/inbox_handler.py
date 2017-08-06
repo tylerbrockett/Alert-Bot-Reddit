@@ -166,11 +166,11 @@ class InboxHandler:
         message.mark_read()
 
     @staticmethod
-    def handle_reject_message(reddit, message):
+    def handle_reject_message(reddit, message, error):
         Logger.log('handle reject message')
-        message.reply(inbox.compose_reject_message(str(message.author), message.subject, message.body))
-        reddit.send_message(accounts['developer']['username'], 'REJECT MESSAGE - ' + str(message.author),
-                            inbox.compose_reject_message(str(message.author), message.subject, message.body))
+        reject_message = inbox.compose_reject_message(str(message.author), message.subject, message.body, error)
+        message.reply(reject_message)
+        reddit.send_message(accounts['developer']['username'], 'REJECT MESSAGE - ' + reject_message)
         message.mark_read()
 
     # TODO Add the ability to EDIT existing subscriptions
@@ -202,34 +202,38 @@ class InboxHandler:
                     InboxHandler.handle_help_message(database, message)
                 else:
                     m = MessageParser(message)
-                    valid = m.data[MessageParser.KEY_VALID]
                     action = m.data[MessageParser.KEY_ACTION]
+                    error = m.data[MessageParser.KEY_ERROR]
                     payload = m.get_payload()
 
                     Logger.log(json.dumps(m.data, 2), Color.MAGENTA)
 
-                    if valid and action == MessageParser.ACTION_STATISTICS:
+                    if error:
+                        Logger.log(
+                            'REJECT:\n' +
+                            'Error:\t' + str(error) + '\n' +
+                            'Subject:\t' + str(message.subject) + '\n' +
+                            'Body:\t\t' + str(message.body)
+                        )
+                        InboxHandler.handle_reject_message(reddit, message, error)
+                    elif action == MessageParser.ACTION_STATISTICS:
                         InboxHandler.handle_statistics_message(database, message)
-                    elif valid and action == MessageParser.ACTION_GET_SUBSCRIPTIONS:
+                    elif action == MessageParser.ACTION_GET_SUBSCRIPTIONS:
                         InboxHandler.handle_get_subscriptions_message(database, message)
-                    elif valid and action == MessageParser.ACTION_UNSUBSCRIBE_ALL:
+                    elif action == MessageParser.ACTION_UNSUBSCRIBE_ALL:
                         InboxHandler.handle_unsubscribe_all_message(database, message)
-                    elif valid and action == MessageParser.ACTION_UNSUBSCRIBE:
+                    elif action == MessageParser.ACTION_UNSUBSCRIBE:
                         InboxHandler.handle_unsubscribe_message(reddit, database, message)
-                    elif valid and action == MessageParser.ACTION_UNSUBSCRIBE_FROM_NUM:
+                    elif action == MessageParser.ACTION_UNSUBSCRIBE_FROM_NUM:
                         InboxHandler.handle_unsubscribe_from_num_message(database, message, payload)
-                    elif valid and action == MessageParser.ACTION_SUBSCRIBE:
+                    elif action == MessageParser.ACTION_SUBSCRIBE:
                         InboxHandler.handle_subscription_message(database, reddit, message, payload)
-                    elif valid and action == MessageParser.ACTION_EDIT:
+                    elif action == MessageParser.ACTION_EDIT:
                         InboxHandler.handle_edit_message(database, message, payload)
-                    elif valid and action == MessageParser.ACTION_HELP:
+                    elif action == MessageParser.ACTION_HELP:
                         InboxHandler.handle_help_message(database, message)
-                    elif valid and action == MessageParser.ACTION_FEEDBACK:
+                    elif action == MessageParser.ACTION_FEEDBACK:
                         InboxHandler.handle_feedback_message(reddit, message)
-                    else:
-                        Logger.log('VALID: ' + str(valid))
-                        Logger.log('REJECT:\nSubject:\t' + str(message.subject) + '\nBODY:\t\t' + str(message.body))
-                        InboxHandler.handle_reject_message(reddit, message)
 
             except DatabaseHandlerException as ex:
                 Logger.log(traceback.format_exc(), Color.RED)
@@ -243,6 +247,7 @@ class InboxHandler:
                 Logger.log(traceback.format_exc(), Color.RED)
                 reddit.send_message(accounts['developer']['username'],
                                     'ERROR HANDLING MESSAGE - POTENTIALLY STUCK IN INBOX',
+                                    'Should NOT be seeing this message anymore hopefully...\t \n' +
                                     'AUTHOR: /u/' + str(message.author) + '\t \n' +
                                     'SUBJECT: ' + str(message.subject) + '\t \n' +
                                     'BODY:\n' + str(message.body))

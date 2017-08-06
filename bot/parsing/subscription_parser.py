@@ -99,7 +99,9 @@ class SubscriptionParser:
             self.parse_statement_list()
         token, ttype = self.get_token()
         if ttype != TokenType.EOF:
-            raise SubscriptionParserException('Expecting EOF')
+            raise SubscriptionParserException(
+                'Error in "parse_subscription" method: Expected EOF (extraneous text after accepted text)'
+            )
 
     def parse_statement_list(self):
         token, ttype = self.get_token()
@@ -113,7 +115,9 @@ class SubscriptionParser:
             else:
                 self.unget_token()
         else:
-            raise SubscriptionParserException('Error - parse_statement_list - Expected ' + str(SubscriptionParser.statement_tokens))
+            raise SubscriptionParserException(
+                'Error in "parse_statement_list" method: Expected ' + str(SubscriptionParser.statement_tokens)
+            )
 
     def parse_statement(self):
         token, ttype = self.get_token()
@@ -136,7 +140,9 @@ class SubscriptionParser:
         elif ttype is TokenType.NSFW:
             self.parse_nsfw()
         else:
-            raise SubscriptionParserException('Error - parse_statement_list - Expected ' + str(SubscriptionParser.statement_tokens))
+            raise SubscriptionParserException(
+                'Error in "parse_statement_list" method: Expected ' + str(SubscriptionParser.statement_tokens)
+            )
 
     def parse_title_list(self):
         title_list = sorted(set(self.parse_phrase_list([])))
@@ -211,12 +217,16 @@ class SubscriptionParser:
                     self.unget_token()
                     return self.parse_id_list(ret)
                 else:
-                    raise SubscriptionParserException('Error - parse_id_list - Expected TOKEN after COMMA or SEMICOLON')
+                    raise SubscriptionParserException(
+                        'Error in "parse_id_list" method: Expected TOKEN after COMMA or SEMICOLON'
+                    )
             else:
                 self.unget_token()
                 return ret
         else:
-            raise SubscriptionParserException('Error - parse_id_list - Expected TOKEN')
+            raise SubscriptionParserException(
+                'Error in "parse_id_list" method: Expected TOKEN'
+            )
 
     def parse_phrase_list(self, ret):
         token, ttype = self.get_token()
@@ -230,12 +240,15 @@ class SubscriptionParser:
                     self.unget_token()
                     return self.parse_phrase_list(ret)
                 else:
-                    raise SubscriptionParserException('Error - parse_phrase_list - Expected TOKEN after COMMA or SEMICOLON')
+                    raise SubscriptionParserException(
+                        'Error in "parse_phrase_list" method: Expected TOKEN after COMMA or SEMICOLON'
+                    )
             else:
                 self.unget_token()
                 return ret
         else:
-            raise SubscriptionParserException('Error - parse_phrase_list - Expected TOKEN')
+            raise SubscriptionParserException(
+                'Error in "parse_phrase_list" method: Expected TOKEN')
 
     def parse_element(self, ret):
         token, ttype = self.get_token()
@@ -252,7 +265,9 @@ class SubscriptionParser:
                 self.unget_token()
             return ret
         else:
-            raise SubscriptionParserException('Error - parse_element - Expected TOKEN')
+            raise SubscriptionParserException(
+                'Error in "parse_element" method: Expected TOKEN'
+            )
 
 
 class SubscriptionParserException(Exception):

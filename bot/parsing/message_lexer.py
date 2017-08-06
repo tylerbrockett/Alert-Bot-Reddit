@@ -142,15 +142,17 @@ class MessageLexer:
         return False
 
     def tokenize(self):
-        tokens = []
-        while self.token_type != TokenType.EOF:
-            token = self.get_token()
-            tokens.append(token)
-        return tokens
+        try:
+            tokens = []
+            while self.token_type != TokenType.EOF:
+                token = self.get_token()
+                tokens.append(token)
+            return tokens
+        except:
+            raise MessageLexerException()
 
 
 class MessageLexerException(Exception):
 
-    def __init__(self, errorArgs):
-        Exception.__init__(self, 'Message Lexer Exception: {0}'.format(errorArgs))
-        self.errorArgs = errorArgs
+    def __init__(self):
+        Exception.__init__(self, 'Message Lexer Exception - could not determine token type for characters')
