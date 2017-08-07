@@ -63,14 +63,9 @@ class SubscriptionParser:
             Subscription.EMAIL: False,
             Subscription.SCHEMA_VERSION: Subscription.CURRENT_SCHEMA_VERSION
         }
-        try:
-            self.tokens = SubscriptionLexer(sub).tokenize()
-            self.parse_subscription()
-            self.final_checks()
-            self.data[Subscription.VALID] = True
-        except:
-            print(traceback.format_exc())
-            raise SubscriptionParserException('Error in __init__ method: Malformed Subscription')
+        self.tokens = SubscriptionLexer(sub).tokenize()
+        self.parse_subscription()
+        self.final_checks()
 
     def get_data(self):
         return self.data
