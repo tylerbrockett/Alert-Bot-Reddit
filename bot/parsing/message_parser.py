@@ -13,7 +13,6 @@ import json
 
 from utils.inbox import format_subject
 from parsing.message_lexer import MessageLexer
-from parsing.message_lexer import MessageLexerException
 from parsing.subscription_parser import SubscriptionParser
 from parsing.token_type import TokenType
 import traceback
@@ -58,8 +57,8 @@ class MessageParser:
         try:
             self.tokens = MessageLexer(str(message.body)).tokenize()
             self.parse_message()
-        except:
-            self.data[MessageParser.KEY_ERROR] = traceback.format_exc()
+        except Exception as e:
+            self.data[MessageParser.KEY_ERROR] = str(e)
 
     def get_data(self):
         return self.data
