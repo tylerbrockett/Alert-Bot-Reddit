@@ -170,8 +170,11 @@ class InboxHandler:
         Logger.log('handle reject message')
         reject_message = inbox.compose_reject_message(str(message.author), message.subject, message.body, error)
         message.reply(reject_message)
-        reddit.send_message(accounts['developer']['username'], 'REJECT MESSAGE - ' + reject_message)
         message.mark_read()
+        reddit.send_message(
+            accounts['developer']['username'],
+            'REJECT MESSAGE - ' + str(message.author),
+            reject_message)
 
     # TODO Add the ability to EDIT existing subscriptions
     @staticmethod
