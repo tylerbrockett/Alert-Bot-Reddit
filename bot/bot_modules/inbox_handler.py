@@ -58,14 +58,6 @@ class InboxHandler:
         Logger.log('Sub message')
         new_sub = Subscription(payload, str(message.author), message.id)
         existing_subs = database.get_subscriptions_by_user(str(message.author))
-        if new_sub.status == Subscription.STATUS_INVALID:
-            message.reply(inbox.compose_reject_message(str(message.author), message.subject, message.body))
-            message.mark_read()
-            return
-        elif new_sub.status == Subscription.STATUS_TOO_GENERIC:
-            message.reply(inbox.compose_too_generic_message(str(message.author)))
-            message.mark_read()
-            return
         duplicate_subs = new_sub.check_against_existing(existing_subs)
         if duplicate_subs:
             Logger.log('Subscription already exists', Color.RED)

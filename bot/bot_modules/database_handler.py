@@ -86,12 +86,10 @@ class DatabaseHandler:
             item = sub[database.COL_SUB_ITEM]
             username = sub[database.COL_SUB_USERNAME]
             message_id = sub[database.COL_SUB_MESSAGE_ID]
-            subscription = Subscription(item, username, message_id)
-            if subscription.status == Subscription.STATUS_VALID:
+            try:
+                subscription = Subscription(item, username, message_id)
                 subs.append(subscription)
-            else:
-                print('INVALID SUB:   ' + subscription.to_string())
-                self.remove_subscription(subscription)  # TODO Should this really be here?
+            except:
                 raise DatabaseHandlerException('ERROR - get_subscriptions - Subscription not valid')
         return subs
 
@@ -103,12 +101,10 @@ class DatabaseHandler:
             item = sub[database.COL_SUB_ITEM]
             username = sub[database.COL_SUB_USERNAME]
             message_id = sub[database.COL_SUB_MESSAGE_ID]
-            subscription = Subscription(item, username, message_id)
-            if subscription.status == Subscription.STATUS_VALID:
+            try:
+                subscription = Subscription(item, username, message_id)
                 subs.append(subscription)
-            else:
-                print('INVALID SUB:   ' + subscription.to_string())
-                self.remove_subscription(subscription)  # TODO Should this really be here?
+            except:
                 raise DatabaseHandlerException('ERROR - get_subscriptions - subscription not valid')
         return subs
 
@@ -120,9 +116,12 @@ class DatabaseHandler:
                 item = sub[database.COL_SUB_ITEM]
                 username = sub[database.COL_SUB_USERNAME]
                 message_id = sub[database.COL_SUB_MESSAGE_ID]
-                subscription = Subscription(item, username, message_id)
-                print('BY MESSAGE ID: ' + subscription.to_string())
-                subs.append(subscription)
+                try:
+                    subscription = Subscription(item, username, message_id)
+                    print('BY MESSAGE ID: ' + subscription.to_string())
+                    subs.append(subscription)
+                except:
+                    raise DatabaseHandlerException('ERROR - get_subscriptions_by_message_id - subscription not valid')
             return subs
         except:
             print(traceback.format_exc())

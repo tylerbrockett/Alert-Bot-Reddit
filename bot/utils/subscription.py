@@ -25,32 +25,26 @@ class Subscription:
     SUBREDDITS = 'subreddits'
     NSFW = 'nsfw'
     EMAIL = 'email'
-    VALID = 'valid'
     SCHEMA_VERSION = 'schema_version'
-
-    STATUS_VALID = 'valid'
-    STATUS_INVALID = 'invalid'
-    STATUS_TOO_GENERIC = 'too_generic'
 
     CURRENT_SCHEMA_VERSION = 1
 
     def __init__(self, subscription, username, message_id):
         self.username = username
         self.message_id = message_id
-        self.status = Subscription.STATUS_INVALID
         self.data = {}
+        self.error = None
         try:
             if type(subscription) == dict:
                 self.data = subscription
             else:
                 self.data = json.loads(subscription)
             self.sort()
-            self.status = Subscription.STATUS_VALID if self.data[Subscription.VALID] else Subscription.STATUS_INVALID
-        except:
+            self.check_too_generic()
+        except Exception as e:
             print(traceback.format_exc())
             self.data = {}
-            self.valid = Subscription.STATUS_INVALID
-        self.check_too_generic()
+            self.error = str(e)
 
     def format(self, key):
         result = ''
@@ -92,7 +86,7 @@ class Subscription:
 
     def check_too_generic(self):
         if not self.data[Subscription.TITLE] and 'all' in self.data[Subscription.SUBREDDITS]:
-            self.status = Subscription.STATUS_TOO_GENERIC
+            raise Exception("Subscription too generic")
 
     def sort(self):
         for i in range(0, len(self.data[Subscription.TITLE])):

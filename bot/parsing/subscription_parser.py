@@ -98,7 +98,7 @@ class SubscriptionParser:
         token, ttype = self.get_token()
         if ttype != TokenType.EOF:
             raise SubscriptionParserException(
-                'Error in "parse_subscription" method: Expected EOF (extraneous text after accepted text)'
+                'Error in "parse_subscription" method: Expected EOF (extraneous text)'
             )
 
     def parse_statement_list(self):
@@ -218,6 +218,10 @@ class SubscriptionParser:
                     raise SubscriptionParserException(
                         'Error in "parse_id_list" method: Expected TOKEN after COMMA or SEMICOLON'
                     )
+            elif ttype not in SubscriptionParser.statement_tokens and ttype is not TokenType.EOF:
+                raise SubscriptionParserException(
+                    'Error in "parse_id_list" method: Expected COMMA, new Statement, or EOF (extraneous text)'
+                )
             else:
                 self.unget_token()
                 return ret
@@ -241,6 +245,10 @@ class SubscriptionParser:
                     raise SubscriptionParserException(
                         'Error in "parse_phrase_list" method: Expected TOKEN after COMMA or SEMICOLON'
                     )
+            elif ttype not in SubscriptionParser.statement_tokens and ttype is not TokenType.EOF:
+                raise SubscriptionParserException(
+                    'Error in "parse_phrase_list" method: Expected COMMA, new Statement, or EOF (extraneous text)'
+                )
             else:
                 self.unget_token()
                 return ret
