@@ -13,6 +13,7 @@ from parsing.subscription_lexer import SubscriptionLexer
 from utils.subscription import Subscription
 from parsing.token_type import TokenType
 import json
+import traceback
 
 
 class SubscriptionParser:
@@ -68,7 +69,8 @@ class SubscriptionParser:
             self.final_checks()
             self.data[Subscription.VALID] = True
         except:
-            raise SubscriptionParserException('SubscriptionParser __init__ - Malformed Subscription')
+            print(traceback.format_exc())
+            raise SubscriptionParserException('Error in __init__ method: Malformed Subscription')
 
     def get_data(self):
         return self.data
@@ -86,6 +88,7 @@ class SubscriptionParser:
 
     def parse_subscription(self):
         token, ttype = self.get_token()
+        # Handles cases where -title parameter isn't necessary for title text
         if ttype is TokenType.TOKEN:
             self.unget_token()
             self.parse_title_list()
@@ -116,7 +119,7 @@ class SubscriptionParser:
                 self.unget_token()
         else:
             raise SubscriptionParserException(
-                'Error in "parse_statement_list" method: Expected ' + str(SubscriptionParser.statement_tokens)
+                'Error in "parse_statement_list" method: Expected one of ' + str(SubscriptionParser.statement_tokens)
             )
 
     def parse_statement(self):
