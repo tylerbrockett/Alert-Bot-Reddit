@@ -131,7 +131,7 @@ class MessageParser:
 
 class MessageParserException(Exception):
     EXPECTED_EOF = 'Expected EOF (extraneous text after accepted text)'
-    MALFORMED_REQUEST = 'Message must begin with one of the aliases of the following actions: ' + \
+    MALFORMED_REQUEST = 'Message body must begin with one of the aliases of the following actions: ' + \
                         'subscribe, unsubscribe, subscriptions, help, feedback'
 
     def __init__(self, errorArgs):
