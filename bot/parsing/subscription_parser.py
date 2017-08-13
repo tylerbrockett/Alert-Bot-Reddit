@@ -247,7 +247,7 @@ class SubscriptionParser:
                     raise SubscriptionParserException(
                         'Error in "parse_phrase_list" method: Expected TOKEN after COMMA or SEMICOLON'
                     )
-            elif ttype not in SubscriptionParser.statement_tokens and ttype is not TokenType.EOF:
+            elif ttype not in SubscriptionParser.statement_token_types and ttype is not TokenType.EOF:
                 raise SubscriptionParserException(
                     'Error in "parse_phrase_list" method: Expected COMMA, new Statement, or EOF (extraneous text)'
                 )
