@@ -148,13 +148,13 @@ class SubscriptionParser:
         title_list = sorted(set(self.parse_phrase_list([])))
         if title_list not in self.data[Subscription.TITLE]:
             self.data[Subscription.TITLE].append(title_list)
-            self.data[Subscription.TITLE].sort()
+        self.data[Subscription.TITLE].sort()
 
     def parse_body_list(self):
         body_list = sorted(set(self.parse_phrase_list([])))
         if body_list not in self.data[Subscription.BODY]:
             self.data[Subscription.BODY].append(body_list)
-            self.data[Subscription.BODY].sort()
+        self.data[Subscription.BODY].sort()
 
     def parse_redditors_list(self):
         redditor_list = self.parse_id_list([])
@@ -164,7 +164,7 @@ class SubscriptionParser:
         for redditor in redditor_list:
             if redditor not in self.data[Subscription.REDDITORS]:
                 self.data[Subscription.REDDITORS].append(redditor)
-                self.data[Subscription.REDDITORS].sort()
+        self.data[Subscription.REDDITORS].sort()
 
     def parse_subreddits_list(self):
         subreddit_list = self.parse_id_list([])
@@ -174,7 +174,7 @@ class SubscriptionParser:
         for subreddit in subreddit_list:
             if subreddit not in self.data[Subscription.SUBREDDITS]:
                 self.data[Subscription.SUBREDDITS].append(subreddit)
-                self.data[Subscription.SUBREDDITS].sort()
+        self.data[Subscription.SUBREDDITS].sort()
 
     def parse_email(self):
         self.data[Subscription.EMAIL] = True
@@ -187,14 +187,14 @@ class SubscriptionParser:
         for item in ignore_list:
             if item not in self.data[Subscription.IGNORE_TITLE]:
                 self.data[Subscription.IGNORE_TITLE].append(item)
-                self.data[Subscription.IGNORE_TITLE].sort()
+        self.data[Subscription.IGNORE_TITLE].sort()
 
     def parse_ignore_body_list(self):
         ignore_list = sorted(set(self.parse_phrase_list([])))
         for item in ignore_list:
             if item not in self.data[Subscription.IGNORE_BODY]:
                 self.data[Subscription.IGNORE_BODY].append(item)
-                self.data[Subscription.IGNORE_BODY].sort()
+        self.data[Subscription.IGNORE_BODY].sort()
 
     def parse_ignore_redditors_list(self):
         ignore_list = self.parse_id_list([])
@@ -204,7 +204,7 @@ class SubscriptionParser:
         for item in ignore_list:
             if item not in self.data[Subscription.IGNORE_REDDITORS]:
                 self.data[Subscription.IGNORE_REDDITORS].append(item)
-                self.data[Subscription.IGNORE_REDDITORS].sort()
+        self.data[Subscription.IGNORE_REDDITORS].sort()
 
     def parse_id_list(self, ret):
         token, ttype = self.get_token()
