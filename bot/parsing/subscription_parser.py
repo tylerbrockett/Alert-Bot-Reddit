@@ -17,8 +17,9 @@ import traceback
 
 
 class SubscriptionParser:
-    statement_token_types = [TokenType.TITLE, TokenType.BODY, TokenType.REDDITORS, TokenType.SUBREDDITS, TokenType.IGNORE_TITLE,
-                             TokenType.IGNORE_BODY, TokenType.IGNORE_REDDITORS, TokenType.EMAIL, TokenType.NSFW]
+    statement_token_types = [TokenType.TITLE, TokenType.BODY, TokenType.REDDITORS, TokenType.SUBREDDITS,
+                             TokenType.IGNORE_TITLE, TokenType.IGNORE_BODY, TokenType.IGNORE_REDDITORS, TokenType.EMAIL,
+                             TokenType.NSFW]
 
     statement_tokens = [
         # TITLE
@@ -98,7 +99,8 @@ class SubscriptionParser:
         token, ttype = self.get_token()
         if ttype != TokenType.EOF:
             raise SubscriptionParserException(
-                'Error in "parse_subscription" method: Expected EOF (extraneous text)'
+                'Error in "parse_subscription" method: Expected EOF (extraneous text). ' +
+                'Remember that only one subscription is allowed per message.'
             )
 
     def parse_statement_list(self):
@@ -218,7 +220,7 @@ class SubscriptionParser:
                     raise SubscriptionParserException(
                         'Error in "parse_id_list" method: Expected TOKEN after COMMA or SEMICOLON'
                     )
-            elif ttype not in SubscriptionParser.statement_tokens and ttype is not TokenType.EOF:
+            elif ttype not in SubscriptionParser.statement_token_types and ttype is not TokenType.EOF:
                 raise SubscriptionParserException(
                     'Error in "parse_id_list" method: Expected COMMA, new Statement, or EOF (extraneous text)'
                 )
