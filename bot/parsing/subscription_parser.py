@@ -13,7 +13,6 @@ from parsing.subscription_lexer import SubscriptionLexer
 from utils.subscription import Subscription
 from parsing.token_type import TokenType
 import json
-import traceback
 
 
 class SubscriptionParser:
@@ -47,7 +46,7 @@ class SubscriptionParser:
     def get_token(self):
         self.index += 1
         if self.index >= len(self.tokens) or self.index < 0:
-            raise SubscriptionParserException('Error - Index out of bounds [' + str(self.index) + ']')
+            raise SubscriptionParserException('get_token', 'Index out of bounds [' + str(self.index) + ']')
         return self.tokens[self.index]
 
     def __init__(self, sub):
@@ -98,10 +97,7 @@ class SubscriptionParser:
             self.parse_statement_list()
         token, ttype = self.get_token()
         if ttype != TokenType.EOF:
-            raise SubscriptionParserException(
-                'Error in "parse_subscription" method: Expected EOF (extraneous text). ' +
-                'Remember that only one subscription is allowed per message.'
-            )
+            raise SubscriptionParserException('parse_subscription', SubscriptionParserException.EOF_SUB)
 
     def parse_statement_list(self):
         token, ttype = self.get_token()
@@ -115,9 +111,7 @@ class SubscriptionParser:
             else:
                 self.unget_token()
         else:
-            raise SubscriptionParserException(
-                'Error in "parse_statement_list" method: Expected one of ' + str(SubscriptionParser.statement_tokens)
-            )
+            raise SubscriptionParserException('parse_statement_list', SubscriptionParserException.EXPECTED_STATEMENT)
 
     def parse_statement(self):
         token, ttype = self.get_token()
@@ -140,9 +134,7 @@ class SubscriptionParser:
         elif ttype is TokenType.NSFW:
             self.parse_nsfw()
         else:
-            raise SubscriptionParserException(
-                'Error in "parse_statement_list" method: Expected ' + str(SubscriptionParser.statement_tokens)
-            )
+            raise SubscriptionParserException('parse_statement', SubscriptionParserException.EXPECTED_STATEMENT)
 
     def parse_title_list(self):
         title_list = sorted(set(self.parse_phrase_list([])))
@@ -217,20 +209,14 @@ class SubscriptionParser:
                     self.unget_token()
                     return self.parse_id_list(ret)
                 else:
-                    raise SubscriptionParserException(
-                        'Error in "parse_id_list" method: Expected TOKEN after COMMA or SEMICOLON'
-                    )
+                    raise SubscriptionParserException('parse_id_list', SubscriptionParserException.EXPECTED_TOKEN_AFTER)
             elif ttype not in SubscriptionParser.statement_token_types and ttype is not TokenType.EOF:
-                raise SubscriptionParserException(
-                    'Error in "parse_id_list" method: Expected COMMA, new Statement, or EOF (extraneous text)'
-                )
+                raise SubscriptionParserException('parse_id_list', SubscriptionParserException.EXPECTED_COM_STMT_EOF)
             else:
                 self.unget_token()
                 return ret
         else:
-            raise SubscriptionParserException(
-                'Error in "parse_id_list" method: Expected TOKEN'
-            )
+            raise SubscriptionParserException('parse_id_list', SubscriptionParserException.EXPECTED_TOKEN)
 
     def parse_phrase_list(self, ret):
         token, ttype = self.get_token()
@@ -244,19 +230,14 @@ class SubscriptionParser:
                     self.unget_token()
                     return self.parse_phrase_list(ret)
                 else:
-                    raise SubscriptionParserException(
-                        'Error in "parse_phrase_list" method: Expected TOKEN after COMMA or SEMICOLON'
-                    )
+                    raise SubscriptionParserException('parse_phrase_list', SubscriptionParserException.EXPECTED_TOKEN_AFTER)
             elif ttype not in SubscriptionParser.statement_token_types and ttype is not TokenType.EOF:
-                raise SubscriptionParserException(
-                    'Error in "parse_phrase_list" method: Expected COMMA, new Statement, or EOF (extraneous text)'
-                )
+                raise SubscriptionParserException('parse_phrase_list', SubscriptionParserException.EXPECTED_COM_STMT_EOF)
             else:
                 self.unget_token()
                 return ret
         else:
-            raise SubscriptionParserException(
-                'Error in "parse_phrase_list" method: Expected TOKEN')
+            raise SubscriptionParserException('parse_phrase_list', SubscriptionParserException.EXPECTED_TOKEN)
 
     def parse_element(self, ret):
         token, ttype = self.get_token()
@@ -273,12 +254,17 @@ class SubscriptionParser:
                 self.unget_token()
             return ret
         else:
-            raise SubscriptionParserException(
-                'Error in "parse_element" method: Expected TOKEN'
-            )
+            raise SubscriptionParserException('parse_element', SubscriptionParserException.EXPECTED_TOKEN)
 
 
 class SubscriptionParserException(Exception):
-    def __init__(self, errorArgs):
-        Exception.__init__(self, 'Subscription Parser Exception: {0}'.format(errorArgs))
-        self.errorArgs = errorArgs
+
+    EOF_SUB = 'Expected end of text. (Possible Cause: Remember that only one subscription is allowed per message)'
+    EXPECTED_STATEMENT = 'Expected alias of "-title","-body","-redditor","-subreddit","-ignore-title", "-ignore-body", "-ignore-redditor", "-nsfw"'
+    EXPECTED_TOKEN_AFTER = 'Expected TOKEN after COMMA or SEMICOLON'
+    EXPECTED_COM_STMT_EOF = 'Expected COMMA, new Statement, or end of subscription (extraneous text)'
+    EXPECTED_TOKEN = 'Expected TOKEN'
+
+    def __init__(self, methodName, exceptionText):
+        Exception.__init__(self, 'Subscription Parser Exception - Error in method "{0}": {0}'.format(methodName, exceptionText))
+        self.errorArgs = exceptionText
