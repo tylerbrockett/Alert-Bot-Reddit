@@ -266,5 +266,5 @@ class SubscriptionParserException(Exception):
     EXPECTED_TOKEN = 'Expected TOKEN'
 
     def __init__(self, methodName, exceptionText):
-        Exception.__init__(self, 'Subscription Parser Exception - Error in method "{0}": {0}'.format(methodName, exceptionText))
+        Exception.__init__(self, 'Subscription Parser Exception - Error in method "{0}": {1}'.format(methodName, exceptionText))
         self.errorArgs = exceptionText
