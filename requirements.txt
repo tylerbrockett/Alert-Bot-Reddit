@@ -3,6 +3,4 @@
 # 2. Activate virtualenv
 # 3. pip install -r /path/to/requirements.txt
 
-.virtualenv
 praw>=4.0
-
