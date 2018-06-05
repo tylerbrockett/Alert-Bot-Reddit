@@ -8,9 +8,10 @@
 # git update-index --no-assume-unchanged [<file> ...]
 
 # Sensitive Info
+venv
 accountinfo.py
-/bot/database/BETA.db
-/bot/database/subscriptions.db
+/src/database/BETA.db
+/src/database/subscriptions.db
 
 # "compiled" files
 *.pyc
@@ -19,7 +20,7 @@ accountinfo.py
 .idea/
 
 # Test files
-/bot/test.py
+/src/test.py
 
 #=========================
 #    Original Stuff
