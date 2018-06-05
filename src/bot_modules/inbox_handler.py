@@ -25,6 +25,10 @@ import traceback
 class InboxHandler:
 
     @staticmethod
+    def reply(message, response):
+        message.reply(response[0: min(len(response), 10000)])
+
+    @staticmethod
     def handle_message_from_reddit(reddit, message):
         Logger.log('Message from reddit')
         reddit.send_message(accounts['developer']['username'], 'FWD: ' + message.subject, message.body)
@@ -42,7 +46,7 @@ class InboxHandler:
             len(database.get_unique_subreddits()),
             database.count_total_matches(),
             database.get_unique_subreddits())
-        message.reply(formatted_message)
+        InboxHandler.reply(message, formatted_message)
         message.mark_read()
 
     @staticmethod
@@ -50,7 +54,7 @@ class InboxHandler:
         Logger.log('Get subs message')
         subscriptions = database.get_subscriptions_by_user(str(message.author))
         formatted_message = inbox.compose_all_subscriptions_message(str(message.author), subscriptions)
-        message.reply(formatted_message)
+        InboxHandler.reply(message, formatted_message)
         message.mark_read()
 
     @staticmethod
@@ -61,7 +65,7 @@ class InboxHandler:
         duplicate_subs = new_sub.check_against_existing(existing_subs)
         if duplicate_subs:
             Logger.log('Subscription already exists', Color.RED)
-            message.reply(inbox.compose_duplicate_subscription_message(
+            InboxHandler.reply(message, inbox.compose_duplicate_subscription_message(
                 str(message.author),
                 duplicate_subs[0],
                 new_sub))
@@ -70,7 +74,7 @@ class InboxHandler:
         invalid_subreddits = reddit.check_invalid_subreddits(new_sub.data[Subscription.SUBREDDITS])
         if invalid_subreddits:
             Logger.log('Subreddit(s) invalid: ' + str(invalid_subreddits), Color.RED)
-            message.reply(inbox.compose_invalid_subreddit_message(str(message.author), invalid_subreddits, message))
+            InboxHandler.reply(message, inbox.compose_invalid_subreddit_message(str(message.author), invalid_subreddits, message))
             message.mark_read()
             return
         database.insert_subscription(str(message.author), new_sub.message_id, new_sub.to_string(),
@@ -78,7 +82,7 @@ class InboxHandler:
         existing_subs.append(new_sub)
         # TODO Remove subreddit not specified stuff, taken care of in SubscriptionParser.py
         subreddit_not_specified = len(new_sub.data[Subscription.SUBREDDITS]) == 0
-        message.reply(
+        InboxHandler.reply(message, 
             inbox.compose_subscribe_message(str(message.author), new_sub, existing_subs, subreddit_not_specified))
         database.commit()
         message.mark_read()
@@ -90,9 +94,9 @@ class InboxHandler:
         removed_subs = database.remove_subscriptions_by_message_id(str(message.author), parent_m_id)
         subs = database.get_subscriptions_by_user(str(message.author))
         if len(removed_subs) > 0:
-            message.reply(inbox.compose_unsubscribe_message(str(message.author), removed_subs, subs))
+            InboxHandler.reply(message, inbox.compose_unsubscribe_message(str(message.author), removed_subs, subs))
         else:
-            message.reply(inbox.compose_unsubscribe_invalid_sub_message(str(message.author), subs))
+            InboxHandler.reply(message, inbox.compose_unsubscribe_invalid_sub_message(str(message.author), subs))
         message.mark_read()
 
     @staticmethod
@@ -101,15 +105,15 @@ class InboxHandler:
         removed = database.remove_subscription_by_number(str(message.author), int(payload))
         subs = database.get_subscriptions_by_user(str(message.author))
         if removed:
-            message.reply(inbox.compose_unsubscribe_from_num_message(str(message.author), removed, subs))
+            InboxHandler.reply(message, inbox.compose_unsubscribe_from_num_message(str(message.author), removed, subs))
         else:
-            message.reply(inbox.compose_unsubscribe_invalid_sub_message(str(message.author), subs))
+            InboxHandler.reply(message, inbox.compose_unsubscribe_invalid_sub_message(str(message.author), subs))
         message.mark_read()
 
     @staticmethod
     def handle_edit_message(database, message, payload):
         Logger.log('Edit message')
-        message.reply(inbox.compose_edit_message(str(message.author)))
+        InboxHandler.reply(message, inbox.compose_edit_message(str(message.author)))
         message.mark_read()
 
     # TODO Handle if there are 0 subs for user
@@ -117,14 +121,14 @@ class InboxHandler:
     def handle_unsubscribe_all_message(database, message):
         Logger.log('Unsub all message')
         removed_subscriptions = database.remove_all_subscriptions(str(message.author))
-        message.reply(inbox.compose_unsubscribe_all_message(str(message.author)))
+        InboxHandler.reply(message, inbox.compose_unsubscribe_all_message(str(message.author)))
         message.mark_read()
 
     @staticmethod
     def handle_help_message(database, message):
         Logger.log('Help message')
         subs = database.get_subscriptions_by_user(str(message.author))
-        message.reply(inbox.compose_help_message(str(message.author), subs))
+        InboxHandler.reply(message, inbox.compose_help_message(str(message.author), subs))
         message.mark_read()
 
     @staticmethod
@@ -133,14 +137,14 @@ class InboxHandler:
         reddit.send_message(accounts['developer']['username'], 'FEEDBACK',
                             inbox.compose_feedback_forward(accounts['developer']['username'], str(message.author),
                                                            message.body))
-        message.reply(inbox.compose_feedback_message(str(message.author)))
+        InboxHandler.reply(message, inbox.compose_feedback_message(str(message.author)))
         message.mark_read()
 
     @staticmethod
     def handle_username_mention_message(reddit, message):
         try:
             Logger.log('Username mention message')
-            message.reply(inbox.compose_username_mention_reply(str(message.author)))
+            InboxHandler.reply(message, inbox.compose_username_mention_reply(str(message.author)))
             message.mark_read()
             reddit.send_message(accounts['developer']['username'], 'USERNAME MENTION',
                                 inbox.compose_username_mention_forward(accounts['developer']['username'],
@@ -161,7 +165,7 @@ class InboxHandler:
     def handle_reject_message(reddit, message, error):
         Logger.log('handle reject message')
         reject_message = inbox.compose_reject_message(str(message.author), message.subject, message.body, error)
-        message.reply(reject_message)
+        InboxHandler.reply(message, reject_message)
         message.mark_read()
         reddit.send_message(
             accounts['developer']['username'],
