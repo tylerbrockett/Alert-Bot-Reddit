@@ -15,6 +15,7 @@ from utils.logger import Logger
 from utils.color import Color
 from utils import output
 from prawcore.exceptions import Redirect
+from prawcore.exceptions import Forbidden
 
 
 class RedditHandler:
@@ -72,9 +73,14 @@ class RedditHandler:
         submissions = []
         posts = 200 if (subreddit == 'all') else self.NUM_POSTS
         try:
-            submissions = self.reddit.subreddit(subreddit).new(limit=posts)
-        except:
-            Logger.log(traceback.format_exc(), Color.CYAN)
+            subs = self.reddit.subreddit(subreddit).new(limit=posts)
+            for submission in subs:
+                submissions.append(submission)
+        except Forbidden as e:
+            Logger.log(traceback.format_exc(), Color.RED)
+            return []
+        except Exception as e:
+            Logger.log(traceback.format_exc(), Color.RED)
             raise RedditHelperException(RedditHelperException.GET_SUBMISSIONS_EXCEPTION)
         return submissions
 

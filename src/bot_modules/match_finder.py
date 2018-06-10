@@ -122,10 +122,7 @@ class MatchFinder:
                 if subreddit.lower() not in [k.lower() for k in subreddits.keys()]:
                     Logger.log(subreddit.lower(), Color.CYAN)
                     submissions = reddit.get_submissions(subreddit.lower())
-                    temp = []
-                    for sub in submissions:
-                        temp.append(sub)
-                    subreddits[subreddit.lower()] = temp
+                    subreddits[subreddit.lower()] = submissions
                 submissions = subreddits[subreddit.lower()]
                 for submission in submissions:
                     is_match, mismatched_keys = MatchFinder.is_match(subscription, submission)
