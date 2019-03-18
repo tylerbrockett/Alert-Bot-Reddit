@@ -94,7 +94,7 @@ class DatabaseHandler:
         return subs
 
     def get_subscriptions_by_user(self, username):
-        print('Get Subs By Username')
+        print('Get Subs By Username: ' + username)
         subs = []
         result = self.connection.cursor().execute(database.GET_SUBSCRIPTIONS_BY_USERNAME, [username]).fetchall()
         for sub in result:
