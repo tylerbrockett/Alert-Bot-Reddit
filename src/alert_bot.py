@@ -45,7 +45,7 @@ class AlertBot:
                     Logger.log(str(len(subscriptions)) + ' Subs')
                     matches = MatchFinder.find_matches(subscriptions, self.reddit, self.database)
                     Logger.log(str(len(matches)) + ' Matches')
-                    MatchHandler.send_messages(self.reddit, self.database, matches)
+                    MatchHandler.send_messages(self.reddit, self.database, matches, self.bot)
                     self.database.purge_old_matches()
                     Logger.log(times.get_time_passed(self.start_time), Color.YELLOW)
                 SleepHandler.sleep(20)

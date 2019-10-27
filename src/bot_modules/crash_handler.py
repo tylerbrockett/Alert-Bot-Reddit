@@ -18,9 +18,9 @@ from utils.color import Color
 def handle_crash(stacktrace, bot_credentials, message_dev=False, reddit=None, database=None):
     reset = False
     while not reset:
-        SleepHandler.sleep(30)
         try:
-            print('Trying to handle error \n\n' + stacktrace)
+            Logger.log('Trying to handle error\n', Color.GREEN)
+            Logger.log(stacktrace, Color.RED)
             if reddit:
                 reddit.reset()
             if database:
@@ -32,3 +32,4 @@ def handle_crash(stacktrace, bot_credentials, message_dev=False, reddit=None, da
             reset = True
         except:
             Logger.log('Failed to restart bot. Trying again in 30 seconds.', Color.RED)
+        SleepHandler.sleep(30)
