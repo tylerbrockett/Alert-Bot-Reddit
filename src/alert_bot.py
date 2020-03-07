@@ -57,7 +57,7 @@ class AlertBot:
 
     def check_for_commands(self):
         Logger.log('Checking for commands')
-        commands = CommandHandler.get_commands(self.reddit)
+        commands = CommandHandler.get_commands(self.reddit, bot_username)
         if CommandHandler.PAUSE in commands:
             self.run = False
         if CommandHandler.RUN in commands:

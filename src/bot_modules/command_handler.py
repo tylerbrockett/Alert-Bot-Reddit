@@ -13,6 +13,7 @@ from utils import inbox
 from utils.color import Color
 from utils.logger import Logger
 from accounts.accountinfo import accounts
+from mark_all_read import MarkRead
 import traceback
 
 
@@ -21,11 +22,13 @@ class CommandHandler:
     RUN = 1
     PAUSE = 2
     KILL = 3
+    MARKREAD = 4
 
     run = ['run', 'start', 'resume']
     pause = ['stop', 'pause']
     kill = ['kill']
     test = ['test']
+    mark_read = ['markread', 'readall']
 
     @staticmethod
     def get_dev_messages(reddit):
@@ -38,7 +41,7 @@ class CommandHandler:
         return dev_messages
 
     @staticmethod
-    def get_commands(reddit):
+    def get_commands(reddit, bot_name):
         commands = []
         try:
             messages = CommandHandler.get_dev_messages(reddit)
@@ -63,6 +66,14 @@ class CommandHandler:
                     Logger.log('--------- Bot is being tested ---------', Color.GREEN)
                     message.reply('Bot is being tested')
                     commands.append(CommandHandler.TEST)
+                    message.mark_read()
+                elif body in CommandHandler.mark_read or subject in CommandHandler.mark_read:
+                    Logger.log('--------- Errors being marked as read ---------', Color.GREEN)
+                    message.reply('Messages will be marked as read')
+                    mark_read = MarkRead(bot_name)
+                    num_read = mark_read.mark_read()
+                    commands.append(CommandHandler.MARKREAD)
+                    message.reply(str(num_read) + ' messaged were marked as read')
                     message.mark_read()
         except:
             Logger.log(traceback.format_exc(), Color.RED)
