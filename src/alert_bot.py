@@ -45,7 +45,7 @@ class AlertBot:
                     Logger.log(str(len(subscriptions)) + ' Subs')
                     matches = MatchFinder.find_matches(subscriptions, self.reddit, self.database)
                     Logger.log(str(len(matches)) + ' Matches')
-                    MatchHandler.send_messages(self.reddit, self.database, matches)
+                    MatchHandler.send_messages(self.reddit, self.database, matches, self.bot)
                     self.database.purge_old_matches()
                     Logger.log(times.get_time_passed(self.start_time), Color.YELLOW)
                 SleepHandler.sleep(20)
@@ -57,7 +57,7 @@ class AlertBot:
 
     def check_for_commands(self):
         Logger.log('Checking for commands')
-        commands = CommandHandler.get_commands(self.reddit)
+        commands = CommandHandler.get_commands(self.reddit, bot_username)
         if CommandHandler.PAUSE in commands:
             self.run = False
         if CommandHandler.RUN in commands:

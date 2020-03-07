@@ -13,14 +13,18 @@ from utils import output, inbox
 import traceback
 from utils.logger import Logger
 from utils.color import Color
+from bot_modules.crash_handler import handle_crash
 
 
 class MatchHandler:
 
     @staticmethod
-    def send_messages(reddit, database, matches):
+    def send_messages(reddit, database, matches, bot):
         Logger.log('Handling matches...', Color.GREEN)
+        index = 0
         for subscription, submission in matches:
+            index += 1
+            Logger.log('Handling match ' + str(index) + '/' + str(len(matches)), Color.BLUE)
             try:
                 subs = database.get_subscriptions_by_user(subscription.username)
                 message = reddit.get_message(subscription.message_id)
@@ -29,9 +33,7 @@ class MatchHandler:
                 database.commit()
                 output.match(subscription, submission)
             except:
-                Logger.log(traceback.format_exc(), Color.RED)
-                raise MatchHandlerException('handle_matches')
-
+                handle_crash(traceback.format_exc(), bot, message_dev=True, reddit=reddit, database=database)
 
 class MatchHandlerException(Exception):
 
