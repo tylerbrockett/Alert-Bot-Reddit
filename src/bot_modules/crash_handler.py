@@ -32,4 +32,4 @@ def handle_crash(stacktrace, bot_credentials, message_dev=False, reddit=None, da
             reset = True
         except:
             Logger.log('Failed to restart bot. Trying again in 30 seconds.', Color.RED)
-        SleepHandler.sleep(30)
+        SleepHandler.sleep(15)
