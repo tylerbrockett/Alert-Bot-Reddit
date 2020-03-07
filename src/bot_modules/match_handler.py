@@ -21,7 +21,10 @@ class MatchHandler:
     @staticmethod
     def send_messages(reddit, database, matches, bot):
         Logger.log('Handling matches...', Color.GREEN)
+        index = 0
         for subscription, submission in matches:
+            index += 1
+            Logger.log('Handling match ' + str(index) + '/' + str(len(matches)), Color.BLUE)
             try:
                 subs = database.get_subscriptions_by_user(subscription.username)
                 message = reddit.get_message(subscription.message_id)

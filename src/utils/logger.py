@@ -59,3 +59,11 @@ class Logger:
         except:
             print(traceback.format_exc())
             print(string)
+
+    @staticmethod
+    def aligntext(text, desired_spaces):
+        additional_space = desired_spaces - len(text)
+        while additional_space > 0:
+            text += ' '
+            additional_space -= 1
+        return text
