@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   04/02/2017
+Date Last Edited:   03/07/2020
 Version:            v2.0
 ==========================================
 """
@@ -26,6 +26,7 @@ class InboxHandler:
 
     @staticmethod
     def reply(message, response):
+        Logger.log('Replying to message: ' + message.id)
         message.reply(response[0: min(len(response), 10000)])
 
     @staticmethod
@@ -82,7 +83,7 @@ class InboxHandler:
         existing_subs.append(new_sub)
         # TODO Remove subreddit not specified stuff, taken care of in SubscriptionParser.py
         subreddit_not_specified = len(new_sub.data[Subscription.SUBREDDITS]) == 0
-        InboxHandler.reply(message, 
+        InboxHandler.reply(message,
             inbox.compose_subscribe_message(str(message.author), new_sub, existing_subs, subreddit_not_specified))
         database.commit()
         message.mark_read()
@@ -142,8 +143,8 @@ class InboxHandler:
 
     @staticmethod
     def handle_username_mention_message(reddit, message):
+        Logger.log('Username mention message')
         try:
-            Logger.log('Username mention message')
             InboxHandler.reply(message, inbox.compose_username_mention_reply(str(message.author)))
             message.mark_read()
             reddit.send_message(accounts['developer']['username'], 'USERNAME MENTION',
@@ -163,7 +164,7 @@ class InboxHandler:
 
     @staticmethod
     def handle_reject_message(reddit, message, error):
-        Logger.log('handle reject message')
+        Logger.log('Handle reject message')
         reject_message = inbox.compose_reject_message(str(message.author), message.subject, message.body, error)
         InboxHandler.reply(message, reject_message)
         message.mark_read()
