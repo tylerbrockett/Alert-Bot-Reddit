@@ -18,7 +18,7 @@ accountinfo.py
 
 # IDE files
 .idea/
-.vscode/
+.vscode/settings.json
 
 # Test files
 /src/test.py
