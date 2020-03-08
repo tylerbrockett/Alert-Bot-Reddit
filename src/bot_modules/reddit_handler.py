@@ -60,9 +60,11 @@ class RedditHandler:
         return ret
 
     def get_message(self, message_id):
+        Logger.log('Getting message: ' + message_id)
         return self.reddit.inbox.message(message_id)
 
     def send_message(self, redditor, subject, body):
+        Logger.log('Sending message to: ' + redditor + ', subject: ' + subject)
         try:
             self.reddit.redditor(redditor).message(subject, body)
         except:
@@ -85,6 +87,7 @@ class RedditHandler:
         return submissions
 
     def get_original_message_id(self, received_message, database):
+        Logger.log('Finding original message with subscription: ' + received_message.id)
         message = received_message
         while message.parent_id and len(database.get_subscriptions_by_message_id(str(message.author), message.id)) == 0:
             message = self.reddit.inbox.message(message.parent_id[3:])
