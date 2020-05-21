@@ -53,7 +53,7 @@ class AlertBot:
                 Logger.log('Keyboard Interrupt - Bot killed', Color.RED)
                 exit()
             except:
-                handle_crash(traceback.format_exc(), self.bot, message_dev=True, reddit=self.reddit, database=self.database)
+                handle_crash(traceback.format_exc(), self.bot, message_dev=False, reddit=self.reddit, database=self.database)
 
     def check_for_commands(self):
         Logger.log('Checking for commands')

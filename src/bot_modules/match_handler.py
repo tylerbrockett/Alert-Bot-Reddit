@@ -33,7 +33,7 @@ class MatchHandler:
                 database.commit()
                 output.match(subscription, submission)
             except:
-                handle_crash(traceback.format_exc(), bot, message_dev=True, reddit=reddit, database=database)
+                handle_crash(traceback.format_exc(), bot, message_dev=False, reddit=reddit, database=database)
 
 class MatchHandlerException(Exception):
 
