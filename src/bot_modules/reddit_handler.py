@@ -16,6 +16,7 @@ from utils.color import Color
 from utils import output
 from prawcore.exceptions import Redirect
 from prawcore.exceptions import Forbidden
+from prawcore.exceptions import NotFound
 
 
 class RedditHandler:
@@ -79,11 +80,11 @@ class RedditHandler:
             for submission in subs:
                 submissions.append(submission)
         except Forbidden as e:
-            Logger.log(traceback.format_exc(), Color.RED)
-            return []
+            Logger.log(subreddit + ' - Forbidden (403)', Color.RED)
+        except NotFound as e:
+            Logger.log(subreddit + ' - NotFound (404)', Color.RED)
         except Exception as e:
             Logger.log(traceback.format_exc(), Color.RED)
-            raise RedditHelperException(RedditHelperException.GET_SUBMISSIONS_EXCEPTION)
         return submissions
 
     def get_original_message_id(self, received_message, database):
