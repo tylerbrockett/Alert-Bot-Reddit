@@ -32,8 +32,11 @@ class MatchHandler:
                 database.insert_match(subscription.username, subscription.to_string(), submission.permalink)
                 database.commit()
                 output.match(subscription, submission)
-            except:
-                handle_crash(traceback.format_exc(), bot, message_dev=False, reddit=reddit, database=database)
+            except Exception as e:
+                if (hasattr(e, 'error_type') and e.error_type == 'INVALID_USER'):
+                    Logger.log('Invalid User - ' + subscription.username, Color.RED)
+                else:
+                    handle_crash(traceback.format_exc(), bot, message_dev=False, reddit=reddit, database=database)
 
 class MatchHandlerException(Exception):
 

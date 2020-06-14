@@ -122,8 +122,7 @@ class MatchFinder:
             subreds = subscription.data[Subscription.SUBREDDITS]
             for subreddit in subreds:
                 if subreddit.lower() not in [k.lower() for k in subreddits.keys()]:
-                    Logger.log(Logger.aligntext(subreddit.lower(), 30) + '(' + str(index) + '/' + str(len(subscriptions)) + ')', Color.CYAN)
-                    submissions = reddit.get_submissions(subreddit.lower())
+                    submissions = reddit.get_submissions(subreddit.lower(), index, len(subscriptions))
                     subreddits[subreddit.lower()] = submissions
                 submissions = subreddits[subreddit.lower()]
                 for submission in submissions:

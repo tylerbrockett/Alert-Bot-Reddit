@@ -72,19 +72,20 @@ class RedditHandler:
             Logger.log(traceback.format_exc(), Color.RED)
             raise RedditHelperException(RedditHelperException.SEND_MESSAGE_EXCEPTION)
 
-    def get_submissions(self, subreddit):
+    def get_submissions(self, subreddit, index, num_subs):
         submissions = []
         posts = 200 if (subreddit == 'all') else self.NUM_POSTS
         try:
             subs = self.reddit.subreddit(subreddit).new(limit=posts)
             for submission in subs:
                 submissions.append(submission)
+            Logger.log(Logger.aligntext(subreddit.lower(), 30) + '(' + str(index) + '/' + str(num_subs) + ')', Color.CYAN)
         except Forbidden as e:
-            Logger.log(subreddit + ' - Forbidden (403)', Color.RED)
+            Logger.log(Logger.aligntext(subreddit.lower(), 30) + 'Forbidden (403)', Color.RED)
         except NotFound as e:
-            Logger.log(subreddit + ' - NotFound (404)', Color.RED)
+            Logger.log(Logger.aligntext(subreddit.lower(), 30) + 'NotFound (404)', Color.RED)
         except Exception as e:
-            Logger.log(traceback.format_exc(), Color.RED)
+            Logger.log(Logger.aligntext(subreddit.lower(), 30) + str(e), Color.RED)
         return submissions
 
     def get_original_message_id(self, received_message, database):
