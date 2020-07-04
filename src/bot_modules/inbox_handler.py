@@ -4,7 +4,7 @@ Author:             Tyler Brockett
 Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
-Date Last Edited:   03/07/2020
+Date Last Edited:   07/04/2020
 Version:            v2.0
 ==========================================
 """
@@ -206,7 +206,7 @@ class InboxHandler:
                     error = m.data[MessageParser.KEY_ERROR]
                     payload = m.get_payload()
 
-                    Logger.log(json.dumps(m.data, 2), Color.MAGENTA)
+                    Logger.log(json.dumps(m.data, indent=2), Color.MAGENTA)
 
                     if error:
                         Logger.log(
