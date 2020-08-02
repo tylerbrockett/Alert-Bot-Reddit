@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  alert_bot:
+    image: alert_bot:latest
+    container_name: alert_bot
+    build: .
+    env_file:
+      - ./environments/prod.env
+    volumes:
+      - /docker/data/alert_bot:/data
+    restart: unless-stopped

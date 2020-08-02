@@ -2,10 +2,7 @@
 ==========================================
 Author:             Tyler Brockett
 Username:           /u/tylerbrockett
-Description:        Alert Bot (Formerly sales__bot)
-Date Created:       11/13/2015
-Date Last Edited:   07/04/2020
-Version:            v3.0
+Description:        Alert Bot
 ==========================================
 """
 
@@ -14,7 +11,7 @@ from bot_modules.sleep_handler import SleepHandler
 from bot_modules.database_handler import DatabaseHandlerException
 from utils.logger import Logger
 from utils.color import Color
-from accounts.accountinfo import accounts
+from utils.env import env, DEV_USERNAME
 from utils.subscription import Subscription
 from parsing.message_parser import MessageParser
 from parsing.message_lexer import MessageLexer
@@ -32,7 +29,7 @@ class InboxHandler:
     @staticmethod
     def handle_message_from_reddit(reddit, message):
         Logger.log('Message from reddit')
-        reddit.send_message(accounts['developer']['username'], 'FWD: ' + message.subject, message.body)
+        reddit.send_message(env(DEV_USERNAME), 'FWD: ' + message.subject, message.body)
         message.mark_read()
 
     @staticmethod
@@ -135,9 +132,11 @@ class InboxHandler:
     @staticmethod
     def handle_feedback_message(reddit, message):
         Logger.log('Feedback message')
-        reddit.send_message(accounts['developer']['username'], 'FEEDBACK',
-                            inbox.compose_feedback_forward(accounts['developer']['username'], str(message.author),
-                                                           message.body))
+        reddit.send_message(
+            env(DEV_USERNAME),
+            'FEEDBACK',
+            inbox.compose_feedback_forward(env(DEV_USERNAME), str(message.author), message.body)
+        )
         InboxHandler.reply(message, inbox.compose_feedback_message(str(message.author)))
         message.mark_read()
 
@@ -147,9 +146,11 @@ class InboxHandler:
         try:
             InboxHandler.reply(message, inbox.compose_username_mention_reply(str(message.author)))
             message.mark_read()
-            reddit.send_message(accounts['developer']['username'], 'USERNAME MENTION',
-                                inbox.compose_username_mention_forward(accounts['developer']['username'],
-                                                                       str(message.author), message.body))
+            reddit.send_message(
+                env(DEV_USERNAME),
+                'USERNAME MENTION',
+                inbox.compose_username_mention_forward(env(DEV_USERNAME), str(message.author), message.body)
+            )
         except Exception as e:  # Figure out more specific exception thrown (praw.exceptions.APIException?)
             Logger.log(str(e), Color.RED)
             Logger.log('Handled RateLimitExceeded praw error - Commenting too frequently', Color.RED)
@@ -157,9 +158,11 @@ class InboxHandler:
     @staticmethod
     def handle_post_reply_message(reddit, message):
         Logger.log('Post reply message')
-        reddit.send_message(accounts['developer']['username'], 'USERNAME MENTION',
-                            inbox.compose_username_mention_forward(accounts['developer']['username'], str(message.author),
-                                                                   message.body))
+        reddit.send_message(
+            env(DEV_USERNAME),
+            'USERNAME MENTION',
+            inbox.compose_username_mention_forward(env(DEV_USERNAME), str(message.author), message.body)
+        )
         message.mark_read()
 
     @staticmethod
@@ -169,9 +172,10 @@ class InboxHandler:
         InboxHandler.reply(message, reject_message)
         message.mark_read()
         reddit.send_message(
-            accounts['developer']['username'],
+            env(DEV_USERNAME),
             'REJECT MESSAGE - ' + str(message.author),
-            reject_message)
+            reject_message
+        )
 
     # TODO Add the ability to EDIT existing subscriptions
     @staticmethod
@@ -239,13 +243,13 @@ class InboxHandler:
                 Logger.log(traceback.format_exc(), Color.RED)
                 if ex.errorArgs == DatabaseHandlerException.INTEGRITY_ERROR:
                     message.mark_read()
-                    reddit.send_message(accounts['developer']['username'],
+                    reddit.send_message(env(DEV_USERNAME),
                                         'Integrity Error',
                                         'SUBJECT: ' + str(inbox.format_subject(message.subject)) + '\n\n' +
                                         'BODY:\n' + str(message.body))
             except:
                 Logger.log(traceback.format_exc(), Color.RED)
-                reddit.send_message(accounts['developer']['username'],
+                reddit.send_message(env(DEV_USERNAME),
                                     'ERROR HANDLING MESSAGE - POTENTIALLY STUCK IN INBOX',
                                     'Should NOT be seeing this message anymore hopefully...\t \n' +
                                     'AUTHOR: /u/' + str(message.author) + '\t \n' +

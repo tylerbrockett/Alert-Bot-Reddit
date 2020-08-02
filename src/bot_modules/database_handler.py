@@ -2,10 +2,7 @@
 ==========================================
 Author:             Tyler Brockett
 Username:           /u/tylerbrockett
-Description:        Alert Bot (Formerly sales__bot)
-Date Created:       11/13/2015
-Date Last Edited:   12/2/2016
-Version:            v3.0
+Description:        Alert Bot
 ==========================================
 """
 
@@ -19,11 +16,11 @@ from os import path
 from utils import files
 from utils.logger import Logger
 from utils.color import Color
-
+from utils.env import env, DATABASE
 
 class DatabaseHandler:
-    def __init__(self, db_location):
-        self.db_location = db_location
+    def __init__(self):
+        self.db_location = env(DATABASE)
         self.connection = self.connect()
 
     def connect(self):
@@ -202,7 +199,7 @@ class DatabaseHandler:
         matches = 0
         try:
             matches = len(self.connection.cursor().execute(database.GET_ALL_MATCHES).fetchall())
-        except:
+        except Exception as e:
             matches = -1
             print('Error counting all matches')
         return matches
@@ -210,7 +207,7 @@ class DatabaseHandler:
     def check_if_match_exists(self, username, item, permalink):
         try:
             return len(self.connection.cursor().execute(database.GET_MATCH, [username, item, permalink]).fetchall()) >= 1
-        except:
+        except Exception as e:
             print('ERROR - Couldn\'t figure out if match existed')
             return True
 

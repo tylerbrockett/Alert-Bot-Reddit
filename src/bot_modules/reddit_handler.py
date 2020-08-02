@@ -2,10 +2,7 @@
 ==========================================
 Author:             Tyler Brockett
 Username:           /u/tylerbrockett
-Description:        Alert Bot (Formerly sales__bot)
-Date Created:       11/13/2015
-Date Last Edited:   03/07/2020
-Version:            v3.0
+Description:        Alert Bot
 ==========================================
 """
 
@@ -17,24 +14,31 @@ from utils import output
 from prawcore.exceptions import Redirect
 from prawcore.exceptions import Forbidden
 from prawcore.exceptions import NotFound
-
+from utils.env import (
+    env,
+    CLIENT_ID,
+    CLIENT_SECRET,
+    BOT_USERNAME,
+    BOT_PASSWORD,
+    USER_AGENT,
+)
 
 class RedditHandler:
 
-    def __init__(self, credentials):
-        output.startup_message(credentials)
-        self.credentials = credentials
+    def __init__(self):
+        output.startup_message(env(BOT_USERNAME))
         self.reddit = self.connect()
         self.NUM_POSTS = 20
 
     def connect(self):
         try:
             reddit = praw.Reddit(
-                client_id=self.credentials['client_id'],
-                client_secret=self.credentials['client_secret'],
-                password=self.credentials['password'],
-                user_agent=self.credentials['user_agent'],
-                username=self.credentials['username'])
+                client_id       = env(CLIENT_ID),
+                client_secret   = env(CLIENT_SECRET),
+                username        = env(BOT_USERNAME),
+                password        = env(BOT_PASSWORD),
+                user_agent      = env(USER_AGENT)
+            )
             return reddit
         except:
             raise RedditHelperException('Error connecting to Reddit\n\n' + traceback.format_exc())

@@ -2,17 +2,19 @@
 ==========================================
 Author:             Tyler Brockett
 Username:           /u/tylerbrockett
-Description:        Alert Bot (Formerly sales__bot)
-Date Created:       11/13/2015
-Date Last Edited:   11/28/2016
-Version:            v3.0
+Description:        Alert Bot
 ==========================================
 """
+
+import os
 
 EMPTY = ''
 
 
 def create_file(full_path):
+    directory = os.path.dirname(full_path)
+    if not os.path.exists(directory):
+        os.makedirs(directory)
     with open(full_path, 'w+') as f:
         f.close()
 

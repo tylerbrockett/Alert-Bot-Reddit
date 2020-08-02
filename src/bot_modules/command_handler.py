@@ -2,18 +2,15 @@
 ==========================================
 Author:             Tyler Brockett
 Username:           /u/tylerbrockett
-Description:        Alert Bot (Formerly sales__bot)
-Date Created:       11/13/2015
-Date Last Edited:   03/07/2020
-Version:            v3.0
+Description:        Alert Bot
 ==========================================
 """
 
+from mark_all_read import MarkRead
 from utils import inbox
 from utils.color import Color
+from utils.env import env, DEV_USERNAME
 from utils.logger import Logger
-from accounts.accountinfo import accounts
-from mark_all_read import MarkRead
 import traceback
 
 
@@ -36,12 +33,12 @@ class CommandHandler:
         unread_messages = reddit.get_unread()
         for message in unread_messages:
             username = str(message.author).lower()
-            if username == accounts['developer']['username']:
+            if username == env(DEV_USERNAME):
                 dev_messages.append(message)
         return dev_messages
 
     @staticmethod
-    def get_commands(reddit, bot_name):
+    def get_commands(reddit):
         commands = []
         try:
             messages = CommandHandler.get_dev_messages(reddit)
@@ -70,7 +67,7 @@ class CommandHandler:
                 elif body in CommandHandler.mark_read or subject in CommandHandler.mark_read:
                     Logger.log('--------- Errors being marked as read ---------', Color.GREEN)
                     message.reply('Messages will be marked as read')
-                    mark_read = MarkRead(bot_name)
+                    mark_read = MarkRead()
                     num_read = mark_read.mark_read()
                     commands.append(CommandHandler.MARKREAD)
                     message.reply(str(num_read) + ' messaged were marked as read')

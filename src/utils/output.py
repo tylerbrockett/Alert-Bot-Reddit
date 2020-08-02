@@ -2,10 +2,7 @@
 ==========================================
 Author:             Tyler Brockett
 Username:           /u/tylerbrockett
-Description:        Alert Bot (Formerly sales__bot)
-Date Created:       11/13/2015
-Date Last Edited:   12/24/2016
-Version:            v3.0
+Description:        Alert Bot
 ==========================================
 """
 
@@ -225,9 +222,9 @@ def post_reply(username, body):
         Color.GREEN)
 
 
-def startup_message(bot):
+def startup_message(bot_username):
     Logger.log(
         '================================================================\n' +
-        '\t\tStarting /u/' + bot['username'] + '\n' +
+        '\t\tStarting /u/' + bot_username + '\n' +
         '================================================================\n',
         Color.GREEN)
