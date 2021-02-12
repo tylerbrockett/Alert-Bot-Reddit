@@ -82,7 +82,7 @@ class SubscriptionParser:
     def parse_subscription(self):
         token, ttype = self.get_token()
         # Handles cases where -title parameter isn't necessary for title text
-        if ttype is TokenType.TOKEN:
+        if ttype == TokenType.TOKEN:
             self.unget_token()
             self.parse_title_list()
             t, tt = self.get_token()
@@ -113,23 +113,23 @@ class SubscriptionParser:
 
     def parse_statement(self):
         token, ttype = self.get_token()
-        if ttype is TokenType.TITLE:
+        if ttype == TokenType.TITLE:
             self.parse_title_list()
-        elif ttype is TokenType.BODY:
+        elif ttype == TokenType.BODY:
             self.parse_body_list()
-        elif ttype is TokenType.REDDITORS:
+        elif ttype == TokenType.REDDITORS:
             self.parse_redditors_list()
-        elif ttype is TokenType.SUBREDDITS:
+        elif ttype == TokenType.SUBREDDITS:
             self.parse_subreddits_list()
-        elif ttype is TokenType.IGNORE_TITLE:
+        elif ttype == TokenType.IGNORE_TITLE:
             self.parse_ignore_title_list()
-        elif ttype is TokenType.IGNORE_BODY:
+        elif ttype == TokenType.IGNORE_BODY:
             self.parse_ignore_body_list()
-        elif ttype is TokenType.IGNORE_REDDITORS:
+        elif ttype == TokenType.IGNORE_REDDITORS:
             self.parse_ignore_redditors_list()
-        elif ttype is TokenType.EMAIL:
+        elif ttype == TokenType.EMAIL:
             self.parse_email()
-        elif ttype is TokenType.NSFW:
+        elif ttype == TokenType.NSFW:
             self.parse_nsfw()
         else:
             raise SubscriptionParserException('parse_statement', SubscriptionParserException.EXPECTED_STATEMENT)
@@ -198,17 +198,17 @@ class SubscriptionParser:
 
     def parse_id_list(self, ret):
         token, ttype = self.get_token()
-        if ttype is TokenType.TOKEN:
+        if ttype == TokenType.TOKEN:
             ret += [token]
             token, ttype = self.get_token()
-            if ttype is TokenType.COMMA:
+            if ttype == TokenType.COMMA:
                 token, ttype = self.get_token()
-                if ttype is TokenType.TOKEN:
+                if ttype == TokenType.TOKEN:
                     self.unget_token()
                     return self.parse_id_list(ret)
                 else:
                     raise SubscriptionParserException('parse_id_list', SubscriptionParserException.EXPECTED_TOKEN_AFTER)
-            elif ttype not in SubscriptionParser.statement_token_types and ttype is not TokenType.EOF:
+            elif ttype not in SubscriptionParser.statement_token_types and ttype != TokenType.EOF:
                 raise SubscriptionParserException('parse_id_list', SubscriptionParserException.EXPECTED_COM_STMT_EOF)
             else:
                 self.unget_token()
@@ -218,18 +218,18 @@ class SubscriptionParser:
 
     def parse_phrase_list(self, ret):
         token, ttype = self.get_token()
-        if ttype is TokenType.TOKEN:
+        if ttype == TokenType.TOKEN:
             self.unget_token()
             ret += [self.parse_element('')]
             token, ttype = self.get_token()
-            if ttype is TokenType.COMMA:
+            if ttype == TokenType.COMMA:
                 token, ttype = self.get_token()
-                if ttype is TokenType.TOKEN:
+                if ttype == TokenType.TOKEN:
                     self.unget_token()
                     return self.parse_phrase_list(ret)
                 else:
                     raise SubscriptionParserException('parse_phrase_list', SubscriptionParserException.EXPECTED_TOKEN_AFTER)
-            elif ttype not in SubscriptionParser.statement_token_types and ttype is not TokenType.EOF:
+            elif ttype not in SubscriptionParser.statement_token_types and ttype != TokenType.EOF:
                 raise SubscriptionParserException('parse_phrase_list', SubscriptionParserException.EXPECTED_COM_STMT_EOF)
             else:
                 self.unget_token()
@@ -239,13 +239,13 @@ class SubscriptionParser:
 
     def parse_element(self, ret):
         token, ttype = self.get_token()
-        if ttype is TokenType.TOKEN:
-            if ret is '':
+        if ttype == TokenType.TOKEN:
+            if ret == '':
                 ret += token
             else:
                 ret += ' ' + token
             token, ttype = self.get_token()
-            if ttype is TokenType.TOKEN:
+            if ttype == TokenType.TOKEN:
                 self.unget_token()
                 return self.parse_element(ret)
             else:
