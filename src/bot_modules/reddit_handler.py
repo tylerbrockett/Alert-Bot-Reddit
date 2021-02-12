@@ -5,7 +5,7 @@ Username:           /u/tylerbrockett
 Description:        Alert Bot (Formerly sales__bot)
 Date Created:       11/13/2015
 Date Last Edited:   03/07/2020
-Version:            v2.0
+Version:            v3.0
 ==========================================
 """
 
