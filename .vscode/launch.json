@@ -5,32 +5,31 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Alert-Bot",
+      "name": "Terminal - Dev",
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/src/alert_bot.py",
-      "args": [
-        "bot"
-      ],
-      "console": "integratedTerminal"
+      "envFile": "${workspaceFolder}/environments/dev.env",
+      "console": "integratedTerminal",
+      "args": []
     },
     {
-      "name": "Alert-Bot BETA",
+      "name": "Terminal - Prod",
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/src/alert_bot.py",
-      "args": [
-        "beta"
-      ],
-      "console": "integratedTerminal"
+      "envFile": "${workspaceFolder}/environments/prod.env",
+      "console": "integratedTerminal",
+      "args": []
     },
     {
-      "name": "Alert-Bot Notifications",
+      "name": "Notifications",
       "type": "python",
       "request": "launch",
       "program": "${workspaceFolder}/src/notifications.py",
-      "args": [],
-      "console": "integratedTerminal"
+      "envFile": "${workspaceFolder}/environments/prod.env",
+      "console": "integratedTerminal",
+      "args": []
     }
   ]
 }

@@ -2,20 +2,9 @@
 ==========================================
 Author:             Tyler Brockett
 Username:           /u/tylerbrockett
-Description:        Alert Bot (Formerly sales__bot)
-Date Created:       11/13/2015
-Date Last Edited:   04/02/2017
-Version:            v3.0
+Description:        Alert Bot
 ==========================================
 """
-
-from definitions import ROOT_DIR
-import os
-
-
-def get_db_location(bot):
-    return os.path.join(ROOT_DIR, 'database', bot['database'])
-
 
 # ======================================================================================================
 #           DATABASE SUBSCRIPTIONS TABLE

@@ -2,15 +2,11 @@
 ==========================================
 Author:             Tyler Brockett
 Username:           /u/tylerbrockett
-Description:        Alert Bot (Formerly sales__bot)
-Date Created:       11/13/2015
-Date Last Edited:   04/02/2017
-Version:            v3.0
+Description:        Alert Bot
 ==========================================
 """
 
-from accounts import accountinfo
-from accounts.accountinfo import accounts
+from utils.env import env, BOT_USERNAME, DEV_USERNAME, SUBREDDIT
 
 GITHUB_HOME = 'https://github.com/tylerbrockett/Alert-Bot-Reddit'
 GITHUB_README = 'https://github.com/tylerbrockett/Alert-Bot-Reddit/blob/master/README.md'
@@ -40,9 +36,9 @@ def compose_greeting(username):
 
 
 def compose_salutation():
-    result = '\n\t \n\t \n-/u/' + accounts['bot']['username'] + '\n\t \n\t \n' + \
-             accountinfo.bot_subreddit + ' | ' + \
-             '/u/' + accounts['developer']['username'] + ' | ' + \
+    result = '\n\t \n\t \n-/u/' + env(BOT_USERNAME) + '\n\t \n\t \n' + \
+             env(SUBREDDIT) + ' | ' + \
+             '/u/' + env(DEV_USERNAME) + ' | ' + \
              '[Bot Code](' + GITHUB_HOME + ')\n'
     return result
 
@@ -75,7 +71,7 @@ def compose_duplicate_subscription_message(username, existing_sub, new_sub):
     result = compose_greeting(username) + \
              'We think you already have an existing subscription matching the criteria specified. Below ' + \
              'both subscriptions are listed. If you believe there has been a mistake, please visit ' + \
-             accountinfo.bot_subreddit + ' or message /u/' + accounts['developer']['username'] + '.\n\n' + \
+             env(SUBREDDIT) + ' or message /u/' + env(DEV_USERNAME) + '.\n\n' + \
              existing_sub.to_table('Existing Subscription') + '\n\n' + \
              new_sub.to_table('New Subscription') + '\n' + \
              compose_salutation()
@@ -86,7 +82,7 @@ def compose_help_message(username, subs):
     result = compose_greeting(username) + \
              'Please visit the bot\'s [Github Readme](' + GITHUB_README + ') for ' + \
              'detailed information on how the bot works. If you still have questions, please visit ' + \
-             accountinfo.bot_subreddit + ' or message /u/' + accounts['developer']['username'] + '. Thanks!\t \n\t \n' + \
+             env(SUBREDDIT) + ' or message /u/' + env(DEV_USERNAME) + '. Thanks!\t \n\t \n' + \
              format_subscription_list(subs, 'Your Subscriptions') + \
              compose_salutation()
     return result
@@ -96,8 +92,8 @@ def compose_unsubscribe_invalid_sub_message(username, subs):
     result = compose_greeting(username) + \
         'I\'m sorry, but it looks like the subscription you\'re trying to unsubscribe from is invalid. Please ' + \
         'make sure you are replying to a message that was in regards to a valid and active subscription. If you ' + \
-        'think you are receiving this message in error, please visit ' + accountinfo.bot_subreddit + ' or message ' + \
-        '/u/' + accounts['developer']['username'] + ' to get this sorted out.\n\n' + \
+        'think you are receiving this message in error, please visit ' + env(SUBREDDIT) + ' or message ' + \
+        '/u/' + env(DEV_USERNAME) + ' to get this sorted out.\n\n' + \
         format_subscription_list(subs, 'Your Subscriptions') + \
         compose_salutation()
     return result
@@ -141,7 +137,7 @@ def compose_feedback_message(username):
     result = compose_greeting(username) + \
              'Thank you very much for your feedback! \t \n' + \
              'I am open to whatever requests the community makes. If your message is urgent, please feel free to ' + \
-             'PM me at /u/' + accounts['developer']['username'] + '. Thanks again!' + \
+             'PM me at /u/' + env(DEV_USERNAME) + '. Thanks again!' + \
              compose_salutation()
     return result
 
@@ -150,7 +146,7 @@ def compose_reject_message(username, subject, body, error):
     result = compose_greeting(username) + \
              '**There was an error processing your request.** Please review your message and ' + \
              'make sure it follows [the guidelines](' + GITHUB_README + ') that have been set. ' + \
-             'You can also visit ' + accountinfo.bot_subreddit + ' or message /u/' + accounts['developer']['username'] + \
+             'You can also visit ' + env(SUBREDDIT) + ' or message /u/' + env(DEV_USERNAME) + \
              '. Thank you for your patience! \n\t \n\t \n' + \
              '**Error:** \t \n' + \
              error + '\t \n\t \n' + \
@@ -175,8 +171,8 @@ def format_subreddit_list(subreddits, title):
 def compose_invalid_subreddit_message(username, invalid_subreddits, message):
     result = compose_greeting(username) + \
         'Unfortunately, it appears that the following subreddit(s) you tried to subscribe to were invalid. If you ' + \
-        'believe this is a mistake please visit ' + accountinfo.bot_subreddit + ' or message ' + \
-        '/u/' + accounts['developer']['username'] + '. Sorry for the inconvenience!\t \n\t \n' + \
+        'believe this is a mistake please visit ' + env(SUBREDDIT) + ' or message ' + \
+        '/u/' + env(DEV_USERNAME) + '. Sorry for the inconvenience!\t \n\t \n' + \
         '**Subject:**\t' + message.subject + '\t \n' + \
         '**Body:**\t\t' + message.body + '\t \n' + \
         format_subreddit_list(invalid_subreddits, 'Invalid Subreddits') + \

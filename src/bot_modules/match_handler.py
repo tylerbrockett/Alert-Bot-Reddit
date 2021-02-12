@@ -2,10 +2,7 @@
 ==========================================
 Author:             Tyler Brockett
 Username:           /u/tylerbrockett
-Description:        Alert Bot (Formerly sales__bot)
-Date Created:       11/13/2015
-Date Last Edited:   03/07/2020
-Version:            v3.0
+Description:        Alert Bot
 ==========================================
 """
 
@@ -19,7 +16,7 @@ from bot_modules.crash_handler import handle_crash
 class MatchHandler:
 
     @staticmethod
-    def send_messages(reddit, database, matches, bot):
+    def send_messages(reddit, database, matches):
         Logger.log('Handling matches...', Color.GREEN)
         index = 0
         for subscription, submission in matches:
@@ -36,7 +33,7 @@ class MatchHandler:
                 if (hasattr(e, 'error_type') and e.error_type == 'INVALID_USER'):
                     Logger.log('Invalid User - ' + subscription.username, Color.RED)
                 else:
-                    handle_crash(traceback.format_exc(), bot, message_dev=False, reddit=reddit, database=database)
+                    handle_crash(traceback.format_exc(), message_dev=False, reddit=reddit, database=database)
 
 class MatchHandlerException(Exception):
 

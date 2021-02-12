@@ -2,10 +2,7 @@
 ==========================================
 Author:             Tyler Brockett
 Username:           /u/tylerbrockett
-Description:        Alert Bot (Formerly sales__bot)
-Date Created:       11/13/2015
-Date Last Edited:   04/02/2017
-Version:            v3.0
+Description:        Alert Bot
 ==========================================
 """
 
@@ -13,8 +10,7 @@ import time
 import traceback
 from utils.color import Color
 from utils.logger import Logger
-from accounts.accountinfo import accounts
-from accounts import accountinfo
+from utils.env import env, BOT_USERNAME, DEV_USERNAME, SUBREDDIT
 from bot_modules.database_handler import DatabaseHandler
 from bot_modules.reddit_handler import RedditHandler
 
@@ -26,8 +22,8 @@ class Notifications:
         self.needs_alert = []
         self.errors = []
         self.invalid_users = []
-        self.db = DatabaseHandler(accounts['bot'])
-        self.reddit = RedditHandler(accounts['developer'])
+        self.db = DatabaseHandler(env(BOT_USERNAME))
+        self.reddit = RedditHandler(env(DEV_USERNAME))
 
     def reset(self):
         reset = False
@@ -97,9 +93,9 @@ class Notifications:
         '\t \n\t \n' + \
         \
         '\n\t \n\t \n' \
-        '-/u/' + accounts['developer']['username'] + \
+        '-/u/' + env(DEV_USERNAME) + \
         '\n\t \n\t \n' + \
-        accountinfo.bot_subreddit + ' | [Bot Code](https://github.com/tylerbrockett/Alert-Bot-Reddit)\n'
+        env(SUBREDDIT) + ' | [Bot Code](https://github.com/tylerbrockett/Alert-Bot-Reddit)\n'
 
 
 notifications = Notifications()
