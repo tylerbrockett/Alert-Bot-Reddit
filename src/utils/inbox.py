@@ -253,6 +253,14 @@ def compose_username_mention_forward(developer_username, username, body):
              'USERNAME: ' + username + '\t \nBODY:\n' + body
     return result
 
+def compose_username_mention_contains_subscription_reply(username):
+    result = 'Hi /u/' + username + ',\t \n ' + \
+             'It looks like you are trying to create a subscription. ' + \
+             '**The bot only works if you send your subscription as a direct message.**\t \n' + \
+             'Shoutout to /r/VinylReleases for prompting me to add this ¯\\\\\\_(ツ)\\_/¯. ' + \
+             'For more information, please visit [the Github README](' + GITHUB_README + ').' + \
+             compose_salutation()
+    return result
 
 def compose_username_mention_reply(username):
     result = 'Hi /u/' + username + ', thanks for the mention!\t \n ' + \

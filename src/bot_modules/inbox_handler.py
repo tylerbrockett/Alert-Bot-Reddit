@@ -15,6 +15,7 @@ from utils.env import env, DEV_USERNAME
 from utils.subscription import Subscription
 from parsing.message_parser import MessageParser
 from parsing.message_lexer import MessageLexer
+from parsing.subscription_parser import SubscriptionParser
 import json
 import traceback
 
@@ -144,13 +145,13 @@ class InboxHandler:
     def handle_username_mention_message(reddit, message):
         Logger.log('Username mention message')
         try:
-            InboxHandler.reply(message, inbox.compose_username_mention_reply(str(message.author)))
+            # check if user is trying to subscribe by tagging bot in comment
+            if any(token in message.body.lower() for token in SubscriptionParser.statement_tokens):
+                InboxHandler.reply(message, inbox.compose_username_mention_contains_subscription_reply(str(message.author)))
+            else:
+                InboxHandler.reply(message, inbox.compose_username_mention_reply(str(message.author)))
             message.mark_read()
-            reddit.send_message(
-                env(DEV_USERNAME),
-                'USERNAME MENTION',
-                inbox.compose_username_mention_forward(env(DEV_USERNAME), str(message.author), message.body)
-            )
+
         except Exception as e:  # Figure out more specific exception thrown (praw.exceptions.APIException?)
             Logger.log(str(e), Color.RED)
             Logger.log('Handled RateLimitExceeded praw error - Commenting too frequently', Color.RED)
