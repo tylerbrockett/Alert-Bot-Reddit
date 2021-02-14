@@ -162,7 +162,7 @@ def format_subreddit_list(subreddits, title):
     i = 0
     result = '###' + title + '\n' + \
              '\#|Subreddit' + '\n' + \
-             ':--|:--' + '\n'
+             ':--|--:' + '\n'
     for subreddit in subreddits:
         i += 1
         result += str(i) + '|' + str(subreddit) + '\n'
@@ -214,27 +214,27 @@ def format_subreddits(subreddits, max_displayed):
         result += 'No Results'
         return result
     result += \
-        '\#|Subreddit|# of Subscriptions\n' + \
-        ':--|:--:|:--\n'
+        '|\#|Subreddit|# of Subscriptions|\n' + \
+        '|:--|:--|--:|\n'
     i = 0
     for sub in subreddits[:max_displayed]:
         i += 1
         result += \
-            str(i) + '|' + '/r/' + sub[0] + '|' + str(sub[1]) + '\n'
+            '|' + str(i) + '|' + '/r/' + sub[0] + '|' + f'{sub[1]:,}' + '|\n'
     return result
 
 
 def compose_statistics(username, current_users, all_users, unique_subs, all_subs, unique_subreddits, all_matches, subreddits):
     result = compose_greeting(username) + \
         '###Statistics\n' + \
-        'Statistic|Value\n' + \
-        ':--|:--:' + '\n' + \
-        'Current Users Subscribed|' + str(current_users) + '\n' + \
-        'Total Users|' + str(all_users) + '\n' + \
-        'Unique Subscriptions|' + str(unique_subs) + '\n' + \
-        'Active Subscriptions|' + str(all_subs) + '\n' + \
-        'Unique Subreddits|' + str(unique_subreddits) + '\n' + \
-        'Total Matches to Date|' + str(all_matches) + '\n\n\n' + \
+        '|Statistic|Value|\n' + \
+        '|:--|--:|' + '\n' + \
+        '|Current Users Subscribed|' + f'{current_users:,}|\n' + \
+        '|Total Users|' + f'{all_users:,}|\n' + \
+        '|Unique Subscriptions|' + f'{unique_subs:,}|\n' + \
+        '|Active Subscriptions|' + f'{all_subs:,}|\n' + \
+        '|Unique Subreddits|' + f'{unique_subreddits:,}|\n' + \
+        '|Total Matches to Date|' + f'{all_matches:,}|\n\n\n' + \
         format_subreddits(subreddits, MAX_SUBREDDITS_DISPLAYED) + '\n\n\n' + \
         'Thank ***YOU*** for being a part of that!\n' + \
         compose_salutation()
