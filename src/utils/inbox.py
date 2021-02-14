@@ -8,6 +8,7 @@ Description:        Alert Bot
 
 from utils.env import env, BOT_USERNAME, DEV_USERNAME, SUBREDDIT
 
+MAX_SUBREDDITS_DISPLAYED = 50
 GITHUB_HOME = 'https://github.com/tylerbrockett/Alert-Bot-Reddit'
 GITHUB_README = 'https://github.com/tylerbrockett/Alert-Bot-Reddit/blob/master/README.md'
 
@@ -207,8 +208,8 @@ def compose_too_generic_message(username):
     return result
 
 
-def format_subreddits(subreddits):
-    result = '###Subreddits\n'
+def format_subreddits(subreddits, max_displayed):
+    result = '###Top ' + str(max_displayed) + ' Subreddits\n'
     if len(subreddits) == 0:
         result += 'No Results'
         return result
@@ -216,7 +217,7 @@ def format_subreddits(subreddits):
         '\#|Subreddit|# of Subscriptions\n' + \
         ':--|:--:|:--\n'
     i = 0
-    for sub in subreddits:
+    for sub in subreddits[:max_displayed]:
         i += 1
         result += \
             str(i) + '|' + '/r/' + sub[0] + '|' + str(sub[1]) + '\n'
@@ -234,7 +235,7 @@ def compose_statistics(username, current_users, all_users, unique_subs, all_subs
         'Active Subscriptions|' + str(all_subs) + '\n' + \
         'Unique Subreddits|' + str(unique_subreddits) + '\n' + \
         'Total Matches to Date|' + str(all_matches) + '\n\n\n' + \
-        format_subreddits(subreddits) + '\n\n\n' + \
+        format_subreddits(subreddits, MAX_SUBREDDITS_DISPLAYED) + '\n\n\n' + \
         'Thank ***YOU*** for being a part of that!\n' + \
         compose_salutation()
     return result
