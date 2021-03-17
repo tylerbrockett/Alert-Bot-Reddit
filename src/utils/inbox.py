@@ -109,6 +109,20 @@ def compose_unsubscribe_message(username, removed_subs, subs):
              compose_salutation()
     return result
 
+def compose_unsubscribe_message_failure(username, subs):
+    result = compose_greeting(username) + \
+             'Due to limitations on Reddit\'s inbox size, unsubscribing directly from a message is being ' + \
+             'phased out. You are seeing this message because tracing your reply back to the original ' + \
+             'message failed.\n\n' + \
+             '**From now on, users will need to either unsubscribe by subscription # (shown in the table below), ' + \
+             'e.g. "unsubscribe 3" (don\'t use quotes). Alternatively, you can send "unsubscribe all" (don\'t use quotes) to unsubscribe from all ' + \
+             'subscriptions in one go.**\n\n' + \
+             'I really apologize for the inconvenience, but I think it\'s the only way to handle the situation for now, ' + \
+             'since the bot\'s inbox has grown to over a million alert messages sent.\n\n' + \
+             '[See this post for more information](https://www.reddit.com/r/alert_bot/comments/m6uovx/alert_bot_is_actually_coming_back_up_now_but_with/)\n\n' + \
+             format_subscription_list(subs, 'Your Subscriptions') + \
+             compose_salutation()
+    return result
 
 def compose_unsubscribe_all_message(username):
     result = compose_greeting(username) + \

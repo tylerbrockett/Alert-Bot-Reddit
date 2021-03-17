@@ -16,6 +16,7 @@ from utils.subscription import Subscription
 from parsing.message_parser import MessageParser
 from parsing.message_lexer import MessageLexer
 from parsing.subscription_parser import SubscriptionParser
+from .reddit_handler import RedditHelperException
 import json
 import traceback
 
@@ -89,13 +90,21 @@ class InboxHandler:
     @staticmethod
     def handle_unsubscribe_message(reddit, database, message):
         Logger.log('Unsub message')
-        parent_m_id = reddit.get_original_message_id(message, database)
-        removed_subs = database.remove_subscriptions_by_message_id(str(message.author), parent_m_id)
-        subs = database.get_subscriptions_by_user(str(message.author))
-        if len(removed_subs) > 0:
-            InboxHandler.reply(message, inbox.compose_unsubscribe_message(str(message.author), removed_subs, subs))
-        else:
-            InboxHandler.reply(message, inbox.compose_unsubscribe_invalid_sub_message(str(message.author), subs))
+        # TODO: Remove this section when it is no longer working enough of the time
+        try:
+            subs = database.get_subscriptions_by_user(str(message.author))
+            parent_m_id = reddit.get_original_message_id(message, database)
+            removed_subs = database.remove_subscriptions_by_message_id(str(message.author), parent_m_id)
+            if len(removed_subs) > 0:
+                InboxHandler.reply(message, inbox.compose_unsubscribe_message(str(message.author), removed_subs, subs))
+            else:
+                InboxHandler.reply(message, inbox.compose_unsubscribe_invalid_sub_message(str(message.author), subs))
+        except RedditHelperException as e:
+            if (e.errorArgs == RedditHelperException.COULDNT_FIND_PARENT_MESSAGE):
+                Logger.log('Couldn\'t determine parent message, replying as such: ' + message.id, col=Color.RED)
+                InboxHandler.reply(message, inbox.compose_unsubscribe_message_failure(str(message.author), subs))
+            else:
+                raise e
         message.mark_read()
 
     @staticmethod

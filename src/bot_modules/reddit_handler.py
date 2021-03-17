@@ -97,6 +97,8 @@ class RedditHandler:
         message = received_message
         while message.parent_id and len(database.get_subscriptions_by_message_id(str(message.author), message.id)) == 0:
             message = self.reddit.inbox.message(message.parent_id[3:])
+            if not message:
+                raise RedditHelperException(RedditHelperException.COULDNT_FIND_PARENT_MESSAGE)
         return message.id
 
     def check_invalid_subreddits(self, subreddits):
@@ -112,6 +114,7 @@ class RedditHandler:
 
 
 class RedditHelperException(Exception):
+    COULDNT_FIND_PARENT_MESSAGE = 'Couldn\'t find parent message'
     SEND_MESSAGE_EXCEPTION = 'Error sending message'
     RESET_EXCEPTION = 'Error resetting connection to Reddit'
     GET_SUBMISSIONS_EXCEPTION = 'Error getting submissions'
