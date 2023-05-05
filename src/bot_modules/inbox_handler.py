@@ -181,11 +181,11 @@ class InboxHandler:
         reject_message = inbox.compose_reject_message(str(message.author), message.subject, message.body, error)
         InboxHandler.reply(message, reject_message)
         message.mark_read()
-        reddit.send_message(
-            env(DEV_USERNAME),
-            'REJECT MESSAGE - ' + str(message.author),
-            reject_message
-        )
+        # reddit.send_message(
+        #     env(DEV_USERNAME),
+        #     'REJECT MESSAGE - ' + str(message.author),
+        #     reject_message
+        # )
 
     # TODO Add the ability to EDIT existing subscriptions
     @staticmethod
@@ -259,12 +259,12 @@ class InboxHandler:
                                         'BODY:\n' + str(message.body))
             except:
                 Logger.log(traceback.format_exc(), Color.RED)
-                reddit.send_message(env(DEV_USERNAME),
-                                    'ERROR HANDLING MESSAGE - POTENTIALLY STUCK IN INBOX',
-                                    'Should NOT be seeing this message anymore hopefully...\t \n' +
-                                    'AUTHOR: /u/' + str(message.author) + '\t \n' +
-                                    'SUBJECT: ' + str(message.subject) + '\t \n' +
-                                    'BODY:\n' + str(message.body))
+                # reddit.send_message(env(DEV_USERNAME),
+                #                     'ERROR HANDLING MESSAGE - POTENTIALLY STUCK IN INBOX',
+                #                     'Should NOT be seeing this message anymore hopefully...\t \n' +
+                #                     'AUTHOR: /u/' + str(message.author) + '\t \n' +
+                #                     'SUBJECT: ' + str(message.subject) + '\t \n' +
+                #                     'BODY:\n' + str(message.body))
             SleepHandler.sleep(2)
         Logger.log(str(num_messages) + ' unread messages handled', Color.CYAN)
 
