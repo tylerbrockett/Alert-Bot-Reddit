@@ -8,6 +8,7 @@ Description:        Alert Bot
 
 from utils.env import env, BOT_USERNAME, DEV_USERNAME, SUBREDDIT
 
+MAX_SUBREDDITS_DISPLAYED = 50
 GITHUB_HOME = 'https://github.com/tylerbrockett/Alert-Bot-Reddit'
 GITHUB_README = 'https://github.com/tylerbrockett/Alert-Bot-Reddit/blob/master/README.md'
 
@@ -108,6 +109,20 @@ def compose_unsubscribe_message(username, removed_subs, subs):
              compose_salutation()
     return result
 
+def compose_unsubscribe_message_failure(username, subs):
+    result = compose_greeting(username) + \
+             'Due to limitations on Reddit\'s inbox size, unsubscribing directly from a message is being ' + \
+             'phased out. You are seeing this message because tracing your reply back to the original ' + \
+             'message failed.\n\n' + \
+             '**From now on, users will need to either unsubscribe by subscription # (shown in the table below), ' + \
+             'e.g. "unsubscribe 3" (don\'t use quotes). Alternatively, you can send "unsubscribe all" (don\'t use quotes) to unsubscribe from all ' + \
+             'subscriptions in one go.**\n\n' + \
+             'I really apologize for the inconvenience, but I think it\'s the only way to handle the situation for now, ' + \
+             'since the bot\'s inbox has grown to over a million alert messages sent.\n\n' + \
+             '[See this post for more information](https://www.reddit.com/r/alert_bot/comments/m6uovx/alert_bot_is_actually_coming_back_up_now_but_with/)\n\n' + \
+             format_subscription_list(subs, 'Your Subscriptions') + \
+             compose_salutation()
+    return result
 
 def compose_unsubscribe_all_message(username):
     result = compose_greeting(username) + \
@@ -161,7 +176,7 @@ def format_subreddit_list(subreddits, title):
     i = 0
     result = '###' + title + '\n' + \
              '\#|Subreddit' + '\n' + \
-             ':--|:--' + '\n'
+             ':--|--:' + '\n'
     for subreddit in subreddits:
         i += 1
         result += str(i) + '|' + str(subreddit) + '\n'
@@ -207,34 +222,34 @@ def compose_too_generic_message(username):
     return result
 
 
-def format_subreddits(subreddits):
-    result = '###Subreddits\n'
+def format_subreddits(subreddits, max_displayed):
+    result = '###Top ' + str(max_displayed) + ' Subreddits\n'
     if len(subreddits) == 0:
         result += 'No Results'
         return result
     result += \
-        '\#|Subreddit|# of Subscriptions\n' + \
-        ':--|:--:|:--\n'
+        '|\#|Subreddit|# of Subscriptions|\n' + \
+        '|:--|:--|--:|\n'
     i = 0
-    for sub in subreddits:
+    for sub in subreddits[:max_displayed]:
         i += 1
         result += \
-            str(i) + '|' + '/r/' + sub[0] + '|' + str(sub[1]) + '\n'
+            '|' + str(i) + '|' + '/r/' + sub[0] + '|' + f'{sub[1]:,}' + '|\n'
     return result
 
 
 def compose_statistics(username, current_users, all_users, unique_subs, all_subs, unique_subreddits, all_matches, subreddits):
     result = compose_greeting(username) + \
         '###Statistics\n' + \
-        'Statistic|Value\n' + \
-        ':--|:--:' + '\n' + \
-        'Current Users Subscribed|' + str(current_users) + '\n' + \
-        'Total Users|' + str(all_users) + '\n' + \
-        'Unique Subscriptions|' + str(unique_subs) + '\n' + \
-        'Active Subscriptions|' + str(all_subs) + '\n' + \
-        'Unique Subreddits|' + str(unique_subreddits) + '\n' + \
-        'Total Matches to Date|' + str(all_matches) + '\n\n\n' + \
-        format_subreddits(subreddits) + '\n\n\n' + \
+        '|Statistic|Value|\n' + \
+        '|:--|--:|' + '\n' + \
+        '|Current Users Subscribed|' + f'{current_users:,}|\n' + \
+        '|Total Users|' + f'{all_users:,}|\n' + \
+        '|Unique Subscriptions|' + f'{unique_subs:,}|\n' + \
+        '|Active Subscriptions|' + f'{all_subs:,}|\n' + \
+        '|Unique Subreddits|' + f'{unique_subreddits:,}|\n' + \
+        '|Total Matches to Date|' + f'{all_matches:,}|\n\n\n' + \
+        format_subreddits(subreddits, MAX_SUBREDDITS_DISPLAYED) + '\n\n\n' + \
         'Thank ***YOU*** for being a part of that!\n' + \
         compose_salutation()
     return result
@@ -253,6 +268,14 @@ def compose_username_mention_forward(developer_username, username, body):
              'USERNAME: ' + username + '\t \nBODY:\n' + body
     return result
 
+def compose_username_mention_contains_subscription_reply(username):
+    result = 'Hi /u/' + username + ',\t \n ' + \
+             'It looks like you are trying to create a subscription. ' + \
+             '**The bot only works if you send your subscription as a direct message.**\t \n' + \
+             'Shoutout to /r/VinylReleases for prompting me to add this ¯\\\\\\_(ツ)\\_/¯. ' + \
+             'For more information, please visit [the Github README](' + GITHUB_README + ').' + \
+             compose_salutation()
+    return result
 
 def compose_username_mention_reply(username):
     result = 'Hi /u/' + username + ', thanks for the mention!\t \n ' + \
