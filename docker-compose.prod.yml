@@ -1,5 +1,9 @@
 version: '3'
 
+networks:
+  alert_bot_network:
+    external: true
+
 services:
   alert_bot:
     image: alert_bot:latest
@@ -9,4 +13,6 @@ services:
       - ./environments/prod.env
     volumes:
       - /docker/data/alert_bot:/data
+    networks:
+      - alert_bot_network
     restart: unless-stopped
